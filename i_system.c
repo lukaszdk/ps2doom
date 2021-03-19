@@ -33,7 +33,9 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #include "doomdef.h"
 #include "m_misc.h"
 #include "i_video.h"
-#include "i_sound.h"
+
+//#include "i_sound.h"		// cosmito
+#include "l_sound_sdl.h"
 
 #include "d_net.h"
 #include "g_game.h"
@@ -108,7 +110,8 @@ int  I_GetTime (void)
 //
 void I_Init (void)
 {
-    if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 )
+    //if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 )
+    if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 )
         I_Error("Could not initialize SDL: %s", SDL_GetError());
 
     I_InitSound();

@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id:$
@@ -53,7 +53,7 @@ static int joy_x=0, joy_y=0;
 #define JOYVAL	5000
 
 //
-//  Translates the key 
+//  Translates the key
 //
 
 int xlatekey(SDL_keysym *key)
@@ -82,7 +82,7 @@ int xlatekey(SDL_keysym *key)
       case SDLK_F10:	rc = KEY_F10;		break;
       case SDLK_F11:	rc = KEY_F11;		break;
       case SDLK_F12:	rc = KEY_F12;		break;
-	
+
       case SDLK_BACKSPACE:
       case SDLK_DELETE:	rc = KEY_BACKSPACE;	break;
 
@@ -97,19 +97,19 @@ int xlatekey(SDL_keysym *key)
       case SDLK_RSHIFT:
 	rc = KEY_RSHIFT;
 	break;
-	
+
       case SDLK_LCTRL:
       case SDLK_RCTRL:
 	rc = KEY_RCTRL;
 	break;
-	
+
       case SDLK_LALT:
       case SDLK_LMETA:
       case SDLK_RALT:
       case SDLK_RMETA:
 	rc = KEY_RALT;
 	break;
-	
+
       default:
         rc = key->sym;
 	break;
@@ -143,7 +143,7 @@ void I_GetEvent(SDL_Event *Event)
 {
     Uint8 buttonstate;
     event_t event;
-
+DOMULTITASK;
 	//printf("Event->type: %i\n", Event->type);
 
     switch (Event->type)
@@ -152,7 +152,7 @@ void I_GetEvent(SDL_Event *Event)
 
 		case SDL_JOYBUTTONDOWN:
 		{
-			// printf("button: %i\n", Event->jbutton.button);
+            //printf("button: %i\n", Event->jbutton.button);
 
 			switch(Event->jbutton.button)
 			{
@@ -163,7 +163,7 @@ void I_GetEvent(SDL_Event *Event)
 				case 1:
 					event.data1 = KEY_ENTER;
 				break;
-	
+
 				case 2:
 					event.data1 = SDLK_SPACE;
 				break;
@@ -188,7 +188,6 @@ void I_GetEvent(SDL_Event *Event)
 					event.data1 = SDLK_SPACE;
 				break;
 
-
 			}
 			event.type = ev_keydown;
 
@@ -207,7 +206,7 @@ void I_GetEvent(SDL_Event *Event)
 				case 1:
 					event.data1 = KEY_ENTER;
 				break;
-		
+
 				case 2:
 					event.data1 = KEY_RCTRL;
 				break;
@@ -243,8 +242,8 @@ void I_GetEvent(SDL_Event *Event)
 
 		case SDL_JOYAXISMOTION:
 		{
-			// printf(" event.jaxis.axis : %i value: %i\n", Event->jaxis.axis, Event->jaxis.value);
-	
+            //printf(" event.jaxis.axis : %i value: %i\n", Event->jaxis.axis, Event->jaxis.value);
+
 
 			if( Event->jaxis.axis == 0)
 			{
@@ -266,12 +265,12 @@ void I_GetEvent(SDL_Event *Event)
 				else
 					if( ( Event->jaxis.value < -JOYVAL) )
 						joy_y = -1;
-			}	
+			}
 
 			event.data2 = joy_x;
 			event.data3 = joy_y;
 			event.type = ev_joystick;
-				
+
 			D_PostEvent(&event);
 
 		} break;
@@ -455,7 +454,7 @@ void I_FinishUpdate (void)
 
 	ilineptr = (unsigned int *) (screens[0]);
 	for (i=0 ; i<3 ; i++) {
-	    olineptrs[i] = 
+	    olineptrs[i] =
 		(unsigned int *)&((Uint8 *)screen->pixels)[i*screen->pitch];
         }
 
@@ -557,7 +556,7 @@ void I_InitGraphics(void)
 
 	#ifdef _EE
 		video_flags |= SDL_FULLSCREEN;
-	#endif 
+	#endif
 
     if (M_CheckParm("-2"))
 	multiply = 2;

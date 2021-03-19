@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ps2sdldoom" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="ps2_gcc_compiler" />
+		<MakeCommands>
+			<Build command="$make -f $makefile" />
+			<CompileFile command="$make -f $makefile $file" />
+			<Clean command="$make -f $makefile clean" />
+			<DistClean command="$make -f $makefile distclean" />
+		</MakeCommands>
+		<Build>
+			<Target title="default">
+				<Option output="bin\Release\ps2dev" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="1" />
+				<Option compiler="ps2_gcc_compiler" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<MakeCommands>
+					<Build command="$make -f $makefile" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile distclean" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Makefile" />
+		<Unit filename="am_map.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="am_map.h" />
+		<Unit filename="d_englsh.h" />
+		<Unit filename="d_event.h" />
+		<Unit filename="d_french.h" />
+		<Unit filename="d_items.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="d_items.h" />
+		<Unit filename="d_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="d_main.h" />
+		<Unit filename="d_net.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="d_net.h" />
+		<Unit filename="d_player.h" />
+		<Unit filename="d_textur.h" />
+		<Unit filename="d_think.h" />
+		<Unit filename="d_ticcmd.h" />
+		<Unit filename="doomdata.h" />
+		<Unit filename="doomdef.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="doomdef.h" />
+		<Unit filename="doomstat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="doomstat.h" />
+		<Unit filename="doomtype.h" />
+		<Unit filename="dstrings.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dstrings.h" />
+		<Unit filename="f_finale.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="f_finale.h" />
+		<Unit filename="f_wipe.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="f_wipe.h" />
+		<Unit filename="g_game.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="g_game.h" />
+		<Unit filename="hu_lib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="hu_lib.h" />
+		<Unit filename="hu_stuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="hu_stuff.h" />
+		<Unit filename="i_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="i_net.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="i_net.h" />
+		<Unit filename="i_sound.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="i_sound.h" />
+		<Unit filename="i_system.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="i_system.h" />
+		<Unit filename="i_video.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="i_video.h" />
+		<Unit filename="info.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="info.h" />
+		<Unit filename="m_argv.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="m_argv.h" />
+		<Unit filename="m_bbox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="m_bbox.h" />
+		<Unit filename="m_cheat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="m_cheat.h" />
+		<Unit filename="m_fixed.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="m_fixed.h" />
+		<Unit filename="m_menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="m_menu.h" />
+		<Unit filename="m_misc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="m_misc.h" />
+		<Unit filename="m_random.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="m_random.h" />
+		<Unit filename="m_swap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="m_swap.h" />
+		<Unit filename="p_ceilng.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_doors.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_enemy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_floor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_inter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_inter.h" />
+		<Unit filename="p_lights.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_local.h" />
+		<Unit filename="p_map.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_maputl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_mobj.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_mobj.h" />
+		<Unit filename="p_plats.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_pspr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_pspr.h" />
+		<Unit filename="p_saveg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_saveg.h" />
+		<Unit filename="p_setup.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_setup.h" />
+		<Unit filename="p_sight.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_spec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_spec.h" />
+		<Unit filename="p_switch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_telept.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_tick.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="p_tick.h" />
+		<Unit filename="p_user.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ps2doom.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ps2doom.h" />
+		<Unit filename="r_bsp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="r_bsp.h" />
+		<Unit filename="r_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="r_data.h" />
+		<Unit filename="r_defs.h" />
+		<Unit filename="r_draw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="r_draw.h" />
+		<Unit filename="r_local.h" />
+		<Unit filename="r_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="r_main.h" />
+		<Unit filename="r_plane.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="r_plane.h" />
+		<Unit filename="r_segs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="r_segs.h" />
+		<Unit filename="r_sky.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="r_sky.h" />
+		<Unit filename="r_state.h" />
+		<Unit filename="r_things.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="r_things.h" />
+		<Unit filename="s_sound.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="s_sound.h" />
+		<Unit filename="sounds.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sounds.h" />
+		<Unit filename="st_lib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="st_lib.h" />
+		<Unit filename="st_stuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="st_stuff.h" />
+		<Unit filename="tables.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tables.h" />
+		<Unit filename="v_video.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="v_video.h" />
+		<Unit filename="w_mmap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="w_wad.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="w_wad.h" />
+		<Unit filename="wi_stuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="wi_stuff.h" />
+		<Unit filename="z_zone.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="z_zone.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

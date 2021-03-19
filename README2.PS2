@@ -1,0 +1,5 @@
+Audio doesn't work in current Lukasz port.
+
+This is the main reason for me to take his port and replace the audio functions by the used at the prboom+ port. I hope also to add other features and fix whatever else that may be broken.
+
+cosmito

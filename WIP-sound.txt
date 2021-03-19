@@ -1,0 +1,60 @@
+sound support functions :
+-------------------------
+
+Checked/changed functions:
+
+(copied from lsdldoom)
+s_sound.c
+s_sound.h
+sounds.c
+sounds.h
+l_sound_sdl.c
+l_sound_sdl.h   (from lsdldoom i_sound.h)
+
+Non-sound related Changed functions, from lsdldoom (may introduce errors/crash)
+  w_wad.c :
+  W_CacheLumpNum
+
+
+to test :
+use Z_Malloc instead of Z_Calloc
+     s_sound.c : S_Init()
+    (channel_t *) Z_Malloc(numChannels*sizeof(channel_t), PU_STATIC, 0);
+    
+    
+    
+SDLMixer use :
+---------------------------------------------
+
+Mix_Pause
+  I_StartSound  - l_sound_sdl.c
+  I_InitSound   - l_sound_sdl.c
+
+Mix_Resume
+  I_StartSound  - l_sound_sdl.c
+
+Mix_PlayChannel * (done - PlaySampleAtChannel)
+  I_StartSound  - l_sound_sdl.c
+
+Mix_Playing * (done - IsPlayingAtChannel)
+  I_StartSound      - l_sound_sdl.c
+  I_SoundIsPlaying  - l_sound_sdl.c  
+  
+Mix_HaltChannel * (done - StopSampleAtChannel)
+  I_StartSound  - l_sound_sdl.c
+  I_StopSound   - l_sound_sdl.c  
+  
+Mix_VolumeChunk * later (volume;		Per-sample volume, 0-128 )    TBD done integrated at Mix_PlayChannel...
+  I_StartSound  - l_sound_sdl.c
+  
+Mix_SetPanning  * later 
+  I_StartSound  - l_sound_sdl.c
+
+Mix_OpenAudio
+  I_InitSound   - l_sound_sdl.c
+
+Mix_QuickLoad_RAW *
+  I_InitSound   - l_sound_sdl.c
+
+Mix_AllocateChannels
+  I_SetChannels - l_sound_sdl.c

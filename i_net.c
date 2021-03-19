@@ -282,7 +282,8 @@ int GetLocalAddress (void)
     if (!hostentry)
 	I_Error ("GetLocalAddress : gethostbyname: couldn't get local host");
 		
-    return *(int *)hostentry->h_addr_list[0];
+    //return *(int *)hostentry->h_addr_list[0];
+    return 0;
 }
 
 
@@ -367,8 +368,8 @@ void I_InitNetwork (void)
 
 	    if (!hostentry)
 		I_Error ("gethostbyname: couldn't find %s", myargv[i]);
-	    sendaddress[doomcom->numnodes].sin_addr.s_addr 
-		= *(int *)hostentry->h_addr_list[0];
+	    //sendaddress[doomcom->numnodes].sin_addr.s_addr 
+		//= *(int *)hostentry->h_addr_list[0];
 	}
 	doomcom->numnodes++;
     }

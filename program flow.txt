@@ -1,0 +1,13 @@
+ps2doom :
+=========
+
+
+sound init :
+
+i_main.c : main() >
+    
+       d_main.c : D_DoomMain() >
+      
+           i_system.c : I_Init() >
+          
+               l_sound_sdl.c : I_InitSound()

@@ -35,12 +35,13 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #include <stdlib.h>
 
 //extern int access(char *file, int mode);
+extern int mixer_period;
+extern int SAMPLERATE;
 
 #define R_OK	4
 static int access(char *file, int mode)
 {
 	FILE *test_fp;
-
 	test_fp = fopen(file, "r");
 	if ( test_fp != NULL ) {
 		fclose(test_fp);
@@ -69,7 +70,10 @@ static int access(char *file, int mode)
 #include "m_menu.h"
 
 #include "i_system.h"
-#include "i_sound.h"
+
+//#include "i_sound.h"		// cosmito
+#include "l_sound_sdl.h"
+
 #include "i_video.h"
 
 #include "g_game.h"
@@ -108,7 +112,6 @@ boolean         fastparm;	// checkparm of -fast
 boolean         drone;
 
 boolean		singletics = false; // debug flag to cancel adaptiveness
-
 
 
 //extern int soundVolume;
@@ -383,13 +386,19 @@ void D_DoomLoop (void)
 	if (singletics)
 	{
 	    I_StartTic ();
+DOMULTITASK;
 	    D_ProcessEvents ();
-	    G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
-	    if (advancedemo)
+DOMULTITASK;
+        G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
+DOMULTITASK;
+        if (advancedemo)
 		D_DoAdvanceDemo ();
-	    M_Ticker ();
-	    G_Ticker ();
-	    gametic++;
+DOMULTITASK;
+        M_Ticker ();
+DOMULTITASK;
+        G_Ticker ();
+DOMULTITASK;
+        gametic++;
 	    maketic++;
 	}
 	else
@@ -398,9 +407,14 @@ void D_DoomLoop (void)
 	}
 
 	S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
-
+DOMULTITASK;
 	// Update display, next frame, with current state.
 	D_Display ();
+    
+    ///
+	RotateThreadReadyQueue(42);
+    ///
+
     }
 }
 
@@ -575,39 +589,40 @@ void IdentifyVersion (void)
     doomwaddir = getenv("DOOMWADDIR");
 
 	#ifdef _EE
-		doomwaddir = "";
+		//doomwaddir = "";
+        doomwaddir = "mass:";
 	#else
     if (!doomwaddir)
 		doomwaddir = "./";
 	#endif
 
     // Commercial.
-    doom2wad = malloc(strlen(doomwaddir)+1+9+1);
+    doom2wad = malloc(strlen(doomwaddir)+1+9+1+5);
     sprintf(doom2wad, "%sdoom2.wad", doomwaddir);
 
     // Retail.
-    doomuwad = malloc(strlen(doomwaddir)+1+8+1);
+    doomuwad = malloc(strlen(doomwaddir)+1+8+1+5);
     sprintf(doomuwad, "%sdoomu.wad", doomwaddir);
     
     // Registered.
-    doomwad = malloc(strlen(doomwaddir)+1+8+1);
+    doomwad = malloc(strlen(doomwaddir)+1+8+1+5);
     sprintf(doomwad, "%sdoom.wad", doomwaddir);
     
     // Shareware.
-    doom1wad = malloc(strlen(doomwaddir)+1+9+1);
+    doom1wad = malloc(strlen(doomwaddir)+1+9+1+5);
     sprintf(doom1wad, "%sdoom1.wad", doomwaddir);
 
      // Bug, dear Shawn.
     // Insufficient malloc, caused spurious realloc errors.
-    plutoniawad = malloc(strlen(doomwaddir)+1+/*9*/12+1);
+    plutoniawad = malloc(strlen(doomwaddir)+1+/*9*/12+1+5);
     sprintf(plutoniawad, "%splutonia.wad", doomwaddir);
 
-    tntwad = malloc(strlen(doomwaddir)+1+9+1);
+    tntwad = malloc(strlen(doomwaddir)+1+9+1+5);
     sprintf(tntwad, "%stnt.wad", doomwaddir);
 
 
     // French stuff.
-    doom2fwad = malloc(strlen(doomwaddir)+1+10+1);
+    doom2fwad = malloc(strlen(doomwaddir)+1+10+1+5);
     sprintf(doom2fwad, "%sdoom2f.wad", doomwaddir);
 
     home = getenv("HOME");
@@ -670,7 +685,15 @@ void IdentifyVersion (void)
     if ( !access (doom2wad,R_OK) )
     {
 	gamemode = commercial;
-	D_AddFile (doom2wad);
+	    
+    /// TBD
+    // halves sample playing frequency to avoid lack of memory for the upsampled sounds
+    mixer_period = 2;
+    SAMPLERATE = SAMPLERATE	/ 2;
+    printf("doom2 detected : halving sample playing frequency to %dHz **************** \n", SAMPLERATE);
+    ///
+
+    D_AddFile (doom2wad);
 	return;
     }
 
@@ -799,6 +822,8 @@ void D_DoomMain (void)
     int             p;
     char                    file[256];
 
+    init_scr();
+
     FindResponseFile ();
 	
     IdentifyVersion ();
@@ -870,10 +895,10 @@ void D_DoomMain (void)
 	break;
     }
     
-    printf ("%s\n",title);
+    scr_printf ("%s\n",title);
 
     if (devparm)
-	printf(D_DEVSTR);
+	scr_printf(D_DEVSTR);
     
     // turbo option
     if ( (p=M_CheckParm ("-turbo")) )
@@ -888,7 +913,7 @@ void D_DoomMain (void)
 	    scale = 10;
 	if (scale > 400)
 	    scale = 400;
-	printf ("turbo scale: %i%%\n",scale);
+	scr_printf ("turbo scale: %i%%\n",scale);
 	forwardmove[0] = forwardmove[0]*scale/100;
 	forwardmove[1] = forwardmove[1]*scale/100;
 	sidemove[0] = sidemove[0]*scale/100;
@@ -948,7 +973,7 @@ void D_DoomMain (void)
     {
 	sprintf (file,"%s.lmp", myargv[p+1]);
 	D_AddFile (file);
-	printf("Playing demo %s.lmp.\n",myargv[p+1]);
+	scr_printf("Playing demo %s.lmp.\n",myargv[p+1]);
     }
     
     // get skill / episode / map from parms
@@ -1002,7 +1027,7 @@ void D_DoomMain (void)
     }
     
     // init subsystems
-    printf ("V_Init: allocate screens.\n");
+    scr_printf ("V_Init: allocate screens.\n");
     V_Init ();
 
 	#ifdef _EE
@@ -1010,16 +1035,15 @@ void D_DoomMain (void)
 	#endif
 
 
-    printf ("M_LoadDefaults: Load system defaults.\n");
+    scr_printf ("M_LoadDefaults: Load system defaults.\n");
     M_LoadDefaults ();              // load before initing other systems
 
-    printf ("Z_Init: Init zone memory allocation daemon. \n");
+    scr_printf ("Z_Init: Init zone memory allocation daemon. \n");
     Z_Init ();
 
-    printf ("W_Init: Init WADfiles.\n");
+    scr_printf ("W_Init: Init WADfiles.\n");
     W_InitMultipleFiles (wadfiles);
-printf("added\n");
-    
+   
 
     // Check for -file in shareware
     if (modifiedgame)
@@ -1049,7 +1073,7 @@ printf("added\n");
     // Iff additonal PWAD files are used, print modified banner
     if (modifiedgame)
     {
-	/*m*/printf (
+	/*m*/scr_printf (
 	    "===========================================================================\n"
 	    "ATTENTION:  This version of DOOM has been modified.  If you would like to\n"
 	    "get a copy of the original game, call 1-800-IDGAMES or see the readme file.\n"
@@ -1066,7 +1090,7 @@ printf("added\n");
     {
       case shareware:
       case indetermined:
-	printf (
+	scr_printf (
 	    "===========================================================================\n"
 	    "                                Shareware!\n"
 	    "===========================================================================\n"
@@ -1075,7 +1099,7 @@ printf("added\n");
       case registered:
       case retail:
       case commercial:
-	printf (
+	scr_printf (
 	    "===========================================================================\n"
 	    "                 Commercial product - do not distribute!\n"
 	    "         Please report software piracy to the SPA: 1-800-388-PIR8\n"
@@ -1088,28 +1112,28 @@ printf("added\n");
 	break;
     }
 
-    printf ("M_Init: Init miscellaneous info.\n");
+    scr_printf ("M_Init: Init miscellaneous info.\n");
     M_Init ();
 
-    printf ("R_Init: Init DOOM refresh daemon - ");
+    scr_printf ("R_Init: Init DOOM refresh daemon - ");
     R_Init ();
 
-    printf ("\nP_Init: Init Playloop state.\n");
+    scr_printf ("\nP_Init: Init Playloop state.\n");
     P_Init ();
 
-    printf ("I_Init: Setting up machine state.\n");
+    scr_printf ("I_Init: Setting up machine state.\n");
     I_Init ();
 
-    printf ("D_CheckNetGame: Checking network game status.\n");
+    scr_printf ("D_CheckNetGame: Checking network game status.\n");
     D_CheckNetGame ();
 
-    printf ("S_Init: Setting up sound.\n");
+    scr_printf ("S_Init: Setting up sound.\n");
     S_Init (snd_SfxVolume /* *8 */, snd_MusicVolume /* *8*/ );
 
-    printf ("HU_Init: Setting up heads up display.\n");
+    scr_printf ("HU_Init: Setting up heads up display.\n");
     HU_Init ();
 
-    printf ("ST_Init: Init status bar.\n");
+    scr_printf ("ST_Init: Init status bar.\n");
     ST_Init ();
 
     // check for a driver that wants intermission stats
@@ -1120,7 +1144,7 @@ printf("added\n");
 	extern  void*	statcopy;                            
 
 	statcopy = (void*)atoi(myargv[p+1]);
-	printf ("External statistics registered.\n");
+	scr_printf ("External statistics registered.\n");
     }
     
     // start the apropriate game based on parms

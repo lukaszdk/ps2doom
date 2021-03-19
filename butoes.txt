@@ -1,0 +1,18 @@
+botão     event.jbutton (int) :
+
+x       - 1
+trangle - 3
+o       - 2
+square  - 0
+
+analog left click - 10
+analog right click - 11
+
+l1 - 6
+l2 - 8
+
+r1 - 7
+r2 - 9
+
+select - 4
+start - 5

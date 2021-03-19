@@ -219,7 +219,7 @@ typedef struct
 default_t	defaults[] =
 {
     {"mouse_sensitivity",&mouseSensitivity, 5},
-    {"sfx_volume",&snd_SfxVolume, 8},
+    {"sfx_volume",&snd_SfxVolume, 15},
     {"music_volume",&snd_MusicVolume, 8},
     {"show_messages",&showMessages, 1},
     
@@ -254,7 +254,7 @@ default_t	defaults[] =
 
 
 
-    {"usegamma",&usegamma, 0},
+    {"usegamma",&usegamma, 1},
 
 #ifndef __BEOS__
     {"chatmacro0", (int *) &chat_macros[0], (int) HUSTR_CHATMACRO0 },

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="default" />
+	<File name="Makefile" open="0" top="0" tabpos="9">
+		<Cursor position="1090" topLine="6" />
+	</File>
+	<File name="am_map.c" open="1" top="0" tabpos="1">
+		<Cursor position="11657" topLine="494" />
+	</File>
+	<File name="d_englsh.h" open="0" top="0" tabpos="4">
+		<Cursor position="9507" topLine="259" />
+	</File>
+	<File name="d_event.h" open="0" top="0" tabpos="3">
+		<Cursor position="1020" topLine="33" />
+	</File>
+	<File name="d_main.c" open="0" top="0" tabpos="13">
+		<Cursor position="16596" topLine="784" />
+	</File>
+	<File name="d_main.h" open="0" top="0" tabpos="0">
+		<Cursor position="1231" topLine="32" />
+	</File>
+	<File name="doomdef.c" open="0" top="0" tabpos="0">
+		<Cursor position="586" topLine="8" />
+	</File>
+	<File name="doomdef.h" open="0" top="0" tabpos="9">
+		<Cursor position="2092" topLine="73" />
+	</File>
+	<File name="doomstat.c" open="0" top="0" tabpos="12">
+		<Cursor position="1478" topLine="25" />
+	</File>
+	<File name="doomstat.h" open="0" top="0" tabpos="4">
+		<Cursor position="3851" topLine="106" />
+	</File>
+	<File name="f_finale.c" open="0" top="0" tabpos="5">
+		<Cursor position="11709" topLine="583" />
+	</File>
+	<File name="g_game.c" open="1" top="0" tabpos="2">
+		<Cursor position="32283" topLine="1527" />
+	</File>
+	<File name="hu_stuff.c" open="0" top="0" tabpos="7">
+		<Cursor position="5272" topLine="296" />
+	</File>
+	<File name="i_main.c" open="0" top="0" tabpos="12">
+		<Cursor position="1761" topLine="49" />
+	</File>
+	<File name="i_sound.c" open="1" top="1" tabpos="5">
+		<Cursor position="24535" topLine="900" />
+	</File>
+	<File name="i_sound.h" open="0" top="0" tabpos="11">
+		<Cursor position="1242" topLine="31" />
+	</File>
+	<File name="i_system.c" open="0" top="0" tabpos="11">
+		<Cursor position="2780" topLine="148" />
+	</File>
+	<File name="i_video.c" open="0" top="0" tabpos="1">
+		<Cursor position="12264" topLine="571" />
+	</File>
+	<File name="i_video.h" open="0" top="0" tabpos="14">
+		<Cursor position="950" topLine="0" />
+	</File>
+	<File name="m_fixed.c" open="0" top="0" tabpos="9">
+		<Cursor position="1050" topLine="28" />
+	</File>
+	<File name="m_menu.c" open="0" top="0" tabpos="0">
+		<Cursor position="12119" topLine="671" />
+	</File>
+	<File name="m_misc.c" open="0" top="0" tabpos="16">
+		<Cursor position="4625" topLine="238" />
+	</File>
+	<File name="p_inter.c" open="0" top="0" tabpos="10">
+		<Cursor position="13954" topLine="717" />
+	</File>
+	<File name="p_setup.c" open="0" top="0" tabpos="0">
+		<Cursor position="0" topLine="21" />
+	</File>
+	<File name="r_defs.h" open="0" top="0" tabpos="0">
+		<Cursor position="8259" topLine="420" />
+	</File>
+	<File name="r_main.c" open="0" top="0" tabpos="8">
+		<Cursor position="5247" topLine="390" />
+	</File>
+	<File name="r_plane.c" open="0" top="0" tabpos="0">
+		<Cursor position="8216" topLine="425" />
+	</File>
+	<File name="s_sound.c" open="1" top="0" tabpos="3">
+		<Cursor position="12434" topLine="549" />
+	</File>
+	<File name="s_sound.h" open="0" top="0" tabpos="2">
+		<Cursor position="2125" topLine="76" />
+	</File>
+	<File name="sounds.c" open="0" top="0" tabpos="3">
+		<Cursor position="6905" topLine="226" />
+	</File>
+	<File name="sounds.h" open="0" top="0" tabpos="5">
+		<Cursor position="1109" topLine="22" />
+	</File>
+	<File name="v_video.c" open="0" top="0" tabpos="12">
+		<Cursor position="7892" topLine="205" />
+	</File>
+	<File name="v_video.h" open="0" top="0" tabpos="11">
+		<Cursor position="1283" topLine="41" />
+	</File>
+	<File name="w_mmap.c" open="1" top="0" tabpos="4">
+		<Cursor position="419" topLine="7" />
+	</File>
+	<File name="w_wad.c" open="0" top="0" tabpos="6">
+		<Cursor position="8249" topLine="424" />
+	</File>
+	<File name="w_wad.h" open="0" top="0" tabpos="0">
+		<Cursor position="1198" topLine="49" />
+	</File>
+	<File name="z_zone.c" open="0" top="0" tabpos="7">
+		<Cursor position="4671" topLine="218" />
+	</File>
+	<File name="z_zone.h" open="0" top="0" tabpos="8">
+		<Cursor position="1380" topLine="29" />
+	</File>
+</CodeBlocks_layout_file>
