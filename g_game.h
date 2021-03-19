@@ -26,8 +26,6 @@
 #include "doomdef.h"
 #include "d_event.h"
 
-
-
 //
 // GAME
 //

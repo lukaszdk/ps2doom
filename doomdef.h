@@ -282,7 +282,18 @@ typedef enum
 
 #define KEY_LALT	KEY_RALT
 
-
+//#define PS2_SQUARE 0
+//#define PS2_CROSS 1
+//#define PS2_CIRCLE 2
+//#define PS2_TRIANGLE 3
+//#define PS2_SELECT 4
+//#define PS2_START 5
+//#define PS2_L1 6
+//#define PS2_R1 7
+//#define PS2_L2 8
+//#define PS2_R2 9
+//#define PS2_L3 10
+//#define PS2_R3 11
 
 // DOOM basic types (boolean),
 //  and max/min values.

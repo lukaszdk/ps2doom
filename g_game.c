@@ -66,7 +66,7 @@ rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #include "r_data.h"
 #include "r_sky.h"
 
-
+#include "p_pspr.h"     // cosmito
 
 #include "g_game.h"
 
@@ -156,6 +156,9 @@ int             key_fire;
 int		key_use;
 int		key_strafe;
 int		key_speed;
+
+int     key_weaponnext;           // cosmito : added
+int     key_weaponprevious;       // cosmito : added
 
 int             mousebfire;
 int             mousebstrafe;
@@ -346,6 +349,31 @@ void G_BuildTiccmd (ticcmd_t* cmd)
 	    cmd->buttons |= i<<BT_WEAPONSHIFT;
 	    break;
 	}
+
+    /// cosmito : next/prev weapon section
+    int newweapon = wp_nochange;
+    if (gamekeydown[key_weaponnext])                                 
+    {
+        newweapon = P_NextWeapon(&players[consoleplayer]);
+    }
+    
+    if (gamekeydown[key_weaponprevious])                                 
+    {
+        newweapon = P_PreviousWeapon(&players[consoleplayer]);
+    } 
+
+	if (newweapon != wp_nochange)
+	{
+		cmd->buttons |= BT_CHANGE;
+		cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
+	}
+
+    if (newweapon != wp_nochange)
+	{
+		cmd->buttons |= BT_CHANGE;
+		cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
+	}
+    ///
 
     // mouse
     if (mousebuttons[mousebforward])

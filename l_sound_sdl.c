@@ -214,7 +214,9 @@ int qq;
 
 	// upsample to fit ps2 specs
 	SDL_BuildAudioCVT(&cvt, AUDIO_U8, 1, 5513, AUDIO_S16, 1, SAMPLERATE);
-    printf("%d\n", SAMPLERATE);
+    
+    //printf("%d\n", SAMPLERATE);
+
 ////debug
 //printf("paddedsize = %d ,  cvt.len_mult = %d\n", paddedsize, cvt.len_mult);
 //while(1) {};

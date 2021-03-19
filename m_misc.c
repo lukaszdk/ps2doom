@@ -178,6 +178,9 @@ extern int	key_use;
 extern int	key_strafe;
 extern int	key_speed;
 
+extern int  key_weaponnext;           // cosmito : added
+extern int  key_weaponprevious;       // cosmito : added
+
 extern int	mousebfire;
 extern int	mousebstrafe;
 extern int	mousebforward;
@@ -236,6 +239,10 @@ default_t	defaults[] =
     {"key_strafe",&key_strafe, KEY_RALT},
     {"key_speed",&key_speed, KEY_RSHIFT},
 
+    // cosmito : added
+    {"key_weaponnext",&key_weaponnext, 'p'},     // key to select next weapon with ammo
+    {"key_weaponprevious",&key_weaponprevious, 'o'},     // key to select previous weapon with ammo
+
     {"use_mouse",&usemouse, 1},
     {"mouseb_fire",&mousebfire,0},
     {"mouseb_strafe",&mousebstrafe,1},
@@ -280,6 +287,8 @@ char*	defaultfile;
 //
 void M_SaveDefaults (void)
 {
+    return;         /// cosmito : currently disabled
+
     int		i;
     int		v;
     FILE*	f;

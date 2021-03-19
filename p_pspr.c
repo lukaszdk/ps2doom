@@ -153,6 +153,161 @@ void P_BringUpWeapon (player_t* player)
     P_SetPsprite (player, ps_weapon, newstate);
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+// cosmito : selects next weapon with ammo
+int P_NextWeapon(player_t *player)
+{
+    int demo_compatibility = 1;
+
+    int currentweapon = player->readyweapon;
+    int newweapon = currentweapon + 1;
+    if (newweapon == NUMWEAPONS)
+        newweapon = wp_fist;
+    
+    //printf("currentweapon : %d\n", currentweapon);
+    //printf("newweapon     : %d\n", newweapon);
+    
+    switch(newweapon)
+    {
+        // ?
+        //case 1:
+        //  if (!player->powers[pw_strength])      // allow chainsaw override
+        //    break;
+        
+    case wp_pistol:
+        if (player->ammo[am_clip])
+            break;
+        else
+            newweapon++;
+
+    case wp_shotgun:
+        if (player->weaponowned[wp_shotgun] && player->ammo[am_shell])
+            break;
+        else
+            newweapon++;
+        
+    case wp_chaingun:
+        if (player->weaponowned[wp_chaingun] && player->ammo[am_clip])
+            break;
+        else
+            newweapon++;
+        
+    case wp_missile:
+        if (player->weaponowned[wp_missile] && player->ammo[am_misl])
+            break;
+        else
+            newweapon++;
+        
+    case wp_plasma:
+        if (player->weaponowned[wp_plasma] && player->ammo[am_cell] &&
+            gamemode != shareware)
+            break;
+        else
+            newweapon++;
+        
+    case wp_bfg:
+        if (player->weaponowned[wp_bfg] && gamemode != shareware &&
+            player->ammo[am_cell] >= (demo_compatibility ? 41 : 40))
+            break;
+        else
+            newweapon++;
+        
+    case wp_chainsaw:
+        if (player->weaponowned[wp_chainsaw])
+            break;
+        else
+            newweapon++;
+        
+    case wp_supershotgun:
+        if (player->weaponowned[wp_supershotgun] && gamemode == commercial &&
+            player->ammo[am_shell] >= (demo_compatibility ? 3 : 2))
+            break;
+        else
+        {
+            newweapon++;
+            if ( newweapon == NUMWEAPONS)
+                newweapon = wp_fist;
+        }
+    }
+
+    return newweapon;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+// cosmito : selects previous weapon with ammo
+int P_PreviousWeapon(player_t *player)
+{
+    int demo_compatibility = 1;
+
+    int currentweapon = player->readyweapon;
+    int newweapon = currentweapon - 1;
+    if (newweapon < wp_fist)
+        newweapon = NUMWEAPONS - 1;
+    
+    switch(newweapon)
+    {
+        
+    case wp_supershotgun:
+        if (player->weaponowned[wp_supershotgun] && gamemode == commercial &&
+            player->ammo[am_shell] >= (demo_compatibility ? 3 : 2))
+            break;
+        else
+            newweapon--;
+        
+    case wp_chainsaw:
+        if (player->weaponowned[wp_chainsaw])
+            break;
+        else
+            newweapon--;
+        
+    case wp_bfg:
+        if (player->weaponowned[wp_bfg] && gamemode != shareware &&
+            player->ammo[am_cell] >= (demo_compatibility ? 41 : 40))
+            break;
+        else
+            newweapon--;
+        
+    case wp_plasma:
+        if (player->weaponowned[wp_plasma] && player->ammo[am_cell] &&
+            gamemode != shareware)
+            break;
+        else
+            newweapon--;
+        
+    case wp_missile:
+        if (player->weaponowned[wp_missile] && player->ammo[am_misl])
+            break;
+        else
+            newweapon--;
+        
+    case wp_chaingun:
+        if (player->weaponowned[wp_chaingun] && player->ammo[am_clip])
+            break;
+        else
+            newweapon--;
+        
+    case wp_shotgun:
+        if (player->weaponowned[wp_shotgun] && player->ammo[am_shell])
+            break;
+        else
+            newweapon--;
+        
+    case wp_pistol:
+        if (player->ammo[am_clip])
+            break;
+        else
+            newweapon--;
+        
+        // ?
+        //case 1:
+        //  if (!player->powers[pw_strength])      // allow chainsaw override
+        //    break;   
+    }
+    
+    return newweapon;
+}
+
 //
 // P_CheckAmmo
 // Returns true if there is enough ammo to shoot.

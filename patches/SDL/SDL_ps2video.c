@@ -113,10 +113,12 @@ static void initialize_devices(SDL_VideoDevice *device)
 	   		SDL_SetError("Unable to open keyboard");
 	    	}
 
+        /*
 		if (PS2_InitMouse(device) < 0) 
 		{
     			SDL_SetError("Unable to open mouse");
 		}
+        */
     	}       
 	else
 	{

@@ -156,37 +156,51 @@ DOMULTITASK;
 
 			switch(Event->jbutton.button)
 			{
-				case 0:
-					event.data1 = KEY_RCTRL;
+				case 0:                             // 'Square' PS2 button
+					event.data1 = SDLK_o;
 				break;
 
-				case 1:
-					event.data1 = KEY_ENTER;
+				case 1:                             // 'Cross' PS2 button
+					event.data1 = KEY_RSHIFT;
 				break;
 
-				case 2:
-					event.data1 = SDLK_SPACE;
+				case 2:                             // 'Circle' PS2 button
+					event.data1 = SDLK_p;
 				break;
 
-				case 3:
+				case 3:                             // '^' PS2 button
 					event.data1 = KEY_ESCAPE;
 				break;
 
-				case 6:
-					event.data1 = SDLK_x;
+                //case 4:                             // 'Select' PS2 button
+                //    break;
+                case 5:                             // 'Start' PS2 button
+					event.data1 = KEY_ENTER;
+                    break;
+
+                case 6:                             // 'L1' PS2 button
+					event.data1 = SDLK_n;
 				break;
 
-				case 7:
+				case 7:                             // 'R1' PS2 button
 					event.data1 = KEY_RCTRL;
 				break;
 
-				case 8:
+				case 8:                             // 'L2' PS2 button
 					event.data1 = SDLK_y;
 				break;
 
-				case 9:
+				case 9:                             // 'R2' PS2 button
 					event.data1 = SDLK_SPACE;
 				break;
+
+                case 10:                             // 'Analog Left click' PS2 button
+                    event.data1 = KEY_TAB;
+                break;
+
+                case 11:                             // 'Analog Right click' PS2 button
+                    event.data1 = KEY_F11;
+                break;
 
 			}
 			event.type = ev_keydown;
@@ -200,23 +214,27 @@ DOMULTITASK;
 			switch(Event->jbutton.button)
 			{
 				case 0:
-					event.data1 = KEY_RCTRL;
+					event.data1 = SDLK_o;
 				break;
 
 				case 1:
-					event.data1 = KEY_ENTER;
+					event.data1 = KEY_RSHIFT;
 				break;
 
 				case 2:
-					event.data1 = KEY_RCTRL;
+					event.data1 = SDLK_p;
 				break;
 
 				case 3:
 					event.data1 = KEY_ESCAPE;
 				break;
 
+                case 5:                             // 'Start' PS2 button
+                    event.data1 = KEY_ENTER;
+                break;
+
 				case 6:
-					event.data1 = SDLK_x;
+					event.data1 = SDLK_n;
 				break;
 
 				case 7:
@@ -230,7 +248,14 @@ DOMULTITASK;
 				case 9:
 					event.data1 = SDLK_SPACE;
 				break;
+                
+                case 10:                             // 'Analog Left click' PS2 button
+                    event.data1 = KEY_TAB;
+                break;
 
+                case 11:                             // 'Analog Right click' PS2 button
+                    event.data1 = KEY_F11;
+                break;
 			}
 
 			event.type = ev_keyup;

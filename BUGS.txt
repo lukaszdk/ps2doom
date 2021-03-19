@@ -1,0 +1,3 @@
+crashes at startup menu if game not started:
+W_GetNumForName: HELP2 not found!Error: W_CacheLumpNum: -1 >= numlumps
+I_ShutdownSound:

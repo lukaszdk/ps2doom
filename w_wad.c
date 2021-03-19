@@ -308,7 +308,13 @@ void W_InitMultipleFiles (char** filenames)
 	W_AddFile (*filenames);
 
     if (!numlumps)
-	I_Error ("W_InitFiles: no files found");
+	//I_Error ("W_InitFiles: no files found");
+    {
+        scr_clear();
+        scr_printf ("\n\nERROR at W_InitFiles: no files found\n\n");
+        scr_printf ("Put a .WAD file into the root of a USB pen or USB hard disk before running Doom.\n\n");
+        SleepThread();
+    }
     
     // set up caching
     size = numlumps * sizeof(*lumpcache);
