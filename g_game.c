@@ -1304,11 +1304,12 @@ void G_DoSaveGame (void)
     int		i;
 
     if (M_CheckParm("-cdrom"))
-	sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",savegameslot);
+        sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",savegameslot);
     else
-	sprintf (name,SAVEGAMENAME"%d.dsg",savegameslot);
+        //sprintf (name,SAVEGAMENAME"%d.dsg",savegameslot);
+        sprintf (name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",savegameslot);
     description = savedescription;
-
+printf("savename : %s\n", name);        ///
     save_p = savebuffer = screens[1]+0x4000;
 
     memcpy (save_p, description, SAVESTRINGSIZE);

@@ -43,6 +43,8 @@ SDL_Surface *screen;
 // Fake mouse handling.
 boolean		grabMouse;
 
+extern SDL_Joystick *joystick;      // cosmito : shared between i_video.c and i_system.c for joystick staffing
+
 // Blocky mode,
 // replace each 320x200 pixel with multiply*multiply pixels.
 // According to Dave Taylor, it still is a bonehead thing
@@ -354,6 +356,106 @@ DOMULTITASK;
 
 }
 
+// cosmito : from lsdldoom, PS2 port
+void I_PollJoystick(void)
+{
+  //  boolean strafeonrightjoy = true;        // TBD
+
+  //  event_t ev;
+  //  Sint16 xaxisl, yaxisl, xaxisr;
+  //  Uint8 hat;
+
+  //  //if (!usejoystick || (!joystick)) return;
+  //  ev.type = ev_joystick;
+
+  //  ev.data1 = 0;
+  //  // rm -- treat buttons like key inputs (easier than recoding main)
+  //  //ev.data1 =
+  //  //	(SDL_JoystickGetButton(joystick, 0)<<0) |
+  //  //	(SDL_JoystickGetButton(joystick, 1)<<1) |
+  //  //	(SDL_JoystickGetButton(joystick, 2)<<2) |
+  //  //	(SDL_JoystickGetButton(joystick, 3)<<3);
+
+  //  hat = SDL_JoystickGetHat(joystick, 0);
+  //  //printf("hat %d\n", hat);
+  //  if ( hat == SDL_HAT_CENTERED )
+  //  {
+  //      if (strafeonrightjoy == false)
+  //          xaxisl = SDL_JoystickGetAxis(joystick, 0) / 3000;
+  //      else		
+  //          xaxisl = SDL_JoystickGetAxis(joystick, 2) / 3000;
+
+  //      if (abs(xaxisl) < 3)
+  //          ev.data1 = 0;
+  //      else if ( xaxisl > 0 )
+		//	ev.data1 = 1;
+		//else
+		//	ev.data1 = -1;
+
+  //      yaxisl = SDL_JoystickGetAxis(joystick, 1) / 3000;
+  //      if (abs(yaxisl) < 2) 
+  //          ev.data3 = 0;
+  //      else if ( yaxisl > 0 )
+  //          ev.data3 = 1;
+  //      else
+  //          ev.data3 = -1;
+  //      if (strafeonrightjoy == false)
+  //          xaxisr = SDL_JoystickGetAxis(joystick, 2) / 3000;
+  //      else		
+  //          xaxisr = SDL_JoystickGetAxis(joystick, 0) / 3000;
+  //      //if (xaxisr != 0)
+  //      //    printf("%d\n", xaxisr);
+  //      if (abs(xaxisr) < 2)
+  //          ev.data2 = 0;
+  //      else if ( xaxisr > 0 )
+  //          ev.data2 = 1;
+  //      else
+  //          ev.data2 = -1;
+  //  }
+  //  else
+  //  {
+  //      if ( hat & SDL_HAT_UP )
+  //          ev.data3 = -1;
+  //      if ( hat & SDL_HAT_RIGHT )
+  //          ev.data2 = 1;
+  //      if ( hat & SDL_HAT_DOWN )
+  //          ev.data3 = 1;
+  //      if ( hat & SDL_HAT_LEFT )
+  //          ev.data2 = -1;
+  //  }
+  //  D_PostEvent(&ev);
+                                                                // nao funciona
+    boolean strafeonrightjoy = true;        // TBD
+
+    event_t ev;
+    Sint16 xaxisl, yaxisl, xaxisr;
+    Uint8 hat;
+
+    ev.type = ev_keydown;
+
+    ev.data1 = 0;
+
+    hat = SDL_JoystickGetHat(joystick, 0);
+    if ( hat == SDL_HAT_CENTERED )
+    {
+        if (strafeonrightjoy == false)
+            xaxisl = SDL_JoystickGetAxis(joystick, 0) / 3000;
+        else		
+            xaxisl = SDL_JoystickGetAxis(joystick, 2) / 3000;
+
+        if (abs(xaxisl) < 3)
+            ev.data1 = 0;
+        else if ( xaxisl > 0 )
+			ev.data1 = SDLK_o;
+		else
+            ev.data1 = SDLK_p;
+
+    D_PostEvent(&ev);
+
+    }
+}
+
+
 //
 // I_StartTic
 //
@@ -365,8 +467,9 @@ void I_StartTic (void)
 
     while ( SDL_PollEvent(&Event) )
 	I_GetEvent(&Event);
-}
 
+    //I_PollJoystick();     // cosmito : from lsdldoom, PS2 port
+}
 
 //
 // I_UpdateNoBlit

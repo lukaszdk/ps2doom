@@ -106,6 +106,8 @@ int  StopSampleAtChannel(int chan)
         channels[chan].sampleLenght = 0;
 		channels[chan].volume = 0;
         channels[chan].stereo = 0;
+
+	return chan;
 }
 
 ///

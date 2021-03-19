@@ -50,6 +50,7 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 int	mb_used = 6;
 
+SDL_Joystick *joystick;
 
 int I_strncasecmp(char *str1, char *str2, int len)
 {
@@ -117,7 +118,7 @@ void I_Init (void)
     I_InitSound();
     //  I_InitGraphics();
 
-	SDL_Joystick *joystick;
+	//SDL_Joystick *joystick;
 
 	joystick = SDL_JoystickOpen(0);
 

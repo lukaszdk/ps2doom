@@ -58,3 +58,11 @@ Mix_QuickLoad_RAW *
 
 Mix_AllocateChannels
   I_SetChannels - l_sound_sdl.c
+
+
+TBD:
+---
+Strafe using right analog stick
+fixing NTSC sound
+Support for OGG/MOD playing during gameplay
+Support for ADPCM streaming during gameplay

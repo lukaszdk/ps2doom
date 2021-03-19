@@ -114,14 +114,18 @@ M_WriteFile
     FILE       *handle;
     int		count;
 	
-    handle = fopen ( name, "wb");
+    //handle = fopen ( name, "wb");
+    handle = fioOpen ( name, O_WRONLY | O_CREAT | O_TRUNC);
 
-    if (handle == NULL)
+    if (handle == NULL || handle == -1)
 	return false;
 
-    count = fwrite (source, 1, length, handle);
-    fclose (handle);
-	
+    //count = fwrite (source, 1, length, handle);
+    count = fioWrite (handle, source, length);
+
+    //fclose (handle);
+	fioClose (handle);
+
     if (count < length)
 	return false;
 		
@@ -141,18 +145,26 @@ M_ReadFile
     int count, length;
     byte	*buf;
 	
-    handle = fopen (name, "rb");
+    //handle = fopen (name, "rb");
+    handle = fioOpen(name, O_RDONLY);     /// cosmito : for mc IO use fio*
     if (handle == NULL)
-	I_Error ("Couldn't read file %s", name);
-    fseek(handle, 0, SEEK_END);
-    length = ftell(handle);
-    rewind(handle);
+        I_Error ("Couldn't read file %s", name);
+    
+    //fseek(handle, 0, SEEK_END);
+    //length = ftell(handle);
+    //rewind(handle);
+    length = fioLseek(handle, 0, SEEK_END);
+    fioLseek(handle, 0, SEEK_SET);
+
     buf = Z_Malloc (length, PU_STATIC, NULL);
-    count = fread (buf, 1, length, handle);
-    fclose (handle);
-	
+    //count = fread (buf, 1, length, handle);
+    count = fioRead (handle, buf, length);
+    
+    //fclose (handle);
+    fioClose(handle);
+
     if (count < length)
-	I_Error ("Couldn't read file %s", name);
+        I_Error ("Couldn't read file %s", name);
 		
     *buffer = buf;
     return length;

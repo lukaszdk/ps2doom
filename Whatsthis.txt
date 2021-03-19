@@ -1,4 +1,4 @@
-Is is version 1.0.2.1 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
+Is is version 1.0.2.2 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
 
 Run PS2Doom.elf using uLaunchELF and make sure you have a doom1.wad, doom.wad, or doom2.wad copied at the root of a USB pen attached to tou PS2 (put only one .wad at the USB pen since currently no selector is made).
 
@@ -32,6 +32,8 @@ For compiling, get free ps2sdk and gsKit revision 1470 or less. Apply "patch" fo
 # Enable USB keyboard and mouse (100 KB)
 HAVE_INPUT_DEVICES=1
 
+Optionaly build 'ps2sdk\ee\debug\' with the supplied font.c at 'font for debug lib\' folder.
+
 
 Say tuned for next releases at
 http://ps2homebrewing.wordpress.com
@@ -42,6 +44,10 @@ cosmito
 
 History:
 ========
+
+20/04/2009 - v1.0.2.2
+  - Enabled game save/load to memory card (mc0:). Use R1 e R2 buttons to write funny savenames
+  - Nicer 'debug' font (thanks NoEffex and Allen http://forums.ps2dev.org/viewtopic.php?t=11663)
 
 12/03/2009 - v1.0.2.1
   - No more hicups on sound during screen melt/wipe effect

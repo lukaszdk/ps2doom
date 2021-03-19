@@ -824,7 +824,7 @@ void D_DoomMain (void)
     int             p;
     char                    file[256];
 
-    init_scr();
+    //init_scr();
 
     FindResponseFile ();
 	
@@ -1179,7 +1179,7 @@ void D_DoomMain (void)
 	if (M_CheckParm("-cdrom"))
 	    sprintf(file, "c:\\doomdata\\"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
 	else
-	    sprintf(file, SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+        sprintf(file, "mc0:PS2DOOM/"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
 	G_LoadGame (file);
     }
 	

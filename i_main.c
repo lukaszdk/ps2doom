@@ -54,8 +54,8 @@ static char s_pUDNL   [] __attribute__(   (  section( ".data" ), aligned( 1 )  )
 #include <sifrpc.h>
 #include "mixer.h"
 #include "mixer_thread.h"
-
 #include <kernel.h>     //for GetThreadId 
+#include <libmc.h>
 
 extern int SAMPLECOUNT;
 
@@ -72,6 +72,10 @@ int main( int argc, char**	argv )
     main_thread_id = GetThreadId ();
 
 	SifInitRpc(0); 
+
+    init_scr();
+    scr_printf("                           --==== PS2DOOM v1.0.2.2 ====--\n\n");
+    scr_printf("         A Doom PS2 port started by Lukasz Bruun and improved by cosmito\n\n\n");
 
     int ret;
     printf("sample: kicking IRXs\n");
@@ -103,6 +107,51 @@ int main( int argc, char**	argv )
     // USB mass support
     SifExecModuleBuffer(usbd, size_usbd, 0, NULL, &ret);
     SifExecModuleBuffer(usbhdfsd, size_usbhdfsd, 0, NULL, &ret);
+
+    // MC support   (from ps2sdk mc_example.c)
+    int mc_Type, mc_Free, mc_Format;
+	ret = SifLoadModule("rom0:XSIO2MAN", 0, NULL);
+	if (ret < 0) {
+		printf("Failed to load module: SIO2MAN");
+        scr_printf("Failed to load module: SIO2MAN");
+		SleepThread();
+	}
+	ret = SifLoadModule("rom0:XMCMAN", 0, NULL);
+	if (ret < 0) {
+		printf("Failed to load module: MCMAN");
+		scr_printf("Failed to load module: MCMAN");
+		SleepThread();
+	}
+	ret = SifLoadModule("rom0:XMCSERV", 0, NULL);
+	if (ret < 0) {
+		printf("Failed to load module: MCSERV");
+		SleepThread();
+	}
+	if(mcInit(MC_TYPE_XMC) < 0) {
+		printf("Failed to initialise memcard server!\n");
+		SleepThread();
+	}
+	// Since this is the first call, -1 should be returned.
+	mcGetInfo(0, 0, &mc_Type, &mc_Free, &mc_Format); 
+	mcSync(0, NULL, &ret);
+	printf("mcGetInfo returned %d\n",ret);
+	printf("Type: %d Free: %d Format: %d\n\n", mc_Type, mc_Free, mc_Format);
+
+	// Assuming that the same memory card is connected, this should return 0
+	mcGetInfo(0,0,&mc_Type,&mc_Free,&mc_Format);
+	mcSync(0, NULL, &ret);
+	printf("mcGetInfo returned %d\n",ret);
+	printf("Type: %d Free: %d Format: %d\n\n", mc_Type, mc_Free, mc_Format);
+    if (ret != 0)
+        printf("mc0 trouble... should save to other device... To implement\n");  /// TBD
+    
+    // create save/load dir (mc0:PS2DOOM)
+    int handle = fioOpen ("mc0:PS2DOOM/doomsav0.dsg", O_RDONLY);
+    if (handle < 0)
+        fioMkdir("mc0:PS2DOOM"); // Make sure it exists
+    else
+        fioClose(handle);
+
 
     SjPCM_Init(1);		// sync mode
 	//SjPCM_Init(0);
