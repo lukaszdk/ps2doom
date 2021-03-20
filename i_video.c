@@ -50,7 +50,9 @@ extern SDL_Joystick *joystick;      // cosmito : shared between i_video.c and i_
 // According to Dave Taylor, it still is a bonehead thing
 // to use ....
 static int	multiply=1;
+
 static int joy_x=0, joy_y=0;
+static int strafe_x=0;		/// cosmito
 
 #define JOYVAL	5000
 
@@ -145,6 +147,7 @@ void I_GetEvent(SDL_Event *Event)
 {
     Uint8 buttonstate;
     event_t event;
+
 DOMULTITASK;
 	//printf("Event->type: %i\n", Event->type);
 
@@ -174,8 +177,9 @@ DOMULTITASK;
 					event.data1 = KEY_ESCAPE;
 				break;
 
-                //case 4:                             // 'Select' PS2 button
-                //    break;
+                case 4:                             // 'Select' PS2 button
+                    event.data1 = KEY_TAB;			// activates the map
+                    break;
                 case 5:                             // 'Start' PS2 button
 					event.data1 = KEY_ENTER;
                     break;
@@ -196,8 +200,8 @@ DOMULTITASK;
 					event.data1 = SDLK_SPACE;
 				break;
 
-                case 10:                             // 'Analog Left click' PS2 button
-                    event.data1 = KEY_TAB;
+                //case 10:                          /// Using dlanor suggestion : It's easy to knock off this button during gameplay.   // 'Analog Left click' PS2 button
+                //    event.data1 = KEY_TAB;
                 break;
 
                 case 11:                             // 'Analog Right click' PS2 button
@@ -230,7 +234,9 @@ DOMULTITASK;
 				case 3:
 					event.data1 = KEY_ESCAPE;
 				break;
-
+                case 4:                             // 'Select' PS2 button
+                    event.data1 = KEY_TAB;
+                    break;
                 case 5:                             // 'Start' PS2 button
                     event.data1 = KEY_ENTER;
                 break;
@@ -251,8 +257,8 @@ DOMULTITASK;
 					event.data1 = SDLK_SPACE;
 				break;
                 
-                case 10:                             // 'Analog Left click' PS2 button
-                    event.data1 = KEY_TAB;
+                //case 10:                             // 'Analog Left click' PS2 button
+                //    event.data1 = KEY_TAB;
                 break;
 
                 case 11:                             // 'Analog Right click' PS2 button
@@ -269,18 +275,21 @@ DOMULTITASK;
 
 		case SDL_JOYAXISMOTION:
 		{
-            //printf(" event.jaxis.axis : %i value: %i\n", Event->jaxis.axis, Event->jaxis.value);
-
-
 			if( Event->jaxis.axis == 0)
 			{
 				joy_x = 0;
 
 				if( (Event->jaxis.value > JOYVAL) )
+                {
 					joy_x = 1;
+                	//printf("  RIGHT\n");
+                }
 				else
 					if( ( Event->jaxis.value < -JOYVAL) )
-						joy_x = -1;
+                    {
+                        joy_x = -1;
+                //printf("LEFT\n");
+                    }
 			}
 
 			if( Event->jaxis.axis == 1)
@@ -294,10 +303,38 @@ DOMULTITASK;
 						joy_y = -1;
 			}
 
+            /// strafe with right analog stick
+            if( Event->jaxis.axis == 2)
+			{
+                //event.data1 = 0;
+
+                Sint16 val = Event->jaxis.value / 3000;
+                //printf(" event.jaxis.axis: %i val: %i\n", Event->jaxis.axis, val /*Event->jaxis.value*/);
+
+                if (abs(val) < 3)   // eixo do strafe.  se modulo < 3, nao move
+                {
+                    strafe_x = 0;
+                    //event.data1 = 0;      // se positivo, direita                    
+                }
+                else if ( val > 0 ) // se negativo, esquerda
+                {
+                    strafe_x = 1;
+                    //event.data1 = 1;
+                    //1printf("  strafe DIR\n");
+                }
+                else
+                {
+                    strafe_x = -1;
+                    //event.data1 = -1;
+                    //1printf("  strafe ESQ\n");
+                }
+			}
+
+            event.data1 = strafe_x;
 			event.data2 = joy_x;
 			event.data3 = joy_y;
 			event.type = ev_joystick;
-
+			//printf("D_PostEvent *%d\n", event.data1);
 			D_PostEvent(&event);
 
 		} break;
@@ -468,7 +505,7 @@ void I_StartTic (void)
     while ( SDL_PollEvent(&Event) )
 	I_GetEvent(&Event);
 
-    //I_PollJoystick();     // cosmito : from lsdldoom, PS2 port
+    //I_PollJoystick();     // cosmito : from lsdldoom, PS2 port. Not needed and not implemented.
 }
 
 //

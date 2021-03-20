@@ -1,4 +1,4 @@
-Is is version 1.0.3.0 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
+Is is version 1.0.4.0 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
 
 Run PS2Doom.elf using uLaunchELF and make sure you have a doom1.wad, doom.wad, or doom2.wad copied at the same directory as the ps2doom.elf. Memory cards and USB storage devices can be used and also. Currently HD support is not implemented. Put only one .wad at a time since currently no selector is made yet.
 
@@ -13,13 +13,14 @@ Circle            : p / Next weapon
 Triangle          : Escape
 L1                : n
 L2                : y
-r1                : Fire
-r2                : Space / Open doors
+R1                : Fire
+R2                : Space / Open doors
 
 Start             : Enter
+Select            : Map
 
-Analog Left click : Map
 Analog Right click: Brightness (gamma)
+
 
 Please note: Enter key action (required to menu operations like starting new game) is a bit clumsy for now. For bringing up the menu, use the Cross button but to select items, use the Start button. This will be fixed.
 
@@ -44,6 +45,9 @@ cosmito
 
 History:
 ========
+
+31/05/2009 - v1.0.4.0
+  - Strafe support for right analog stick. Now map button is Select instead of right analog click, using dlanor suggestion as stated over http://psx-scene.com/forums/454723-post22.html.
 
 01/05/2009 - v1.0.3.0
   - Now loads the .wad from current directory. No need to put it at a root of a USB device anymore. As consequence, loads perfectly from memory card.

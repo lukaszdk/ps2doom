@@ -601,8 +601,13 @@ void IdentifyVersion (void)
 	#ifdef _EE
 		//doomwaddir = "";
         //doomwaddir = "mass:";
+//printf(">>>>>>>>>>>>>>> myargv[0] %s:\n", myargv[0]);
+//printf(">>>>>>>>>>>>>>> GetElfFilename :\n");
         GetElfFilename(myargv[0], deviceName, fullPath, elfFilename);
+//printf(">>>>>>>>>>>>>>> deviceName %s, fullPath %s, elfFilename %s\n", deviceName, fullPath, elfFilename);
         doomwaddir = fullPath;
+//scr_printf("myargv[0] = %s\n", myargv[0]);
+//printf("%s\n", doomwaddir);
 	#else
     if (!doomwaddir)
 		doomwaddir = "./";

@@ -203,6 +203,9 @@ int		dclicks2;
 // joystick values are repeated
 int             joyxmove;
 int		joyymove;
+
+static int   joyxside;      /// cosmito : for strafe
+
 boolean         joyarray[5];
 boolean*	joybuttons = &joyarray[1];		// allow [-1]
 
@@ -280,59 +283,70 @@ void G_BuildTiccmd (ticcmd_t* cmd)
     // let movement keys cancel each other out
     if (strafe)
     {
-	if (gamekeydown[key_right])
-	{
-	    // fprintf(stderr, "strafe right\n");
-	    side += sidemove[speed];
-	}
-	if (gamekeydown[key_left])
-	{
-	    //	fprintf(stderr, "strafe left\n");
-	    side -= sidemove[speed];
-	}
-	if (joyxmove > 0)
-	    side += sidemove[speed];
-	if (joyxmove < 0)
-	    side -= sidemove[speed];
+        /// lsdldoom strafe nao usa isto
+        if (gamekeydown[key_right])
+        {
+            // fprintf(stderr, "strafe right\n");
+            side += sidemove[speed];
+        }
+        if (gamekeydown[key_left])
+        {
+            //	fprintf(stderr, "strafe left\n");
+            side -= sidemove[speed];
+        }
+        if (joyxmove > 0)
+            side += sidemove[speed];
+        if (joyxmove < 0)
+            side -= sidemove[speed];
 
     }
     else
     {
-	if (gamekeydown[key_right])
-	    cmd->angleturn -= angleturn[tspeed];
-	if (gamekeydown[key_left])
-	    cmd->angleturn += angleturn[tspeed];
-	if (joyxmove > 0)
-	    cmd->angleturn -= angleturn[tspeed];
-	if (joyxmove < 0)
-	    cmd->angleturn += angleturn[tspeed];
+        if (gamekeydown[key_right])
+            cmd->angleturn -= angleturn[tspeed];
+        if (gamekeydown[key_left])
+            cmd->angleturn += angleturn[tspeed];
+        
+        //printf("joy_x = %d\n", joy_x);
+
+        if (joyxmove > 0)
+        {
+            cmd->angleturn -= angleturn[tspeed];
+            //printf("angleturn ESQ, joy_x = %d\n", joy_x);
+        }
+        if (joyxmove < 0)
+        {
+            cmd->angleturn += angleturn[tspeed];
+            //printf("angleturn DIR, joy_x = %d\n", joy_x);
+        }
+
     }
 
     if (gamekeydown[key_up])
     {
-	// fprintf(stderr, "up\n");
-	forward += forwardmove[speed];
+        // fprintf(stderr, "up\n");
+        forward += forwardmove[speed];
     }
     if (gamekeydown[key_down])
     {
-	// fprintf(stderr, "down\n");
-	forward -= forwardmove[speed];
+        // fprintf(stderr, "down\n");
+        forward -= forwardmove[speed];
     }
     if (joyymove < 0)
-	forward += forwardmove[speed];
+        forward += forwardmove[speed];
     if (joyymove > 0)
-	forward -= forwardmove[speed];
+        forward -= forwardmove[speed];
     if (gamekeydown[key_straferight])
-	side += sidemove[speed];
+        side += sidemove[speed];
     if (gamekeydown[key_strafeleft])
-	side -= sidemove[speed];
+        side -= sidemove[speed];
 
     // buttons
     cmd->chatchar = HU_dequeueChatChar();
 
     if (gamekeydown[key_fire] || mousebuttons[mousebfire]
-	|| joybuttons[joybfire])
-	cmd->buttons |= BT_ATTACK;
+    || joybuttons[joybfire])
+        cmd->buttons |= BT_ATTACK;
 
     if (gamekeydown[key_use] || joybuttons[joybuse] )
     {
@@ -432,23 +446,33 @@ void G_BuildTiccmd (ticcmd_t* cmd)
 
     forward += mousey;
     if (strafe)
-	side += mousex*2;
+        side += mousex*2;
     else
-	cmd->angleturn -= mousex*0x8;
+        cmd->angleturn -= mousex*0x8;
 
     mousex = mousey = 0;
+    
+    /// cosmito : from lsdldoom strafe support
+    if ( joyxside > 0 )
+    {
+        side += sidemove[speed];        
+    }
+    if ( joyxside < 0 )
+    {
+        side -= sidemove[speed];
+    }
 
     if (forward > MAXPLMOVE)
-	forward = MAXPLMOVE;
+        forward = MAXPLMOVE;
     else if (forward < -MAXPLMOVE)
-	forward = -MAXPLMOVE;
+        forward = -MAXPLMOVE;
     if (side > MAXPLMOVE)
-	side = MAXPLMOVE;
+        side = MAXPLMOVE;
     else if (side < -MAXPLMOVE)
-	side = -MAXPLMOVE;
+        side = -MAXPLMOVE;
 
     cmd->forwardmove += forward;
-    cmd->sidemove += side;
+    cmd->sidemove += side;          /// cosmito : side = amount of strafe
 
     // special buttons
     if (sendpause)
@@ -609,12 +633,21 @@ boolean G_Responder (event_t* ev)
 	return true;    // eat events
 
       case ev_joystick:
-	joybuttons[0] = ev->data1 & 1;
-	joybuttons[1] = ev->data1 & 2;
-	joybuttons[2] = ev->data1 & 4;
-	joybuttons[3] = ev->data1 & 8;
+	//joybuttons[0] = ev->data1 & 1;        /// cosmito : might interefere with strafe info, so it's commented
+	//joybuttons[1] = ev->data1 & 2;
+	//joybuttons[2] = ev->data1 & 4;
+	//joybuttons[3] = ev->data1 & 8;
 	joyxmove = ev->data2;
 	joyymove = ev->data3;
+	
+	joyxside = ev->data1;     /// cosmito : joyxside is a trick for doing strafe in lsdldoom
+
+    /// cosmito : note: in lsdldoom, for strafe support joybuttons aren't set. only this is made.
+  	//  case ev_joystick:
+	//	joyxside = ev->data1;     /// cosmito : joyxside is a trick for doing strafe in lsdldoom
+	//	joyxmove = ev->data2;
+	//	joyymove = ev->data3;
+
 	return true;    // eat events
 
       default:
