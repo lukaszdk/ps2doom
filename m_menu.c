@@ -65,6 +65,8 @@ extern boolean		message_dontfuckwithme;
 
 extern boolean		chat_on;		// in heads-up code
 
+char		currentWadName[20];
+
 //
 // defaulted values
 //
@@ -505,18 +507,20 @@ menu_t  SaveDef =
 //
 void M_ReadSaveStrings(void)
 {
-    FILE           *handle;
+    //FILE           *handle;   /// cosmito : for fioOpen type is s32
+    s32 handle;
     int             count;
     int             i;
     char    name[256];
 	
     for (i = 0;i < load_end;i++)
     {
-	sprintf(name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",i);
+	//sprintf(name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",i);
+	sprintf(name,"mc0:PS2DOOM/%s%d.dsg",currentWadName,i);
 
 	//handle = fopen (name, "r");
     handle = fioOpen(name, O_RDONLY);
-	if (handle == NULL || handle < 0)
+	if (/*handle == NULL || */handle < 0)
 	{
 	    strcpy(&savegamestrings[i][0],EMPTYSTRING);
 	    LoadMenu[i].status = 0;
@@ -576,9 +580,11 @@ void M_LoadSelect(int choice)
     char    name[256];
 	
     if (M_CheckParm("-cdrom"))
-        sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",choice);
+        //sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",choice);
+        sprintf(name,"c:\\doomdata\\%s%d.dsg",currentWadName,choice);
     else
-        sprintf(name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",choice);
+        //sprintf(name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",choice);
+        sprintf(name,"mc0:PS2DOOM/%s%d.dsg",currentWadName,choice);
     G_LoadGame (name);
     M_ClearMenus ();
 }

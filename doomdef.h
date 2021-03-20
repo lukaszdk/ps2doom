@@ -28,6 +28,7 @@
 
 /// cosmito
 #define DOMULTITASK RotateThreadReadyQueue(42)
+#define pf printf
 
 //
 // Global parameters/defines.
@@ -84,7 +85,9 @@ typedef enum
 //  and unfinished. Default is synchronous.
 // Experimental asynchronous timer based is
 //  handled by SNDINTR.
+#ifndef SNDSERV     /// cosmito
 #define SNDSERV  1
+#endif              /// cosmito
 //#define SNDINTR  1
 
 

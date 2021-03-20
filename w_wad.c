@@ -532,7 +532,11 @@ W_CacheLumpNum
 	byte*	ptr;
 
 	if ((unsigned)lump >= numlumps)
-		I_Error ("W_CacheLumpNum: %i >= numlumps",lump);
+    {
+        //I_Error ("W_CacheLumpNum: %i >= numlumps",lump);      // cosmito
+        printf("W_CacheLumpNum: %i >= numlumps",lump);      // cosmito  : for doom.wad, HELP2 is not found so return null
+        return NULL;
+    }
 
 	if (!lumpcache[lump])
 	{
@@ -556,10 +560,7 @@ W_CacheLumpNum
 //
 // W_CacheLumpName
 //
-void*
-W_CacheLumpName
-( char*		name,
-  int		tag )
+void* W_CacheLumpName (char*		name,  int		tag )
 {
     return W_CacheLumpNum (W_GetNumForName(name), tag);
 }

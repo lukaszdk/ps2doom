@@ -38,6 +38,9 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 extern int mixer_period;
 extern int SAMPLERATE;
 
+/// cosmito
+extern char		currentWadName[20];
+
 #define R_OK	4
 static int access(char *file, int mode)
 {
@@ -601,13 +604,8 @@ void IdentifyVersion (void)
 	#ifdef _EE
 		//doomwaddir = "";
         //doomwaddir = "mass:";
-//printf(">>>>>>>>>>>>>>> myargv[0] %s:\n", myargv[0]);
-//printf(">>>>>>>>>>>>>>> GetElfFilename :\n");
         GetElfFilename(myargv[0], deviceName, fullPath, elfFilename);
-//printf(">>>>>>>>>>>>>>> deviceName %s, fullPath %s, elfFilename %s\n", deviceName, fullPath, elfFilename);
         doomwaddir = fullPath;
-//scr_printf("myargv[0] = %s\n", myargv[0]);
-//printf("%s\n", doomwaddir);
 	#else
     if (!doomwaddir)
 		doomwaddir = "./";
@@ -695,7 +693,14 @@ void IdentifyVersion (void)
 	// Let's handle languages in config files, okay?
 	language = french;
 	printf("French version\n");
-	D_AddFile (doom2fwad);
+    /// TBD
+    // halves sample playing frequency to avoid lack of memory for the upsampled sounds
+    mixer_period = 2;
+    SAMPLERATE = SAMPLERATE	/ 2;
+    printf("doom2f detected : halving sample playing frequency to %dHz **************** \n", SAMPLERATE);
+    ///
+    D_AddFile (doom2fwad);
+    sprintf(currentWadName, "doom2fsav");
 	return;
     }
 
@@ -710,6 +715,9 @@ void IdentifyVersion (void)
     printf("doom2 detected : halving sample playing frequency to %dHz **************** \n", SAMPLERATE);
     ///
 
+    sprintf(currentWadName, "doom2sav");
+//printf("\n\n           ->> %s\n\n", currentWadName);
+
     D_AddFile (doom2wad);
 	return;
     }
@@ -717,6 +725,7 @@ void IdentifyVersion (void)
     if ( !access (plutoniawad, R_OK ) )
     {
       gamemode = commercial;
+      sprintf(currentWadName, "plutoniasav");
       D_AddFile (plutoniawad);
       return;
     }
@@ -724,6 +733,8 @@ void IdentifyVersion (void)
     if ( !access ( tntwad, R_OK ) )
     {
       gamemode = commercial;
+      sprintf(currentWadName, "tntsav");
+      
       D_AddFile (tntwad);
       return;
     }
@@ -731,6 +742,7 @@ void IdentifyVersion (void)
     if ( !access (doomuwad,R_OK) )
     {
       gamemode = retail;
+      sprintf(currentWadName, "doomusav");
       D_AddFile (doomuwad);
       return;
     }
@@ -738,6 +750,7 @@ void IdentifyVersion (void)
     if ( !access (doomwad,R_OK) )
     {
       gamemode = registered;
+      sprintf(currentWadName, "doomsav");
       D_AddFile (doomwad);
       return;
     }
@@ -745,12 +758,14 @@ void IdentifyVersion (void)
     if ( !access (doom1wad,R_OK) )
     {
       gamemode = shareware;
+      sprintf(currentWadName, "doom1sav");
       D_AddFile (doom1wad);
       return;
     }
 
     printf("Game mode indeterminate.\n");
     gamemode = indetermined;
+    sprintf(currentWadName, "indetersav");
 
     // We don't abort. Let's see what the PWAD contains.
     //exit(1);
@@ -1192,9 +1207,11 @@ void D_DoomMain (void)
     if (p && p < myargc-1)
     {
 	if (M_CheckParm("-cdrom"))
-	    sprintf(file, "c:\\doomdata\\"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+	    //sprintf(file, "c:\\doomdata\\"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+        sprintf(file, "c:\\doomdata\\%s%c.dsg", currentWadName, myargv[p+1][0]);
 	else
-        sprintf(file, "mc0:PS2DOOM/"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+        //sprintf(file, "mc0:PS2DOOM/"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+        sprintf(file, "mc0:PS2DOOM/%s%c.dsg",currentWadName,myargv[p+1][0]);
 	G_LoadGame (file);
     }
 	

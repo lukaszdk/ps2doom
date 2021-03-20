@@ -144,7 +144,6 @@ void* getsfx( const char* sfxname, int* len )
 	int                 paddedsize;
 	char                name[20];
 	int                 sfxlump;
-int qq;
 
 	SDL_AudioCVT cvt;
 	int outlen;
@@ -459,8 +458,7 @@ void I_ShutdownSound(void)
 
 void I_InitSound()
 { 
-	int i;
-	int qq=0;
+	int i;	
 	boolean nomusicparm = 1;		/// TBD : cosmito : ugly hardwired
 
 	//// Secure and configure sound device first.

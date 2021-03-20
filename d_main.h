@@ -37,8 +37,6 @@ extern char*		wadfiles[MAXWADFILES];
 
 void D_AddFile (char *file);
 
-
-
 //
 // D_DoomMain()
 // Not a globally visible function, just included for source reference,

@@ -717,7 +717,7 @@ void F_Drawer (void)
 			 W_CacheLumpName("CREDIT",PU_CACHE));
 	    else
 	      V_DrawPatch (0,0,0,
-			 W_CacheLumpName("HELP2",PU_CACHE));
+          W_CacheLumpName("HELP2",PU_CACHE));        /// cosmito : the HELP2 isn't on doom.wad... added check protection at W_CacheLumpNum and V_DrawPatch level.
 	    break;
 	  case 2:
 	    V_DrawPatch(0,0,0,

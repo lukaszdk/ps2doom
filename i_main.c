@@ -79,7 +79,7 @@ int main( int argc, char**	argv )
     init_scr();
     //scr_printf("                           --==== PS2DOOM v1.0.2.2 ====--\n\n");
     //scr_printf("         A Doom PS2 port started by Lukasz Bruun and improved by cosmito\n\n\n");
-    scr_printf("                           --==== PS2DOOM v1.0.3.0 ====--\n\n\n");
+    scr_printf("                           --==== PS2DOOM v1.0.4.1 ====--\n\n\n");
 
     int ret;
     printf("sample: kicking IRXs\n");

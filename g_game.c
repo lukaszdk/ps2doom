@@ -74,7 +74,7 @@ rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #define SAVEGAMESIZE	0x2c000
 #define SAVESTRINGSIZE	24
 
-
+char		currentWadName[20];
 
 boolean	G_CheckDemoStatus (void);
 void	G_ReadDemoTiccmd (ticcmd_t* cmd);
@@ -380,13 +380,11 @@ void G_BuildTiccmd (ticcmd_t* cmd)
 	{
 		cmd->buttons |= BT_CHANGE;
 		cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
+//pf("newweapon<<BT_WEAPONSHIFT = %d\n", newweapon<<BT_WEAPONSHIFT);
+//pf("cmd->buttons = %d\n", cmd->buttons);
 	}
+//TBD : cada versao deve ter o seu dir de savegame no mc0
 
-    if (newweapon != wp_nochange)
-	{
-		cmd->buttons |= BT_CHANGE;
-		cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
-	}
     ///
 
     // mouse
@@ -1267,8 +1265,13 @@ void G_DoLoadGame (void)
     char	vcheck[VERSIONSIZE];
 
     gameaction = ga_nothing;
-
+pf("G_DoLoadGame\n");
     length = M_ReadFile (savename, &savebuffer);
+    if (length == 0)
+    {
+        pf("invalid filename or bad file\n");
+        return;
+    }
     save_p = savebuffer + SAVESTRINGSIZE;
 
     // skip the description field
@@ -1337,10 +1340,12 @@ void G_DoSaveGame (void)
     int		i;
 
     if (M_CheckParm("-cdrom"))
-        sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",savegameslot);
+        //sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",savegameslot);
+        sprintf(name,"c:\\doomdata\\%s%d.dsg",currentWadName,savegameslot);
     else
         //sprintf (name,SAVEGAMENAME"%d.dsg",savegameslot);
-        sprintf (name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",savegameslot);
+        //sprintf (name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",savegameslot);
+        sprintf (name,"mc0:PS2DOOM/%s%d.dsg",currentWadName,savegameslot);
     description = savedescription;
 printf("savename : %s\n", name);        ///
     save_p = savebuffer = screens[1]+0x4000;

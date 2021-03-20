@@ -37,12 +37,14 @@
 #include "sounds.h"
 #include "doomtype.h"
 
+#ifndef SNDSERV     /// cosmito
 #define SNDSERV
 #undef SNDINTR
 
 #ifndef SNDSERV
 #include "l_soundgen.h"
 #endif
+#endif              /// cosmito
 
 // Init at program start...
 void I_InitSound(void);

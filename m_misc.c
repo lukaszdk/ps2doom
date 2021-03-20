@@ -111,13 +111,15 @@ M_WriteFile
   void*		source,
   int		length )
 {
-    FILE       *handle;
+    //FILE       *handle;       /// cosmito : good for fopen but not for fioOpen ... use s32 intead
+    s32 handle;
+
     int		count;
 	
     //handle = fopen ( name, "wb");
     handle = fioOpen ( name, O_WRONLY | O_CREAT | O_TRUNC);
 
-    if (handle == NULL || handle == -1)
+    if (/*handle == NULL || */ handle < 0)
 	return false;
 
     //count = fwrite (source, 1, length, handle);
@@ -127,7 +129,7 @@ M_WriteFile
 	fioClose (handle);
 
     if (count < length)
-	return false;
+	    return false;
 		
     return true;
 }
@@ -141,15 +143,21 @@ M_ReadFile
 ( char const*	name,
   byte**	buffer )
 {
-    FILE *handle;
+    //FILE *handle;            /// cosmito : good for fopen but not for fioOpen ... use s32 intead
+    s32 handle;
+
     int count, length;
     byte	*buf;
 	
     //handle = fopen (name, "rb");
     handle = fioOpen(name, O_RDONLY);     /// cosmito : for mc IO use fio*
-    if (handle == NULL)
-        I_Error ("Couldn't read file %s", name);
-    
+    if (/*handle == NULL || */ handle < 0)
+    {
+        //I_Error ("Couldn't read file %s", name);
+        pf("Couldn't read file %s", name);
+        return 0;
+    }    
+
     //fseek(handle, 0, SEEK_END);
     //length = ftell(handle);
     //rewind(handle);
@@ -164,7 +172,11 @@ M_ReadFile
     fioClose(handle);
 
     if (count < length)
-        I_Error ("Couldn't read file %s", name);
+    {
+        //I_Error ("Couldn't read file %s", name);
+        pf("Couldn't read file %s", name);
+        return 0;
+    }    
 		
     *buffer = buf;
     return length;

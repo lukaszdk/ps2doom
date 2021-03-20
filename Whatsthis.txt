@@ -1,23 +1,39 @@
-Is is version 1.0.4.0 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
+Is is version 1.0.4.1 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
 
-Run PS2Doom.elf using uLaunchELF and make sure you have a doom1.wad, doom.wad, or doom2.wad copied at the same directory as the ps2doom.elf. Memory cards and USB storage devices can be used and also. Currently HD support is not implemented. Put only one .wad at a time since currently no selector is made yet.
+Important: Now the savegame filenames stored at the memorycard changed. This means that
+your previous saves needs to be renamed at the PS2DOOM memory card folder.
+Use uLaunchELF for that (copy the save files to a USB storage device for example,
+rename those at your computer - see below, delete those same files at the memory card
+and copy the renamed saves from the USB device back to the PS2DOOM memory card folder).
+Refer to uLaunchELF documentation for this operations (I won't offer help at this subject).
+
+Until now, the saves follows the scheme for all the WADs : doomsav0.dsg,  doomsav1.dsg,
+and so on. For now on, the saves reflect the WAD name:
+
+For doom2.wad savegames, you should use the the naming scheme : doom2sav0.dsg,  doom2sav1.dsg, etc. Similarly for doom1.wad saves, this will be doom1sav0.dsg,  doom1sav1.dsg.
+
+For doom.wad, the filenames should be doomsav0.dsg,  etc. You get the picture (sorry to explain this to detail, but I wanted to keep this clear).
+
+
+Run PS2Doom.elf using uLaunchELF and make sure you have a doom1.wad, doom.wad, or doom2.wad (note: case sensitive, that is, DOOM1.WAD, DOOM.WAD, DOOM2.WAD, etc will not work) copied at the same directory as the ps2doom.elf. Memory cards and USB storage devices can be used and also. Currently HD support is not implemented. Put only one .wad at a time since currently no selector is made yet.
 
 
 Dualshock Joystick mappings:
 ============================
 
-Left Analog Stick : Move
-Cross             : Shift / Run
-Square            : o / Previous weapon
-Circle            : p / Next weapon
-Triangle          : Escape
-L1                : n
-L2                : y
-R1                : Fire
-R2                : Space / Open doors
+Left Analog Stick  : Move
+Right Analog Stick : Strafe
+Cross              : Shift / Run
+Square             : o / Previous weapon
+Circle             : p / Next weapon
+Triangle           : Escape
+L1                 : n
+L2                 : y
+R1                 : Fire
+R2                 : Space / Open doors
 
-Start             : Enter
-Select            : Map
+Start              : Enter
+Select             : Map
 
 Analog Right click: Brightness (gamma)
 
@@ -45,6 +61,28 @@ cosmito
 
 History:
 ========
+
+12/06/2009 - v1.0.4.1
+  - Savegame handling for different WAD : Now savegames from doom1 and doom2 and other WADs can happy cohexist at the same memory card
+
+Important: This means that your previous saves needs to be renamed at the PS2DOOM memory
+card folder. Use uLaunchELF for that (copy the save files to a USB storage device for
+example, rename those at your computer - see below, delete those same files at the memory 
+card and copy the renamed saves from the USB device back to the PS2DOOM memory card 
+folder). Refer to uLaunchELF documentation for this operations (I won't offer help at 
+this subject).
+
+Until now, the saves follows the scheme for all the WADs : doomsav0.dsg,  doomsav1.dsg,
+and so on. For now on, the saves reflect the WAD name:
+
+For doom2.wad savegames, you should use the the naming scheme : doom2sav0.dsg,  doom2sav1.dsg, etc. Similarly for doom1.wad saves, this will be doom1sav0.dsg,  doom1sav1.dsg.
+
+For doom.wad, the filenames should be doomsav0.dsg,  etc. You get the picture (sorry to explain this to detail, but I wanted to keep this clear).
+
+  - Should work with the doom2f.wad (I don't own it)
+  - Previous/next weapon selection was buggy (some weapons weren't selectable) - fixed
+  - Fixed a crash when a lump is not found (doom.wad at "menu slideshow") - original sources bug?
+  - Save/load file handle fixed (no more trying to load/save from empty slots)
 
 31/05/2009 - v1.0.4.0
   - Strafe support for right analog stick. Now map button is Select instead of right analog click, using dlanor suggestion as stated over http://psx-scene.com/forums/454723-post22.html.
