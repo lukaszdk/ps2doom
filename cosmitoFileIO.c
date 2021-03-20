@@ -78,7 +78,7 @@ void GetElfFilename(const char *argv0_probe, char* deviceName, char* fullPath, c
     strncpy(deviceName, argv0_probe, doispontosIndex+1);
     deviceName[doispontosIndex+1] = 0;
 
-    // set fullPath to full path (ex: 'mass:directory/', 'mass:directory1/directory2', etc (no limit over depth))
+    // set fullPath to full path including '/' (ex: 'mass:directory/', 'mass:directory1/directory2/', etc (no limit over depth))
     if (isFileOnRoot)
         strcpy(fullPath, deviceName);   // fullPath = deviceName actually
     else

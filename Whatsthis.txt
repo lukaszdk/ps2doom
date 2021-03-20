@@ -1,25 +1,17 @@
-Is is version 1.0.4.1 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
+This is version 1.0.5.0 of PS2Doom, a port of Doom for the PS2 started by Lukasz Bruun
+(http://lukasz.dk) and currently maintained by me,
+cosmito (http://ps2homebrewing.wordpress.com).
+It also features audio support functions by Jason Yu (http://www.jasonyu.net)
+and contributions for HDD support by Adilson Pierog.
 
-Important: Now the savegame filenames stored at the memorycard changed. This means that
-your previous saves needs to be renamed at the PS2DOOM memory card folder.
-Use uLaunchELF for that (copy the save files to a USB storage device for example,
-rename those at your computer - see below, delete those same files at the memory card
-and copy the renamed saves from the USB device back to the PS2DOOM memory card folder).
-Refer to uLaunchELF documentation for this operations (I won't offer help at this subject).
-
-Until now, the saves follows the scheme for all the WADs : doomsav0.dsg,  doomsav1.dsg,
-and so on. For now on, the saves reflect the WAD name:
-
-For doom2.wad savegames, you should use the the naming scheme : doom2sav0.dsg,  doom2sav1.dsg, etc. Similarly for doom1.wad saves, this will be doom1sav0.dsg,  doom1sav1.dsg.
-
-For doom.wad, the filenames should be doomsav0.dsg,  etc. You get the picture (sorry to explain this to detail, but I wanted to keep this clear).
+Run PS2Doom.elf using uLaunchELF and make sure you have a doom1.wad, doom.wad, or doom2.wad
+(note: case sensitive, that is, DOOM1.WAD, DOOM.WAD, DOOM2.WAD, etc will not work) copied
+at the same directory as the ps2doom.elf. Memory cards and USB storage devices can be used
+also.
 
 
-Run PS2Doom.elf using uLaunchELF and make sure you have a doom1.wad, doom.wad, or doom2.wad (note: case sensitive, that is, DOOM1.WAD, DOOM.WAD, DOOM2.WAD, etc will not work) copied at the same directory as the ps2doom.elf. Memory cards and USB storage devices can be used and also. Currently HD support is not implemented. Put only one .wad at a time since currently no selector is made yet.
-
-
-Dualshock Joystick mappings:
-============================
+Dualshock Joystick default mappings:
+====================================
 
 Left Analog Stick  : Move
 Right Analog Stick : Strafe
@@ -35,32 +27,86 @@ R2                 : Space / Open doors
 Start              : Enter
 Select             : Map
 
+Dpad buttons		   : Move
+
 Analog Right click: Brightness (gamma)
 
 
-Please note: Enter key action (required to menu operations like starting new game) is a bit clumsy for now. For bringing up the menu, use the Cross button but to select items, use the Start button. This will be fixed.
+Please note: Enter key action (required to menu operations like starting new game) is a bit
+clumsy for now. For bringing up the menu, use the Cross button but to select items, use the
+Start button.
 
 You can use any USB compatible keyboard with the PlayStation2 also.
 
 
-Source is included. Also a Visual Studio 2005 project just for code browsing (it doesn't compile).
-For compiling, get free ps2sdk and gsKit revision 1470 or less. Apply "patch" for gsKit (copy supplied gsInit.c to your gsKit sources, replacing it). Get also SDL for PS2, revision 1384 or less and apply my "patch" (SDL_ps2video.c). If you want to get USB keyboard support, make sure you build SDL with the HAVE_INPUT_DEVICES=1 at the makefile :
+Ps2doom configuration:
+======================
+
+Version 1.0.5.0 features a configuration file named 'ps2doom.config'. It can be manually edited
+to redefine the game controls at a computer or at the PS2 using uLaunchELF text editor, for example.
+
+Here to place the configuration file?
+
+At startup it looks for the configuration file first at the same folder ps2doom is running and if it
+doesn’t find it, then looks at memory card (mc0:ps2doom).
+
+Normally you would put the file along with the ps2doom executable but it requires a different approach
+when running off HDD. There’s a simple rule you can follow:
+
+ - If you want to run it off USB device or memory card you just place it along the ELF. Additionally,
+   if you want the option to run it also from HDD, then you must place the configuration file
+   at memory card (mc0:ps2doom). Also in this case you must set the HDD paths. I recommend having only one
+   configuration file, placed at the memory card.
+
+The reason for this is that there's no way of knowing the launch path when running off HDD
+so it cannot load the configuration file from the local folder simply because it doesn’t
+know where the local folder is. So if running from HDD, it will look at the memory card location
+after failing to it it from the local folder.
+
+If you want to load the WADs from the HDD you also need to edit the hdd section of the config.
+Example: Supposing you have the doom wads placed at a partition named '+MyPartition' inside the
+'ps2doom' folder, (at '+MyPartition/ps2doom/ that is) the hdd section should be :
+
+  hdd:
+  {
+     use_hdd           = false;						    // set to true if you want to load the WADs from the HDD
+     path_to_partition = "hdd0:+MyPartition";		// Case sensitive !
+     wads_folder       = "ps2doom";		         // Case sensitive !
+  };
+
+Remember that the paths are case sensitive, so "hdd0:+MyPartition" and "hdd0:+mypartition" are different paths!
+
+
+
+Building from sources:
+======================
+
+For compiling, get free ps2sdk and gsKit revision 1470 and overwrite the files from
+'sdk source changes\gsKit_revision1470'. Get also SDL for PS2, revision 1384 or less
+overwrite it with 'sdk source changes\SDL\SDL_ps2video.c'. If you want to get USB
+keyboard support, make sure you build SDL with the HAVE_INPUT_DEVICES=1 at the makefile:
+
 \sdl\src\Makefile
 # Enable USB keyboard and mouse (100 KB)
 HAVE_INPUT_DEVICES=1
 
-Optionaly build 'ps2sdk\ee\debug\' with the supplied font.c at 'font for debug lib\' folder.
+Build 'ps2sdk\ee\debug\' with the supplied changes.
 
-
-Say tuned for next releases at
-http://ps2homebrewing.wordpress.com
 
 cosmito
+http://ps2homebrewing.wordpress.com
 
 
 
 History:
 ========
+
+21/03/2010 - v1.0.5.0
+  - Simple but funcional wad selector
+  - Controller almost fully configurable using the configuration file (ps2doom.config)
+  - HDD support (at last). Thanks Adilson for the boring work
+  - Now uses freesd instead of rom0:LIBSD. Japanese users should be happy now. And PS3 compatible now?
+  - For doom2 wads, sound is no longer half sampled. Sounds the same to me...
 
 12/06/2009 - v1.0.4.1
   - Savegame handling for different WAD : Now savegames from doom1 and doom2 and other WADs can happy cohexist at the same memory card

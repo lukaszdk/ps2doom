@@ -285,6 +285,12 @@ typedef enum
 
 #define KEY_LALT	KEY_RALT
 
+
+// cosmito : extra defines
+#define STRAFELEFT      256 + 0
+#define STRAFERIGHT     256 + 1
+
+
 //#define PS2_SQUARE 0
 //#define PS2_CROSS 1
 //#define PS2_CIRCLE 2

@@ -111,25 +111,19 @@ M_WriteFile
   void*		source,
   int		length )
 {
-    //FILE       *handle;       /// cosmito : good for fopen but not for fioOpen ... use s32 intead
-    s32 handle;
-
+    FILE       *handle;
     int		count;
 	
-    //handle = fopen ( name, "wb");
-    handle = fioOpen ( name, O_WRONLY | O_CREAT | O_TRUNC);
+    handle = fopen ( name, "wb");
 
-    if (/*handle == NULL || */ handle < 0)
+    if (handle == NULL)
 	return false;
 
-    //count = fwrite (source, 1, length, handle);
-    count = fioWrite (handle, source, length);
-
-    //fclose (handle);
-	fioClose (handle);
-
+    count = fwrite (source, 1, length, handle);
+    fclose (handle);
+	
     if (count < length)
-	    return false;
+	return false;
 		
     return true;
 }
@@ -143,40 +137,22 @@ M_ReadFile
 ( char const*	name,
   byte**	buffer )
 {
-    //FILE *handle;            /// cosmito : good for fopen but not for fioOpen ... use s32 intead
-    s32 handle;
-
+    FILE *handle;
     int count, length;
     byte	*buf;
 	
-    //handle = fopen (name, "rb");
-    handle = fioOpen(name, O_RDONLY);     /// cosmito : for mc IO use fio*
-    if (/*handle == NULL || */ handle < 0)
-    {
-        //I_Error ("Couldn't read file %s", name);
-        pf("Couldn't read file %s", name);
-        return 0;
-    }    
-
-    //fseek(handle, 0, SEEK_END);
-    //length = ftell(handle);
-    //rewind(handle);
-    length = fioLseek(handle, 0, SEEK_END);
-    fioLseek(handle, 0, SEEK_SET);
-
+    handle = fopen (name, "rb");
+    if (handle == NULL)
+	I_Error ("Couldn't read file %s", name);
+    fseek(handle, 0, SEEK_END);
+    length = ftell(handle);
+    rewind(handle);
     buf = Z_Malloc (length, PU_STATIC, NULL);
-    //count = fread (buf, 1, length, handle);
-    count = fioRead (handle, buf, length);
-    
-    //fclose (handle);
-    fioClose(handle);
-
+    count = fread (buf, 1, length, handle);
+    fclose (handle);
+	
     if (count < length)
-    {
-        //I_Error ("Couldn't read file %s", name);
-        pf("Couldn't read file %s", name);
-        return 0;
-    }    
+	I_Error ("Couldn't read file %s", name);
 		
     *buffer = buf;
     return length;

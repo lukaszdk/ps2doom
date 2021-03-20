@@ -7,14 +7,15 @@ p_doors.o p_enemy.o p_floor.o p_inter.o p_lights.o p_map.o p_maputl.o \
 p_mobj.o p_plats.o p_pspr.o p_saveg.o p_setup.o p_sight.o p_spec.o \
 p_switch.o p_telept.o p_tick.o p_user.o r_bsp.o r_data.o r_draw.o \
 r_main.o r_plane.o r_segs.o r_sky.o r_things.o s_sound.o sounds.o \
-st_lib.o st_stuff.o tables.o v_video.o w_wad.o wi_stuff.o z_zone.o ps2doom.o mixer_thread.o mixer.o cosmitoFileIO.o sjpcm_rpc.o usbd.s usbhdfsd.s SJPCM.s
+st_lib.o st_stuff.o tables.o v_video.o w_wad.o wi_stuff.o z_zone.o ps2doom.o mixer_thread.o mixer.o cosmitoFileIO.o sjpcm_rpc.o usbd.s usbhdfsd.s SJPCM.s freesd.s \
+iomanX.o fileXio.o ps2dev9.o ps2atad.o ps2fs.o ps2hdd.o poweroff.o
 
 EE_BIN = ps2doom.elf
 
-EE_INCS = -I$(PS2SDK)/ports/include/SDL
+EE_INCS = -I$(PS2SDK)/ports/include/SDL -I$(PS2SDK)/ports/include
 EE_LDFLAGS = -L$(PS2SDK)/ports/lib -L$(PS2DEV)/gsKit/lib 
-EE_LIBS = -lsdlmain -lsdlmixer -lsdl -lgskit -lcdvd -lmf -lps2ip -ldebug -lmc -lc
-EE_CFLAGS = -DUSE_RWOPS -DHAVE_CONFIG_H -DHAVE_MIXER
+EE_LIBS = -lsdlmain -lsdlmixer -lsdl -lgskit -lcdvd -lmf -lps2ip -ldebug -lconfig -lmc -lc -lhdd -lfileXio -lpoweroff
+EE_CFLAGS = -DUSE_RWOPS -DHAVE_CONFIG_H -DHAVE_MIXER #-g
 
 all: $(EE_BIN)
 
@@ -36,6 +37,31 @@ usbhdfsd.s : usbhdfsd.irx
 SJPCM.s : SJPCM.IRX
 	bin2s SJPCM.IRX SJPCM.s SJPCM
 
+freesd.s : freesd-1.01.irx
+	bin2s freesd-1.01.irx freesd.s freesd
+	
+iomanX.s : iomanX.irx
+	bin2s iomanX.irx iomanX.s iomanX
+
+fileXio.s : fileXio.irx
+	bin2s fileXio.irx fileXio.s fileXio
+
+ps2dev9.s : ps2dev9.irx
+	bin2s ps2dev9.irx ps2dev9.s ps2dev9
+
+ps2atad.s : ps2atad.irx
+	bin2s ps2atad.irx ps2atad.s ps2atad
+
+ps2hdd.s : ps2hdd.irx
+	bin2s ps2hdd.irx ps2hdd.s ps2hdd
+
+ps2fs.s : ps2fs.irx
+	bin2s ps2fs.irx ps2fs.s ps2fs
+
+poweroff.s : poweroff.irx
+	bin2s poweroff.irx poweroff.s poweroff
+	
+		
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal
 

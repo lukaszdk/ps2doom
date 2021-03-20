@@ -1,0 +1,4 @@
+This Visual Studio project exists only for code browsing. It doesn't compile anything of course.
+
+---
+cosmito

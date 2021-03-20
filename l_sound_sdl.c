@@ -241,6 +241,9 @@ void* getsfx( const char* sfxname, int* len )
     */
 
 	*len = outlen;
+
+    free(sfx);      // cosmito : needes testing
+
 	return (void *) cvt.buf;
 }
 
@@ -480,6 +483,7 @@ void I_InitSound()
 
 //printf("\n**** using SAMPLECOUNT = %d\n\n", SAMPLECOUNT);
 
+int debug_memusage = 0;
 	for (i=1 ; i<NUMSFX ; i++)
 	{ 
 		// Alias? Example is the chaingun sound linked to pistol.
@@ -497,6 +501,9 @@ void I_InitSound()
 //{};
 			//S_sfx[i].data = Mix_QuickLoad_RAW(data, lengths[i]);
             S_sfx[i].data = Mix_QuickLoad_RAW_custom(data, lengths[i]);
+
+debug_memusage = debug_memusage + lengths[i];
+
 		}
 		else
 		{
@@ -513,6 +520,8 @@ void I_InitSound()
 			//{};
 
 	fprintf( stderr, " pre-cached all sound data\n");
+
+printf(" .... Used %d bytes for sounds\n\n", debug_memusage);
 
 	atexit(I_ShutdownSound);
 

@@ -205,6 +205,8 @@ int             joyxmove;
 int		joyymove;
 
 static int   joyxside;      /// cosmito : for strafe
+int joyxside_byjoy;         /// cosmito
+int joyxside_bykey;         /// cosmito
 
 boolean         joyarray[5];
 boolean*	joybuttons = &joyarray[1];		// allow [-1]
@@ -307,29 +309,23 @@ void G_BuildTiccmd (ticcmd_t* cmd)
         if (gamekeydown[key_left])
             cmd->angleturn += angleturn[tspeed];
         
-        //printf("joy_x = %d\n", joy_x);
-
         if (joyxmove > 0)
         {
             cmd->angleturn -= angleturn[tspeed];
-            //printf("angleturn ESQ, joy_x = %d\n", joy_x);
         }
         if (joyxmove < 0)
         {
             cmd->angleturn += angleturn[tspeed];
-            //printf("angleturn DIR, joy_x = %d\n", joy_x);
         }
 
     }
 
     if (gamekeydown[key_up])
     {
-        // fprintf(stderr, "up\n");
         forward += forwardmove[speed];
     }
     if (gamekeydown[key_down])
     {
-        // fprintf(stderr, "down\n");
         forward -= forwardmove[speed];
     }
     if (joyymove < 0)
@@ -380,10 +376,7 @@ void G_BuildTiccmd (ticcmd_t* cmd)
 	{
 		cmd->buttons |= BT_CHANGE;
 		cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
-//pf("newweapon<<BT_WEAPONSHIFT = %d\n", newweapon<<BT_WEAPONSHIFT);
-//pf("cmd->buttons = %d\n", cmd->buttons);
 	}
-//TBD : cada versao deve ter o seu dir de savegame no mc0
 
     ///
 
@@ -614,7 +607,10 @@ boolean G_Responder (event_t* ev)
 	    return true;
 	}
 	if (ev->data1 <NUMKEYS)
-	    gamekeydown[ev->data1] = true;
+    //{
+        gamekeydown[ev->data1] = true;
+    //  printf("    gamekeydown[ev->data1] = true;  %d\n", ev->data1);
+    //}
 	return true;    // eat key down events
 
       case ev_keyup:
@@ -637,8 +633,23 @@ boolean G_Responder (event_t* ev)
 	//joybuttons[3] = ev->data1 & 8;
 	joyxmove = ev->data2;
 	joyymove = ev->data3;
-	
-	joyxside = ev->data1;     /// cosmito : joyxside is a trick for doing strafe in lsdldoom
+//printf(" joyxmove = %d\n", joyxmove);
+
+    // ev->data1 info is now irrelevant :
+    // for strafe, account for joyxside_byjoy and joyxside_bykey
+    joyxside = 0;
+    if ((joyxside_byjoy == 0 && joyxside_bykey == 0) || (joyxside_byjoy + joyxside_bykey == 0))
+        joyxside = 0;
+    else
+    {
+        if (joyxside_byjoy == -1 || joyxside_bykey == -1)
+            joyxside = -1;
+        else
+        {
+            if (joyxside_byjoy == 1 || joyxside_bykey == 1)
+                joyxside = 1;
+        }
+    }
 
     /// cosmito : note: in lsdldoom, for strafe support joybuttons aren't set. only this is made.
   	//  case ev_joystick:
@@ -1752,6 +1763,3 @@ boolean G_CheckDemoStatus (void)
 
     return false;
 }
-
-
-

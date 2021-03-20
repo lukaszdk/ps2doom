@@ -171,7 +171,7 @@ void W_AddFile (char *filename)
 	return;
     }
 
-    printf (" adding %s\n",filename);
+    scr_printf ("adding %s\n",filename);
     startlump = numlumps;
 	
     if (I_strncasecmp (filename+strlen(filename)-3 , "wad", 3 ) )
@@ -312,7 +312,7 @@ void W_InitMultipleFiles (char** filenames)
     {
         scr_clear();
         scr_printf ("\n\nERROR at W_InitFiles: no files found\n\n");
-        scr_printf ("Put a .WAD file along with PS2Doom.elf before running it.\n\n");
+        scr_printf (" Put a .WAD file along with PS2Doom.elf before running it or check if HDD paths are correct at ps2doom.config.\n\n");
         SleepThread();
     }
     
@@ -499,14 +499,14 @@ W_ReadLump
     else
 	handle = (FILE *)l->handle;
 
-	// Hack to make I/O quicker	
-	ps2_fseek (handle, l->position, SEEK_SET);
-    c = ps2_fread (dest, 1, l->size, handle);
+	//// Hack to make I/O quicker	
+	//ps2_fseek (handle, l->position, SEEK_SET);
+ //   c = ps2_fread (dest, 1, l->size, handle);
 
-	/*	
+		
     fseek (handle, l->position, SEEK_SET);
     c = fread (dest, 1, l->size, handle);
-	*/
+	
 
     if (c < l->size)
 	I_Error ("W_ReadLump: only read %i of %i on lump %i",

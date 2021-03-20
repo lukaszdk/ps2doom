@@ -437,447 +437,38 @@ P_SetThingPosition (mobj_t* thing)
 	    thing->bprev = NULL;
 	    thing->bnext = *link;
 	    if (*link)
-		(*link)->bprev = thing;
-
-	    *link = thing;
-	}
-	else
-	{
-	    // thing is off the map
-	    thing->bnext = thing->bprev = NULL;
-	}
-    }
-}
-
-
-
-//
-// BLOCK MAP ITERATORS
-// For each line/thing in the given mapblock,
-// call the passed PIT_* function.
-// If the function returns false,
-// exit with false without checking anything else.
-//
-
-
-//
-// P_BlockLinesIterator
-// The validcount flags are used to avoid checking lines
-// that are marked in multiple mapblocks,
-// so increment validcount before the first call
-// to P_BlockLinesIterator, then make one or more calls
-// to it.
-//
-boolean
-P_BlockLinesIterator
-( int			x,
-  int			y,
-  boolean(*func)(line_t*) )
-{
-    int			offset;
-    short*		list;
-    line_t*		ld;
-	
-    if (x<0
-	|| y<0
-	|| x>=bmapwidth
-	|| y>=bmapheight)
-    {
-	return true;
-    }
-    
-    offset = y*bmapwidth+x;
-	
-    offset = *(blockmap+offset);
-
-    for ( list = blockmaplump+offset ; *list != -1 ; list++)
-    {
-	ld = &lines[*list];
-
-	if (ld->validcount == validcount)
-	    continue; 	// line has already been checked
-
-	ld->validcount = validcount;
-		
-	if ( !func(ld) )
-	    return false;
-    }
-    return true;	// everything was checked
-}
-
-
-//
-// P_BlockThingsIterator
-//
-boolean
-P_BlockThingsIterator
-( int			x,
-  int			y,
-  boolean(*func)(mobj_t*) )
-{
-    mobj_t*		mobj;
-	
-    if ( x<0
-	 || y<0
-	 || x>=bmapwidth
-	 || y>=bmapheight)
-    {
-	return true;
-    }
-    
-
-    for (mobj = blocklinks[y*bmapwidth+x] ;
-	 mobj ;
-	 mobj = mobj->bnext)
-    {
-	if (!func( mobj ) )
-	    return false;
-    }
-    return true;
-}
-
-
-
-//
-// INTERCEPT ROUTINES
-//
-intercept_t	intercepts[MAXINTERCEPTS];
-intercept_t*	intercept_p;
-
-divline_t 	trace;
-boolean 	earlyout;
-int		ptflags;
-
-//
-// PIT_AddLineIntercepts.
-// Looks for lines in the given block
-// that intercept the given trace
-// to add to the intercepts list.
-//
-// A line is crossed if its endpoints
-// are on opposite sides of the trace.
-// Returns true if earlyout and a solid line hit.
-//
-boolean
-PIT_AddLineIntercepts (line_t* ld)
-{
-    int			s1;
-    int			s2;
-    fixed_t		frac;
-    divline_t		dl;
-	
-    // avoid precision problems with two routines
-    if ( trace.dx > FRACUNIT*16
-	 || trace.dy > FRACUNIT*16
-	 || trace.dx < -FRACUNIT*16
-	 || trace.dy < -FRACUNIT*16)
-    {
-	s1 = P_PointOnDivlineSide (ld->v1->x, ld->v1->y, &trace);
-	s2 = P_PointOnDivlineSide (ld->v2->x, ld->v2->y, &trace);
-    }
-    else
-    {
-	s1 = P_PointOnLineSide (trace.x, trace.y, ld);
-	s2 = P_PointOnLineSide (trace.x+trace.dx, trace.y+trace.dy, ld);
-    }
-    
-    if (s1 == s2)
-	return true;	// line isn't crossed
-    
-    // hit the line
-    P_MakeDivline (ld, &dl);
-    frac = P_InterceptVector (&trace, &dl);
-
-    if (frac < 0)
-	return true;	// behind source
-	
-    // try to early out the check
-    if (earlyout
-	&& frac < FRACUNIT
-	&& !ld->backsector)
-    {
-	return false;	// stop checking
-    }
-    
-	
-    intercept_p->frac = frac;
-    intercept_p->isaline = true;
-    intercept_p->d.line = ld;
-    intercept_p++;
-
-    return true;	// continue
-}
-
-
-
-//
-// PIT_AddThingIntercepts
-//
-boolean PIT_AddThingIntercepts (mobj_t* thing)
-{
-    fixed_t		x1;
-    fixed_t		y1;
-    fixed_t		x2;
-    fixed_t		y2;
-    
-    int			s1;
-    int			s2;
-    
-    boolean		tracepositive;
-
-    divline_t		dl;
-    
-    fixed_t		frac;
-	
-    tracepositive = (trace.dx ^ trace.dy)>0;
-		
-    // check a corner to corner crossection for hit
-    if (tracepositive)
-    {
-	x1 = thing->x - thing->radius;
-	y1 = thing->y + thing->radius;
-		
-	x2 = thing->x + thing->radius;
-	y2 = thing->y - thing->radius;			
-    }
-    else
-    {
-	x1 = thing->x - thing->radius;
-	y1 = thing->y - thing->radius;
-		
-	x2 = thing->x + thing->radius;
-	y2 = thing->y + thing->radius;			
-    }
-    
-    s1 = P_PointOnDivlineSide (x1, y1, &trace);
-    s2 = P_PointOnDivlineSide (x2, y2, &trace);
-
-    if (s1 == s2)
-	return true;		// line isn't crossed
-	
-    dl.x = x1;
-    dl.y = y1;
-    dl.dx = x2-x1;
-    dl.dy = y2-y1;
-    
-    frac = P_InterceptVector (&trace, &dl);
-
-    if (frac < 0)
-	return true;		// behind source
-
-    intercept_p->frac = frac;
-    intercept_p->isaline = false;
-    intercept_p->d.thing = thing;
-    intercept_p++;
-
-    return true;		// keep going
-}
-
-
-//
-// P_TraverseIntercepts
-// Returns true if the traverser function returns true
-// for all lines.
-// 
-boolean
-P_TraverseIntercepts
-( traverser_t	func,
-  fixed_t	maxfrac )
-{
-    int			count;
-    fixed_t		dist;
-    intercept_t*	scan;
-    intercept_t*	in;
-	
-    count = intercept_p - intercepts;
-    
-    in = 0;			// shut up compiler warning
-	
-    while (count--)
-    {
-	dist = MAXINT;
-	for (scan = intercepts ; scan<intercept_p ; scan++)
-	{
-	    if (scan->frac < dist)
-	    {
-		dist = scan->frac;
-		in = scan;
-	    }
-	}
-	
-	if (dist > maxfrac)
-	    return true;	// checked everything in range		
-
-#if 0  // UNUSED
-    {
-	// don't check these yet, there may be others inserted
-	in = scan = intercepts;
-	for ( scan = intercepts ; scan<intercept_p ; scan++)
-	    if (scan->frac > maxfrac)
-		*in++ = *scan;
-	intercept_p = in;
-	return false;
-    }
-#endif
-
-        if ( !func (in) )
-	    return false;	// don't bother going farther
-
-	in->frac = MAXINT;
-    }
-	
-    return true;		// everything was traversed
-}
-
-
-
-
-//
-// P_PathTraverse
-// Traces a line from x1,y1 to x2,y2,
-// calling the traverser function for each.
-// Returns true if the traverser function returns true
-// for all lines.
-//
-boolean
-P_PathTraverse
-( fixed_t		x1,
-  fixed_t		y1,
-  fixed_t		x2,
-  fixed_t		y2,
-  int			flags,
-  boolean (*trav) (intercept_t *))
-{
-    fixed_t	xt1;
-    fixed_t	yt1;
-    fixed_t	xt2;
-    fixed_t	yt2;
-    
-    fixed_t	xstep;
-    fixed_t	ystep;
-    
-    fixed_t	partial;
-    
-    fixed_t	xintercept;
-    fixed_t	yintercept;
-    
-    int		mapx;
-    int		mapy;
-    
-    int		mapxstep;
-    int		mapystep;
-
-    int		count;
-		
-    earlyout = flags & PT_EARLYOUT;
-		
-    validcount++;
-    intercept_p = intercepts;
-	
-    if ( ((x1-bmaporgx)&(MAPBLOCKSIZE-1)) == 0)
-	x1 += FRACUNIT;	// don't side exactly on a line
-    
-    if ( ((y1-bmaporgy)&(MAPBLOCKSIZE-1)) == 0)
-	y1 += FRACUNIT;	// don't side exactly on a line
-
-    trace.x = x1;
-    trace.y = y1;
-    trace.dx = x2 - x1;
-    trace.dy = y2 - y1;
-
-    x1 -= bmaporgx;
-    y1 -= bmaporgy;
-    xt1 = x1>>MAPBLOCKSHIFT;
-    yt1 = y1>>MAPBLOCKSHIFT;
-
-    x2 -= bmaporgx;
-    y2 -= bmaporgy;
-    xt2 = x2>>MAPBLOCKSHIFT;
-    yt2 = y2>>MAPBLOCKSHIFT;
-
-    if (xt2 > xt1)
-    {
-	mapxstep = 1;
-	partial = FRACUNIT - ((x1>>MAPBTOFRAC)&(FRACUNIT-1));
-	ystep = FixedDiv (y2-y1,abs(x2-x1));
-    }
-    else if (xt2 < xt1)
-    {
-	mapxstep = -1;
-	partial = (x1>>MAPBTOFRAC)&(FRACUNIT-1);
-	ystep = FixedDiv (y2-y1,abs(x2-x1));
-    }
-    else
-    {
-	mapxstep = 0;
-	partial = FRACUNIT;
-	ystep = 256*FRACUNIT;
-    }	
-
-    yintercept = (y1>>MAPBTOFRAC) + FixedMul (partial, ystep);
-
-	
-    if (yt2 > yt1)
-    {
-	mapystep = 1;
-	partial = FRACUNIT - ((y1>>MAPBTOFRAC)&(FRACUNIT-1));
-	xstep = FixedDiv (x2-x1,abs(y2-y1));
-    }
-    else if (yt2 < yt1)
-    {
-	mapystep = -1;
-	partial = (y1>>MAPBTOFRAC)&(FRACUNIT-1);
-	xstep = FixedDiv (x2-x1,abs(y2-y1));
-    }
-    else
-    {
-	mapystep = 0;
-	partial = FRACUNIT;
-	xstep = 256*FRACUNIT;
-    }	
-    xintercept = (x1>>MAPBTOFRAC) + FixedMul (partial, xstep);
-    
-    // Step through map blocks.
-    // Count is present to prevent a round off error
-    // from skipping the break.
-    mapx = xt1;
-    mapy = yt1;
-	
-    for (count = 0 ; count < 64 ; count++)
-    {
-	if (flags & PT_ADDLINES)
-	{
-	    if (!P_BlockLinesIterator (mapx, mapy,PIT_AddLineIntercepts))
-		return false;	// early out
-	}
-	
-	if (flags & PT_ADDTHINGS)
-	{
-	    if (!P_BlockThingsIterator (mapx, mapy,PIT_AddThingIntercepts))
-		return false;	// early out
-	}
-		
-	if (mapx == xt2
-	    && mapy == yt2)
-	{
-	    break;
-	}
-	
-	if ( (yintercept >> FRACBITS) == mapy)
-	{
-	    yintercept += ystep;
-	    mapx += mapxstep;
-	}
-	else if ( (xintercept >> FRACBITS) == mapx)
-	{
-	    xintercept += xstep;
-	    mapy += mapystep;
-	}
-		
-    }
-    // go through the sorted list
-    return P_TraverseIntercepts ( trav, FRACUNIT );
-}
-
-
-
+		(*link)->bprev = t  ºDA.É%W‰Ãø  àì  2 À,4@RPrv	j@‘›ÒPA|h
+>üÙ=?í‡HÅ7ü}Äa±"‚ùiÚèä…0«­ãAˆd—×åÃš¤ÌÖ›UÖ  °°  °°  °°   ×ÿû€  µ„OóÃ€  pp  pp  pp   (@a4@š	 ’ Ë€d ü„i4 C	€‹ÿe€è†€ÀIÿÔ•O‹%yV>P\ûŠ(·&41ÀºÀ˜üèRhÀtBrĞbÎM! gA)¿óme"à@È»ş :V`ht˜h 2H" `$ÃN°ápÓùÿX`h€¡0ûC5ƒÿÌÀ¶ŒLp T@;O!£¥[  =Ù›ƒ ©gı‰x¢=Õ˜Ìn`Bh† PÿáI4[‘ À2@BÏ µY:Äólìµ±èzÂ®`!üM=a`vÁÌ¢bràI¢`À4Z6ó ¡ø	‘±)Àa¿¨„‚Of€¨AäëÑ2€b )òÀb½“Ğl ğ0`I =G‰j-@?€©d.ŒïM¡€Yˆ™40 W¶@âj †³€Dm¦9Öiæ€hÀ@ø@4X! Gpï˜xR†g!:¹ğ	ÀË˜™°QÛ‹€Ä Ü,@
+´RhÅ'¸ñÖf&d“CP
+!“Sø!€)E”àüú²(€TŒè dì€B x¢XàĞ1ìH˜ ~~A0
+‚ ‚ëT^AeFPÂËß„6  b * ¨Gp0Xá¡$sà@; {À¡e£€éÉI`	Ï ‚ z .Ä0Ä€Ü`Ğ@ ¼‰e"`€
+á„'NJuâJV°@øA€€€; \ Ø˜° `W(o&ï“Ä+À@@-,”`Å°î	€ˆğĞÄ­ÓÀª˜@¿÷Ø_`L?\˜ nä¼C RØ@Npò f  ü€7%°€P¬½¥&’° Ø?@L	0 ´!`‰ü –íÉ,3$8L ”Ø@@Ğ ú¹$Üj’>+'¬!šŒM‚Š& 3`ä í¿oÉJZG@€À˜CP·S¡jŠÅ¿f‹Ë}`»‰€3 ^RP }úC]%´x@ÇId¿±¾ËAe#ñ›°°tHN¶¤L '!§’Ÿ°ò|8 Ò‚h@ÉeXÀÃ”:¼ ğšxœ€Ø R	À b  +OûØ ÀvĞ-Ş±ÖÉa°(7Ö‚ïÚÂO
+œ&ô@;ˆ¸M†oL§W\·ÇúZ¤¿%«4H°qĞÂÉö+oÛD=ô><q>ñ0Òay“a¼ïçÓÙø™0“Şâœ}üÀj­µ!§ô¨b_®œù,.ÅâiÍ¸¢4±“.{n6o‚)v¤nAÖŞlª€  ?”’'J» P? ¹˜ ô° 9XC¹ @LÜ`ii¬ğjÓÛØùó"`c¬˜…“3©Í€rL1,É$lwHñ0p¡€ˆhJ@CKÈCrYàXI‰%…£Àg$Ïş	bâÙ˜à×Ğû@¡€]#O€bŸØø¼1gIy»~„ù!˜\¸g]ZtÑ»¬èúäù‘´`0”üPgCº0sD¡˜
+¸ÀtŠ&à‚n+-ğU¶%ä¿í¾$m‰.Nh´à“pj1\¥œçÀB÷´<š€ÂŠŞ% ¤’Å %fª&$€PÉÃ pˆ¤ö%%'q13§†= ¼·5‚Yl&Ü’S‚R°>u3C­Ôşˆ5øùˆ¶djRz©oï&Û˜È‡À'-%>6#DÔá¸DCìœ€&¡Ã¤î×£äI7±âdûSG±Õ6‘ÇÜ¯ucÆÁçÁ©$É2JûË»&%fÅ™l>ôÿãcl&‘1áğ ~€ € ¨àúÄĞ[€è€¾ ; Ìµ’İ±XÕÌ9L§ã±¾: HL À @€L Ğ4˜Eä/†ro<¾1_¸Šê2I1ìVL p è0 D 
+€ €„L&C/Èiâİää„$á¼Ø›¾ æUaáAô(,[˜B¹†Bá$"CHY<¢“‡vT R „áE ( ¸˜dÉ€3zCZ±,{%{(Â_@À¸ Õ ;“€rÉGù8P	 ü˜3d@t_&¸êô~ …‰dÒœ	ãÅß<ˆR€€ op1ˆ×º ~ Ø
+€. b@ Å¢h€ªJâú:¾ï  äš”X·s€6ÎCûİ ¾&k>a}«ä{!Ãì¤!H%!—Î°Aa…”İÔbj8¢óÅ†fN¸
+%QŞZ­´-å~„9Î2NùØ  ºDA.Í¶‰Ãø  àì  #o€•†4Y)5Ş>Ò˜
+Ad¾Œûº¶€B)<§V‹&ü1\ *î¬t…ªèXhhbĞ†çh”5ù–cÀg%¬GŒ/¤À9 ×ı(úËÆ^a| xyÚ(Ğö¿ü›sÌò
++ÑE†0y.Pâ=)^èª†a•r0=Ä)Jxğ„E#lì±q¢èş?›Ç¡Åcb”PÊ»ó¥ÉZUGñ
+Q©°sôQ†‹IÇ&NïšCROwpÇFÃ§ÆRpØ®…7óJ¶Øé|¦Ê’5©Ñ˜Pú@½™£µ®U°I
+2Y’å.Ñ{²ä´¦º?‰Òš=Rª‘¦@  Ÿ0 À4 tr, €ÄY€İ'ŒĞ (0@Ò`$
+ dH@;I/Î…ç	XÇ@  HÀÒH@`S<äH `€ªÃ	  +¤8fK…é7…Xûf$†Cş@ÆJA¹ c¥ö|IeiĞ*BäÂV&†-(`´‡ óàÎVÎy\³–œQly¢äC2•ßå-bÖ`è|}±G€p‚!Òš)’…ÏÕßºy9PO@Jâxëfd”ò­Ò•›êÙ9ä¬SŠÊş‚®Â%Ôqµ÷<.ÒG¤¤5'?ĞÏ‘ÃJà{,ÿĞ° î-_áü<…ZÇÃz„Ù729¬ÜP0&  h…h)Çø¼víƒÔÛè™|¯ÅE†¬ËpW$}$½°Än€
+OœéFİ0Cç¹l¯øøth¸×›´‹°¥Â¥áPN]XW `	ÉH ­ T5à‹d$î_Áp8Š/”1#Rp§#À1!À 	À0&“ tYI‰0šà;+”rƒÎSntÂ‹Ò!<?F°ÒFP
+ÅD¯ñ ’Ö…Eä¿rtXt“ŠÃät±üÛe3hş%ĞøM9ìĞ^ƒãYW , r€2 üEìàX˜øĞ—‹HR Ğ–”T òPP| à†† ¼Éû1EbÜòQ¥ÀEÈğ°Ğ*KOw„2Ï3‡À ÑH(T‡À!Øh! :aÎD£»UÁ$0íx7åK‰»ïxü5W¬2Ç†2\9¥yœÛA/ºvÎÜd5–7ÿG|-§¥Şb±Á§àßáÉX(°¨´1İîÉŒ°µÄ®é!±¤Â,„ueŠˆDÅ€ÄPi<ù$—eEb%Èœízë%­óU°aœ¹!Ó·w¶A6«@¬ $.PsÊÎÆê¥XB;c®À¯)s5³1Lu´aqjĞBí—	#Gááwm3Æ\ÄYİíAU¦„I§ùõïu×1Ó@  Œ™¡â3@;&§¤o&7Ç·8Q"É€1+“Frö€’³	?‰G±¶2`!€.î3tù,%q+“`÷ÜÎÛ8qqE,²Wi™[ {xá¡ÎÈ1÷8Á/';ºqIFá;q’êµÀe€¬Ñ/3,Î€€İ’y#‘‰Ö·ø—Ø””Õä¸Ôr] n4Õ‰y¼Ï“yhpÑƒ:rºRGÄèb’5	Å˜ı8y ín?’ÀxEV’¤¨gÊæ´‰wòˆDÀHÕpşæD î€†$3îF%$°&„á>ˆb@¦+`0?¥ÉßDŞÅ–Œ³†:Ä»M–Y™öu¤Â<M, 4‚7ı#n)¼B	A(å¾%¼Å–aa½£üM%¥@]¾ÚMèIg‡ÉÚFNÀp÷Âäà#ªÓe÷’¤Ê·–PûIÃ`w’z ÑCÀUäÖ0À×'[?ÂÎ¼°7»A«jø×â÷ÿÉÜH¦"ÛpéxÃÎe¢ÇÃà,ZÎ’PÎp‡›`%aT‘€0 zL!`* ë&îH,¾p{DĞÂÀ¨a`&&€À¼$¬XiH$g1 PCä0“H`;!÷G( ³d–ŸÀ¾ˆ@x€@”pK°ZöÊRp*çZLĞÄ” 3xvQ, älPÀ;!’ù0Ê+şgq¸‘ f‚jq5–¡ø”@T ä¼RR‘„€0Z,1Lp¢|³…¼Ykë'ZZKYiJ’@³Iğn_Qï„J	@1,˜±ü|PÀÁxš 	òz‡HvG@TCJô~y­m0A
+“@RV(05 ²_ËGÆ Ø·Îo€Á °	ƒC@€À°“p	Ë¸ğ’[•ÀÎ%€Ü„‘ àc:‚g
+uˆĞ€£ Tóà“]$Ä:3Û(„PÎ­ÓÄd&ØÆÃa0hhoA ”Œ½rjIªs°tYæ¯Åaâ!“;åÁ‰!”‡á^N³`ÍœaíNË~`IHQhÜğ¨@Û(zãÎkP™8V„ÈF*J8Æû„%ÏÀn‘–;+ßaŒ;ö|³öƒï2AD­ÔÃx
+îµx0?Üà+‘g öc°áQHY4š=‰&é­f  ºDA.ÒLU‰Ãø  àì  GÿxR@õs!‡¤VÀÂ{HûÛ.ı§œtıøÛa„ªĞje™?º Ç‘GñôÑc¢«Zî€v|i±¶Â qs8éÄ]Úl |Z#Lh^^ÙH	ŒDõÁw˜ò€"g“v‚¥Ê][HNhËSM   ?‘†“I‰ÊF (4™÷ß°ç® ¸`CÛìÿğÄlÇK†PKÚÇÆÌ“‰½8Ävr$ÙiqJ€²(½úùÂ¸UÒ‘¿®YnùDfäwº×\Ä„;Ì>ĞI®Ê‘ŒúœÓGRS²WÛtŸñrÕl"«w´¬Ø|D‹Ìm¥$ÎÃ…ÚX£–â4â”8é­
+ƒJHÃP„l„†âËİY¥7; Œæ¿tóòƒ@I‚?Pæ(PïN’¸Ğ3¶á{0s©ÇÉÃ9H!‚rk'“oŒsOZ£Ì{Ba Â`nb‹ °7$–°ääŸ($°!%Œp× Y>&¥Ğ€á ğaEô¨%pDÿ)Ín’Ğøbû$©à' ¼h`®ªñ·@•ßoòŒ	SU±Ş:®ĞaB!«ÃÃ_/A¤>à6û0! 4’—l²åğé¦9âí;Æı–ÂhÆƒzsº<:ĞB)u©ïHÂöÊ?úàYÈ³ñox€ôà“aL‰€'Ø|”À;,7“ ÃVBvK`
+A#ÿ?’‚ ",˜à8,ç3–µ‹h ÌÀšz¶nDˆa€)&Ê|ã”3IG‡‚T¿[rXÑLiL,¾7  PÜ?{(¾ ~M&ä¤€í¢×ÙP¹.ü>-,œbìÍ©8Ñ÷˜Mß YÅ˜`À¿Àg) ĞÌ”†!Ç$ö(–zq+³¶ÊÂé|ğ»i ¯$ì‚Û$’Ä¥ ò1Ğ` ~¸ÄÒ ¸P €h ô™²	‰FpÀÔ¬ø4„ŒÄ’ÿİÏT”J/ f‚a1 T0°ÀŞÒ²b=RHE`™<Ë!–ã ûGãK×&Paa¬çnD]i@@vKÄ £e€ã,  øÒXA„·nŒÔ $à'B üdÂÿ?¸‡]æ`*Íz¢Ç	±áƒ
+%“¾7­™º‰ÄzAlÖ9àĞÂù7“C9OÍãp±x((”~[„CI,Ü]ñ¬z=æ~×Æ0´ÿø”YÀlËNù¼ãÄÈËI/¥!~XÇh}%g¤*Ğ™—ÖØ'lÀøšœ‡&l#e€²úˆ\ô'şÅCKN8§ÜôJÊão0f&¤
+§:@rãs Â¸ÒhìÊ‰DÒÆFœ0g@åÀP˜²ñÊ&INmÔÔùvPî¹–‚G¶]˜ë™vÃíUÜÈñùc=Zg1’¼!4¥)Ò6wa[¡ã±©»I™wŒ¶£K—WCïO~U°ĞI:8Éw”[İÕ£)F  	ˆ˜^ t J ÿ€œ@€èd ¤h(‡†,	Ÿ j Ä8€`0°(M:J/¡{wT œLŞ ¼ÛD†–…”éâe   / *&€˜† P T`P1(G£KÄÀ2àO„0Ì" zY(ô@	dÕÃN'Xø\0•¿ÉÉíD¨¼…¶t@×b"òÿq>C7ñy.J}àW¬¬¿J—hL!¸Ğˆmœ0š0µ`è´–²_ÉÉB•  B ‰¡¬„J<Mr±j^?}4«}…òNi!™\–‘ K'ğjú|w:”«Y<_Bb«§¶%!}Àÿ<sI!ÜÃØUÂ2ş0Ç/‡ÔyÔüÊu›Ø¢Ò~„?,zÉFò4CAEr‹	$'…@%I@=;‡$C9âl0`Ag›ÔKÃ6äœ”¨ P€&‹B±)<÷B–ÎhšÀ`åp	€š´p(ş©cÂ;î0=¨|8 ØdÄ8Î×ğâ¹ß®D²®`øfàL˜XÃ$îÌæö>‡PÓ-A(tnÒmUó’çA¡¤‚fÆ“O¢ÔRXØ4€0p‹B®‰ˆ:Ùá§)k‹;¦ßÏ®Š1®K¾´nòîÉƒì}FøÚº&Ç_œï.İVÊV Ôæ?¨DQ4
+ rĞ’ìÀuÂ7àRÆ²¾4¢\ +€v©A 0ü4¼†0Æ!ÜpP¤@–©,¥X²ih$-,_ÅœaĞâ"Æ+ıh0`C9õ şå’{È&€ÜÄÔ£ cå¸ÀOGÁĞØØÆôœe Ñ„ ,£°·’C!€œ
+dpd„³ôîyª>!€ZrRœè²Èe–ZÈD ÂJ“”)²ÿy;[(Y{§çà8:(5$„`áp}ÜãHJÀÑƒCı!ó‹W†½ É„0 5&€:&€VbÀÁhÂk)$Ò¿	üY° }ˆÀú€P@:(éI„JIX´ØÁğÀ®)¾3wä‘LIÁôYD´C‘†r€ú;+  ºDA.Öİ‰Ãø  àì  ”ib3À:I3—²{mÏİ¼^BGm»œ­aqó 5AÒ`¨	‹bh@\Æ§’’ÇÌS ¤£fpÀ€ ),ˆÁ  Ù4@:ÈE¸fÃVYKe	€ > !Ğ0€2 Zd“ ¨Ü‚d¤ìüÑ¼ ¬4ÄÀÔnLNvŞ PB	4˜M,0
+”Ÿ²Qó!p/Ã?ëCg:ÙAË€5ÀT Ò±ÃiŸ	¤ ãqû“š;¡<áœœ÷dÄlŒ*‰$>ÙFól’¡‡ó ”¾§ÇkA5bXı¾äø
+şHi0”NÑ7â@ìLÎ¸5%¤4ğ¨c5Ê˜Äj2\‹V>ØIv¥“zn”W»¤wT¤Ôı©Uş¬U¦O—KfvQZÎ€ = F ğâ@vÀcÖb>åì/NÖ04–öã  œàT]˜ ´ğÅ•¾s` ƒü &I`6à:&†t$`n%%\Zœ>uu[½Ÿ0‡ÉZâgz,äÌRÊ,æûĞHëeÄrÈ45"¦±Ã¡—»e-ë}££­Î¼ôÚô‰Ò2ø  
+>€Àb@t’ÿì:ùè ¸@A€ ÅÕ$ä=°uéÁ 
+@ € œü ñ…ğÎ?v@@ 3 L Bİ€˜
+`Ô~e¡eğÎúç& Í™–ä.…`
+S€Eò?† İ9``7á¨@€äñ¸¾„­jáx}p”÷w,›ÆæVâäsïbÀQÓ†eÚ„p«?öÌ!'íëš¾¶& h0¸0Éÿ@2Üá¹*€. l(€ §N …! $	)À!ƒzËÀa88­²ó`‡ÊÀìĞM°ÈP|½åÃíT7¶Ç0ÀB/á= ‰ÿ 6$´—Voû"Y”_JX5±7sûBm‰„Ü–¡¥aÍ3pÂJÉ‰³ÄI-,BP"ÿĞ ÈágGvÓ¹½oXù? ’³´0_,•¿+lÅå¶Y¯KG&ğ2œ†îÉqœókq€;&ÿÜ”¬€ÎN@hù’–Æ–†0VI“Íl0b
+ÀeâBÃV`Q} \[@ÁG?›ÿ"%ä%ÄĞ*K@,À'àBÿ’ha_©)"|ª&âƒR_À`¢ÒP)ÂC1C~VsZBÕâ^ì Ã€ìÑ†º0J\²˜VŞ ÛÚ¨Øš€8OöwPG‰¿p
+€tKC3xÁPm±ì:OøÚ2ĞÖ… á·†âD•Š±©O«E„lòv†^eVÍªo%´_;‡F Kg•aL¹Q 7 (XpĞ0¶@XT¦À1HhÏ >aŒWHb0 È˜–xi: ÈÀ:Å–Wû•‘Èd"†¶Å–àüëÌ¥Š€@€ÂX «€ZÖ’Ù™ÀrQD„	g¡“%Vƒ&DÀĞÒh0o% äÙOäù(QDÌ…dƒøÒiC7Ûãï´ôE£øÊ¦U |Ñì£ŠĞIÂä–á‰Hf-niÑ)€-Ù KÄĞ+”6(ä®îúÆq¿c,†e ¯Š;àÄ0Ü4ÀŸà(	iİ	dî>I+›a…±ã•hÌ&@ÒnOÉS¨30Afàã @ı ä2å ÄaÍÆY¤Ô÷HÅ©V._Á¡¿§)Cœğ¨5€XMÀT¢À¸aÅu”îx|4™˜%c¤âú@ÂC¯ZK˜€ ô 0&P(‚÷JIŒŒëÄø4``€: L·JÀ€€€Èğ@`°Âø!#F¤Á™…ø@ B”‚‹ù÷Ìk…ÄÀ(0ˆb‹ÃMìlÀÖzÂ@Ñ€U9‹³dşÅŠ€ \Aş €BLÉÙÛŠ^3y%t¤19YCfà7(07|µ‡´1,Ù& ‹@ÀCÿ€* QÀ'S‰€tLà…ÿ>+âtK%`	ŠGOÀ]®Âš¹Xƒ"÷X`­[™"ÚumJLteMvqo}áÔªŸn—N¢Æ @ „y` tR tLàTğÈ`€ ÁéJTà"> -8@€@À brø`1) €?î0²É©	3Ú TCØ& )0ÒL¸`q >R<jÏê€  ÀÀ@4 Ìye” Æ ´3¾r±Âl%{-R ²†·™0d0ÒÀ€^CHˆk$
