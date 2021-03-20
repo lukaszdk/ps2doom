@@ -26,7 +26,7 @@
 				ReBuildCommandLine=""
 				CleanCommandLine=""
 				Output="ps2sdldoom_VS2005.exe"
-				PreprocessorDefinitions="WIN32;_DEBUG;HAVE_MIXER"
+				PreprocessorDefinitions="WIN32;_DEBUG;HAVE_MIXER;_EE"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -69,6 +69,14 @@
 			</File>
 			<File
 				RelativePath="..\am_map.h"
+				>
+			</File>
+			<File
+				RelativePath="..\cosmitoFileIO.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cosmitoFileIO.h"
 				>
 			</File>
 			<File

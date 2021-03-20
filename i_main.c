@@ -57,6 +57,9 @@ static char s_pUDNL   [] __attribute__(   (  section( ".data" ), aligned( 1 )  )
 #include <kernel.h>     //for GetThreadId 
 #include <libmc.h>
 
+#include "cosmitoFileIO.h"
+
+
 extern int SAMPLECOUNT;
 
 int getDisplayModeFromELFName(char **argv);
@@ -74,8 +77,9 @@ int main( int argc, char**	argv )
 	SifInitRpc(0); 
 
     init_scr();
-    scr_printf("                           --==== PS2DOOM v1.0.2.2 ====--\n\n");
-    scr_printf("         A Doom PS2 port started by Lukasz Bruun and improved by cosmito\n\n\n");
+    //scr_printf("                           --==== PS2DOOM v1.0.2.2 ====--\n\n");
+    //scr_printf("         A Doom PS2 port started by Lukasz Bruun and improved by cosmito\n\n\n");
+    scr_printf("                           --==== PS2DOOM v1.0.3.0 ====--\n\n\n");
 
     int ret;
     printf("sample: kicking IRXs\n");

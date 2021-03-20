@@ -1,6 +1,6 @@
-Is is version 1.0.2.2 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
+Is is version 1.0.3.0 of PS2Doom, a port of Doom for the PS2, started by Lukasz Bruun (http://lukasz.dk) and currently maintained by me, cosmito (http://ps2homebrewing.wordpress.com). It also features audio support functions by Jason Yu (http://www.jasonyu.net).
 
-Run PS2Doom.elf using uLaunchELF and make sure you have a doom1.wad, doom.wad, or doom2.wad copied at the root of a USB pen attached to tou PS2 (put only one .wad at the USB pen since currently no selector is made).
+Run PS2Doom.elf using uLaunchELF and make sure you have a doom1.wad, doom.wad, or doom2.wad copied at the same directory as the ps2doom.elf. Memory cards and USB storage devices can be used and also. Currently HD support is not implemented. Put only one .wad at a time since currently no selector is made yet.
 
 
 Dualshock Joystick mappings:
@@ -23,7 +23,7 @@ Analog Right click: Brightness (gamma)
 
 Please note: Enter key action (required to menu operations like starting new game) is a bit clumsy for now. For bringing up the menu, use the Cross button but to select items, use the Start button. This will be fixed.
 
-You can use any USB compatible with the PlayStation2 also.
+You can use any USB compatible keyboard with the PlayStation2 also.
 
 
 Source is included. Also a Visual Studio 2005 project just for code browsing (it doesn't compile).
@@ -44,6 +44,10 @@ cosmito
 
 History:
 ========
+
+01/05/2009 - v1.0.3.0
+  - Now loads the .wad from current directory. No need to put it at a root of a USB device anymore. As consequence, loads perfectly from memory card.
+  - The Quit option menu now boots back to the OSD PS2 Browser
 
 20/04/2009 - v1.0.2.2
   - Enabled game save/load to memory card (mc0:). Use R1 e R2 buttons to write funny savenames

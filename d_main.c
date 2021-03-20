@@ -86,6 +86,7 @@ static int access(char *file, int mode)
 #include "p_setup.h"
 #include "r_local.h"
 
+#include "cosmitoFileIO.h"
 
 #include "d_main.h"
 
@@ -588,11 +589,20 @@ void IdentifyVersion (void)
 
     char *home;
     char *doomwaddir;
+	
+#ifdef _EE
+    char elfFilename[100];
+    char deviceName[10];
+    char fullPath[100];
+#endif
+
     doomwaddir = getenv("DOOMWADDIR");
 
 	#ifdef _EE
 		//doomwaddir = "";
-        doomwaddir = "mass:";
+        //doomwaddir = "mass:";
+        GetElfFilename(myargv[0], deviceName, fullPath, elfFilename);
+        doomwaddir = fullPath;
 	#else
     if (!doomwaddir)
 		doomwaddir = "./";
