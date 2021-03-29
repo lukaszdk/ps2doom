@@ -1042,8 +1042,8 @@ void IdentifyVersionAndSelect (void)        // cosmito
     char *doomwaddir;
 	
 #ifdef _EE
-    extern char elfFilename[100];
-    extern char deviceName[10];
+//  extern char elfFilename[100];
+//  extern char deviceName[10];
     extern char fullPath[256];
 #endif
 
