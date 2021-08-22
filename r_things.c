@@ -30,16 +30,16 @@ rcsid[] = "$Id: r_things.c,v 1.5 1997/02/03 16:47:56 b1 Exp $";
 #include <stdlib.h>
 
 
-#include "doomdef.h"
-#include "m_swap.h"
+#include "include\doomdef.h"
+#include "include\m_swap.h"
 
-#include "i_system.h"
-#include "z_zone.h"
-#include "w_wad.h"
+#include "include\i_system.h"
+#include "include\z_zone.h"
+#include "include\w_wad.h"
 
-#include "r_local.h"
+#include "include\r_local.h"
 
-#include "doomstat.h"
+#include "include\doomstat.h"
 
 
 

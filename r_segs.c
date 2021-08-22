@@ -31,13 +31,13 @@ rcsid[] = "$Id: r_segs.c,v 1.3 1997/01/29 20:10:19 b1 Exp $";
 
 #include <stdlib.h>
 
-#include "i_system.h"
+#include "include\i_system.h"
 
-#include "doomdef.h"
-#include "doomstat.h"
+#include "include\doomdef.h"
+#include "include\doomstat.h"
 
-#include "r_local.h"
-#include "r_sky.h"
+#include "include\r_local.h"
+#include "include\r_sky.h"
 
 
 // OPTIMIZE: closed two sided lines as single sided

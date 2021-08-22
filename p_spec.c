@@ -30,27 +30,27 @@ rcsid[] = "$Id: p_spec.c,v 1.6 1997/02/03 22:45:12 b1 Exp $";
 
 #include <stdlib.h>
 
-#include "doomdef.h"
-#include "doomstat.h"
+#include "include\doomdef.h"
+#include "include\doomstat.h"
 
-#include "i_system.h"
-#include "z_zone.h"
-#include "m_argv.h"
-#include "m_random.h"
-#include "w_wad.h"
+#include "include\i_system.h"
+#include "include\z_zone.h"
+#include "include\m_argv.h"
+#include "include\m_random.h"
+#include "include\w_wad.h"
 
-#include "r_local.h"
-#include "p_local.h"
+#include "include\r_local.h"
+#include "include\p_local.h"
 
-#include "g_game.h"
+#include "include\g_game.h"
 
-#include "s_sound.h"
+#include "include\s_sound.h"
 
 // State.
-#include "r_state.h"
+#include "include\r_state.h"
 
 // Data.
-#include "sounds.h"
+#include "include\sounds.h"
 
 
 //
