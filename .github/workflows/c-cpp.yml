@@ -15,4 +15,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: instalação dos apps de compilação
       run: |
-       apk add -y build-base git bash
+       apk add build-base git bash
