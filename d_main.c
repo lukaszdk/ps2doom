@@ -49,41 +49,40 @@ static int access(char *file, int mode)
 	return(-1);
 }
 
-#include "doomdef.h"
-#include "doomstat.h"
+#include "include\doomdef.h"
+#include "include\doomstat.h"
 
-#include "dstrings.h"
-#include "sounds.h"
+#include "include\dstrings.h"
+#include "include\sounds.h"
 
 
-#include "z_zone.h"
-#include "w_wad.h"
-#include "s_sound.h"
-#include "v_video.h"
+#include "include\z_zone.h"
+#include "include\w_wad.h"
+#include "include\s_sound.h"
+#include "include\v_video.h"
 
-#include "f_finale.h"
-#include "f_wipe.h"
+#include "include\f_finale.h"
+#include "include\f_wipe.h"
 
-#include "m_argv.h"
-#include "m_misc.h"
-#include "m_menu.h"
+#include "include\m_argv.h"
+#include "include\m_misc.h"
+#include "include\m_menu.h"
 
-#include "i_system.h"
-#include "i_sound.h"
+#include "include\i_system.h"
+#include "include\i_sound.h"
 #include "i_video.h"
+#include "include\g_game.h"
 
-#include "g_game.h"
+#include "include\hu_stuff.h"
+#include "include\wi_stuff.h"
+#include "include\st_stuff.h"
+#include "include\am_map.h"
 
-#include "hu_stuff.h"
-#include "wi_stuff.h"
-#include "st_stuff.h"
-#include "am_map.h"
-
-#include "p_setup.h"
-#include "r_local.h"
+#include "include\p_setup.h"
+#include "include\r_local.h"
 
 
-#include "d_main.h"
+#include "include\d_main.h"
 
 //
 // D-DoomLoop()

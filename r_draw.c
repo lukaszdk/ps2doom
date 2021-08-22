@@ -28,19 +28,19 @@ static const char
 rcsid[] = "$Id: r_draw.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 
 
-#include "doomdef.h"
+#include "include\doomdef.h"
 
-#include "i_system.h"
-#include "z_zone.h"
-#include "w_wad.h"
+#include "include\i_system.h"
+#include "include\z_zone.h"
+#include "include\w_wad.h"
 
-#include "r_local.h"
+#include "include\r_local.h"
 
 // Needs access to LFB (guess what).
-#include "v_video.h"
+#include "include\v_video.h"
 
 // State.
-#include "doomstat.h"
+#include "include\doomstat.h"
 
 
 // ?

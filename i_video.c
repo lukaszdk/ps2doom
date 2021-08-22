@@ -28,14 +28,14 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "SDL.h"
 
-#include "m_swap.h"
-#include "doomstat.h"
-#include "i_system.h"
-#include "v_video.h"
-#include "m_argv.h"
-#include "d_main.h"
+#include "include\m_swap.h"
+#include "include\doomstat.h"
+#include "include\i_system.h"
+#include "include\v_video.h"
+#include "include\m_argv.h"
+#include "include\d_main.h"
 
-#include "doomdef.h"
+#include "include\doomdef.h"
 
 
 SDL_Surface *screen;
