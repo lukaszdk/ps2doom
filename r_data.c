@@ -35,21 +35,21 @@ extern void *alloca(int);
 #endif
 #endif /* __BEOS__ */
 
-#include "m_swap.h"
+#include "include/m_swap.h"
 
-#include "i_system.h"
-#include "z_zone.h"
+#include "include/i_system.h"
+#include "include/z_zone.h"
 
-#include "w_wad.h"
+#include "include/w_wad.h"
 
-#include "doomdef.h"
-#include "r_local.h"
-#include "p_local.h"
+#include "include/doomdef.h"
+#include "include/r_local.h"
+#include "include/p_local.h"
 
-#include "doomstat.h"
-#include "r_sky.h"
+#include "include/doomstat.h"
+#include "include/r_sky.h"
 
-#include "r_data.h"
+#include "include/r_data.h"
 
 //
 // Graphics.

@@ -28,7 +28,7 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #ifdef __GNUG__
 #pragma implementation "doomstat.h"
 #endif
-#include "doomstat.h"
+#include "include/doomstat.h"
 
 
 // Game Mode - identify IWAD as shareware, retail etc.

@@ -4,7 +4,6 @@
 
 int gethostname(char *name, int len)
 {
-
 	return -1;
 }
 
@@ -20,6 +19,5 @@ float pow(float a, float b)
 
 int setbuf ( FILE * stream, char * buffer )
 {
-
 	return 0;
 }

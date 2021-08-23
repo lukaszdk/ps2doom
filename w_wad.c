@@ -31,15 +31,15 @@ rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 #include <string.h>
 #include <ctype.h>
 
-#include "m_swap.h"
-#include "doomtype.h"
-#include "i_system.h"
-#include "z_zone.h"
+#include "include/m_swap.h"
+#include "include/doomtype.h"
+#include "include/i_system.h"
+#include "include/z_zone.h"
 
 #ifdef __GNUG__
 #pragma implementation "w_wad.h"
 #endif
-#include "w_wad.h"
+#include "include/w_wad.h"
 
 
 
