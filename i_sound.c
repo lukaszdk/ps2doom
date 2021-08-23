@@ -31,16 +31,16 @@ rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 #include "SDL_byteorder.h"
 #include "SDL_version.h"
 
-#include "include\z_zone.h"
+#include "include/z_zone.h"
 
-#include "include\m_swap.h"
-#include "include\i_system.h"
-#include "include\i_sound.h"
-#include "include\m_argv.h"
-#include "include\m_misc.h"
-#include "include\w_wad.h"
+#include "include/m_swap.h"
+#include "include/i_system.h"
+#include "include/i_sound.h"
+#include "include/m_argv.h"
+#include "include/m_misc.h"
+#include "include/w_wad.h"
 
-#include "include\doomdef.h"
+#include "include/doomdef.h"
 
 
 // The number of internal mixing channels,

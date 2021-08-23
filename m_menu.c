@@ -28,35 +28,35 @@ rcsid[] = "$Id: m_menu.c,v 1.7 1997/02/03 22:45:10 b1 Exp $";
 #include <stdio.h>
 #include <ctype.h>
 
-#include "include\m_swap.h"
-#include "include\doomdef.h"
-#include "include\dstrings.h"
+#include "include/m_swap.h"
+#include "include/doomdef.h"
+#include "include/dstrings.h"
 
-#include "include\d_main.h"
+#include "include/d_main.h"
 
-#include "include\i_system.h"
-#include "include\i_video.h"
-#include "include\z_zone.h"
-#include "include\v_video.h"
-#include "include\w_wad.h"
+#include "include/i_system.h"
+#include "include/i_video.h"
+#include "include/z_zone.h"
+#include "include/v_video.h"
+#include "include/w_wad.h"
 
-#include "include\r_local.h"
+#include "include/r_local.h"
 
 
-#include "include\hu_stuff.h"
+#include "include/hu_stuff.h"
 
-#include "include\g_game.h"
+#include "include/g_game.h"
 
-#include "include\m_argv.h"
+#include "include/m_argv.h"
 
-#include "include\s_sound.h"
+#include "include/s_sound.h"
 
-#include "include\doomstat.h"
+#include "include/doomstat.h"
 
 // Data.
-#include "include\sounds.h"
+#include "include/sounds.h"
 
-#include "include\m_menu.h"
+#include "include/m_menu.h"
 
 
 

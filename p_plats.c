@@ -25,21 +25,21 @@ static const char
 rcsid[] = "$Id: p_plats.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 
 
-#include "include\i_system.h"
-#include "include\z_zone.h"
-#include "include\m_random.h"
+#include "include/i_system.h"
+#include "include/z_zone.h"
+#include "include/m_random.h"
 
-#include "include\doomdef.h"
-#include "include\p_local.h"
+#include "include/doomdef.h"
+#include "include/p_local.h"
 
-#include "include\s_sound.h"
+#include "include/s_sound.h"
 
 // State.
-#include "include\doomstat.h"
-#include "include\r_state.h"
+#include "include/doomstat.h"
+#include "include/r_state.h"
 
 // Data.
-#include "include\sounds.h"
+#include "include/sounds.h"
 
 
 plat_t*		activeplats[MAXPLATS];

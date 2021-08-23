@@ -27,44 +27,44 @@ rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #include <string.h>
 #include <stdlib.h>
 
-#include "include\doomdef.h" 
-#include "include\doomstat.h"
+#include "include/doomdef.h" 
+#include "include/doomstat.h"
 
-#include "include\z_zone.h"
-#include "include\f_finale.h"
-#include "include\m_argv.h"
-#include "include\m_misc.h"
-#include "include\m_menu.h"
-#include "include\m_random.h"
-#include "include\i_system.h"
+#include "include/z_zone.h"
+#include "include/f_finale.h"
+#include "include/m_argv.h"
+#include "include/m_misc.h"
+#include "include/m_menu.h"
+#include "include/m_random.h"
+#include "include/i_system.h"
 
-#include "include\p_setup.h"
-#include "include\p_saveg.h"
-#include "include\p_tick.h"
+#include "include/p_setup.h"
+#include "include/p_saveg.h"
+#include "include/p_tick.h"
 
-#include "include\d_main.h"
+#include "include/d_main.h"
 
-#include "include\wi_stuff.h"
-#include "include\hu_stuff.h"
-#include "include\st_stuff.h"
-#include "include\am_map.h"
+#include "include/wi_stuff.h"
+#include "include/hu_stuff.h"
+#include "include/st_stuff.h"
+#include "include/am_map.h"
 
 // Needs access to LFB.
-#include "include\v_video.h"
+#include "include/v_video.h"
 
-#include "include\w_wad.h"
+#include "include/w_wad.h"
 
-#include "include\p_local.h" 
+#include "include/p_local.h" 
 
-#include "include\s_sound.h"
+#include "include/s_sound.h"
 
 // Data.
-#include "include\dstrings.h"
-#include "include\sounds.h"
+#include "include/dstrings.h"
+#include "include/sounds.h"
 
 // SKY handling - still the wrong place.
-#include "include\r_data.h"
-#include "include\r_sky.h"
+#include "include/r_data.h"
+#include "include/r_sky.h"
 
 
 

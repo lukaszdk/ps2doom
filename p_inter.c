@@ -27,16 +27,16 @@ rcsid[] = "$Id: p_inter.c,v 1.4 1997/02/03 22:45:11 b1 Exp $";
 
 
 // Data.
-#include "include\doomdef.h"
-#include "include\dstrings.h"
-#include "include\sounds.h"
+#include "include/doomdef.h"
+#include "include/dstrings.h"
+#include "include/sounds.h"
 
-#include "include\doomstat.h"
+#include "include/doomstat.h"
 
-#include "include\m_random.h"
-#include "include\i_system.h"
+#include "include/m_random.h"
+#include "include/i_system.h"
 
-#include "include\am_map.h"
+#include "include/am_map.h"
 
 #include "include\p_local.h"
 

@@ -24,12 +24,12 @@ static const char
 rcsid[] = "$Id:$";
 
 // We are referring to sprite numbers.
-#include "include\info.h"
+#include "include/info.h"
 
 #ifdef __GNUG__
 #pragma implementation "d_items.h"
 #endif
-#include "include\d_items.h"
+#include "include/d_items.h"
 
 
 //
