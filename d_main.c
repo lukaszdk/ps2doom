@@ -238,6 +238,7 @@ void D_Display (void)
     if (gamestate == GS_LEVEL && gametic)
 	HU_Erase();
     
+	//Resolução da tela?
     // do buffered drawing
     switch (gamestate)
     {
