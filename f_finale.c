@@ -254,7 +254,7 @@ void F_Ticker (void)
 // F_TextWrite
 //
 
-#include "hu_stuff.h"
+#include "include/hu_stuff.h"
 extern	patch_t *hu_font[HU_FONTSIZE];
 
 

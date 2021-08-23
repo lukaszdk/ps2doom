@@ -70,7 +70,7 @@ static int access(char *file, int mode)
 
 #include "include/i_system.h"
 #include "include/i_sound.h"
-#include "i_video.h"
+
 #include "include/g_game.h"
 
 #include "include/hu_stuff.h"
