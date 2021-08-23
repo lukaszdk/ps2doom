@@ -27,10 +27,10 @@ rcsid[] = "$Id: i_main.c,v 1.4 1997/02/03 22:45:10 b1 Exp $";
 
 #include "SDL.h"
 
-#include "doomdef.h"
+#include "include/doomdef.h"
 
-#include "m_argv.h"
-#include "d_main.h"
+#include "include/m_argv.h"
+#include "include/d_main.h"
 
 int
 main

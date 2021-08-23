@@ -26,18 +26,18 @@ rcsid[] = "$Id: p_telept.c,v 1.3 1997/01/28 22:08:29 b1 Exp $";
 
 
 
-#include "doomdef.h"
+#include "include/doomdef.h"
 
-#include "s_sound.h"
+#include "include/s_sound.h"
 
-#include "p_local.h"
+#include "include/p_local.h"
 
 
 // Data.
-#include "sounds.h"
+#include "include/sounds.h"
 
 // State.
-#include "r_state.h"
+#include "include/r_state.h"
 
 
 
