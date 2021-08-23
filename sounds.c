@@ -27,8 +27,8 @@ static const char
 rcsid[] = "$Id: sounds.c,v 1.3 1997/01/29 22:40:44 b1 Exp $";
 
 
-#include "include\doomtype.h"
-#include "include\sounds.h"
+#include "include/doomtype.h"
+#include "include/sounds.h"
 
 //
 // Information about all the music

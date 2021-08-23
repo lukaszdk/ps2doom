@@ -29,7 +29,7 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #ifdef __GNUG__
 #pragma implementation "doomdef.h"
 #endif
-#include "include\doomdef.h"
+#include "include/doomdef.h"
 
 // Location for any defines turned variables.
 

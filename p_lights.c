@@ -26,15 +26,15 @@ static const char
 rcsid[] = "$Id: p_lights.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
 
 
-#include "include\z_zone.h"
-#include "include\m_random.h"
+#include "include/z_zone.h"
+#include "include/m_random.h"
 
-#include "include\doomdef.h"
-#include "include\p_local.h"
+#include "include/doomdef.h"
+#include "include/p_local.h"
 
 
 // State.
-#include "include\r_state.h"
+#include "include/r_state.h"
 
 //
 // FIRELIGHT FLICKER
