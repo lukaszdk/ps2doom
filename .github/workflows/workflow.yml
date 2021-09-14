@@ -10,7 +10,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    container: ps2dev/ps2toolchain:latest
+    container: ps2dev/ps2dev:latest
     steps:
     - uses: actions/checkout@v2
     - name: instalação dos apps de compilação
