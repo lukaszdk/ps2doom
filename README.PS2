@@ -2,7 +2,7 @@ Quick PlayStation 2 port by Lukasz Bruun www.lukasz.dk - 11.02.2008
 
 Requires PS2SDK, gsKit and SDL from svn.ps2dev.org to compile.
 
-Build with: make -f Makefile.ps2
+Build with: 
 
 Some very hackish stuff in w_wad.c / W_ReadLump function, to speed up loading,
 which will probably break loading from multiple files.
