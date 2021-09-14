@@ -16,3 +16,6 @@ jobs:
     - name: instalação dos apps de compilação
       run: |
        apk add build-base git bash
+    - name: MAKE
+      run: |
+         make -f Makefile.ps2 
