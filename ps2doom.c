@@ -17,7 +17,7 @@ float pow(float a, float b)
 	return powf(a,b);
 }
 
-int setbuf ( FILE * stream, char * buffer )
+int setbuf(FILE * stream, char * buffer)
 {
 	return 0;
 }
