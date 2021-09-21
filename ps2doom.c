@@ -1,7 +1,6 @@
-#include <tamtypes.h>
 #include <floatlib.h>
 #include <stdio.h>
-
+#include <kernel.h>
 int gethostname(char *name, int len)
 {
 	return -1;

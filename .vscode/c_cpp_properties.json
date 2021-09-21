@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/local/ps2dev/ps2sdk/ee/include",
+                "/usr/local/ps2dev/ps2sdk/iop/include",
+                "/usr/local/ps2dev/ps2sdk/common/include",
+                "/usr/local/ps2dev/ps2sdk/ports/include/**",
+                "/usr/local/ps2dev/gsKit/include/"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-x64"
+        }
+    ],
+    "version": 4
+}
