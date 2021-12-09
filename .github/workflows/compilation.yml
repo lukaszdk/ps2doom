@@ -10,7 +10,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ps2dev/ps2dev:v1.0
     steps:
     - uses: actions/checkout@v2
     - name: instalação dos apps de compilação
@@ -18,4 +18,4 @@ jobs:
        apk add build-base git bash
     - name: MAKE
       run: |
-         make -f Makefile.ps2 
+         make all
