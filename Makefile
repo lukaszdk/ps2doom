@@ -10,7 +10,7 @@ st_lib.o st_stuff.o tables.o v_video.o w_wad.o wi_stuff.o z_zone.o \
 
 EE_BIN = ps2doom.elf
 
-EE_INCS += -I$(PS2SDK)/ports/include/SDL
+EE_INCS = -I$(PS2SDK)/ports/include/SDL -I$(PS2SDK)/ports/include
 EE_LDFLAGS = -L$(PS2SDK)/ports/lib -L$(PS2DEV)/gsKit/lib 
 EE_LIBS = -lsdlmain -lsdl -lgskit -lcdvd -lps2ip -lnetman -lm
 
