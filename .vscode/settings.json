@@ -22,6 +22,7 @@
         "sdl_version.h": "c",
         "sdl_audio.h": "c",
         "tcpip.h": "c",
-        "ps2ip.h": "c"
+        "ps2ip.h": "c",
+        "file.h": "c"
     }
 }

@@ -1,6 +1,8 @@
-#include <floatlib.h>
+#include <tamtypes.h>
 #include <stdio.h>
 #include <kernel.h>
+#include <math.h>
+
 
 int gethostname(char *name, int len)
 {
@@ -12,12 +14,12 @@ u32 inet_addr(const char *cp)
 	return 0;
 }
 
-float pow(float a, float b)
+extern double pow (double a, double b)
 {
 	return powf(a,b);
 }
 
-int setbuf(FILE * stream, char * buffer)
+void setbuf (FILE *__restrict, char *__restrict)
 {
 	return 0;
 }
