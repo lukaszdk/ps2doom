@@ -27,8 +27,10 @@
 #ifdef __GNUG__
 #pragma interface
 #endif
-
-
+#ifndef alloca
+// Compiler does not seem to come with alloca defined.
+#define alloca __builtin_alloca
+#endif
 //
 // Fixed point, 32bit as 16.16.
 //

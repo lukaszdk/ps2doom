@@ -26,20 +26,19 @@ rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 
 #include <math.h>
 //Isto daqui provavelmente é do sdl não vou mexer aqui.
-#include "SDL/SDL_audio.h"
-#include "SDL/SDL_mutex.h"
-#include "SDL/SDL_byteorder.h"
-#include "SDL/SDL_version.h"
+#include <SDL/SDL_audio.h>
+#include <SDL/SDL_mutex.h>
+#include <SDL/SDL_byteorder.h>
+#include <SDL/SDL_version.h>
+#include <stdio.h>
 
 #include "include/z_zone.h"
-
 #include "include/m_swap.h"
 #include "include/i_system.h"
 #include "include/i_sound.h"
 #include "include/m_argv.h"
 #include "include/m_misc.h"
 #include "include/w_wad.h"
-
 #include "include/doomdef.h"
 
 

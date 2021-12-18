@@ -23,11 +23,6 @@
 static const char
 rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
-
 #if defined(linux) || defined(__SVR4)
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -51,18 +46,17 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #define Win32_Winsock
 #include <windows.h>
 #else
-#ifdef _EE // PlayStation 2 Emotion Engine
-#include <tcpip.h>
+#endif
+#endif
+#endif
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <errno.h>
 #include <ps2ip.h>
-#include "include/ps2doom.h"
+#include "ps2doom.h"
+#include <math.h>
 #define IPPORT_USERRESERVED	1024 // ??
-#else
-#error You should hack this file for your BSD sockets layer
-#endif
-#endif
-#endif
-#endif
-
 #include "include/i_system.h"
 #include "include/d_event.h"
 #include "include/d_net.h"
@@ -269,7 +263,7 @@ int GetLocalAddress (void)
     int			v;
 
     // get local address
-    v = gethostname (hostname, sizeof(hostname));
+//    v = gethostname (hostname, sizeof(hostname));
     if (v == -1)
 	I_Error ("GetLocalAddress : gethostname: errno %d",errno);
 
@@ -291,7 +285,7 @@ int GetLocalAddress (void)
 //
 void I_InitNetwork (void)
 {
-    boolean		trueval = true;
+//  boolean		trueval = true;
     int			i;
     int			p;
     struct hostent*	hostentry = 0;	// host information entry

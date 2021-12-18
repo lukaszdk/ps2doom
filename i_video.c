@@ -26,7 +26,7 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include <stdlib.h>
 
-#include "SDL/SDL.h"
+#include <SDL/SDL.h>
 
 #include "include/m_swap.h"
 #include "include/doomstat.h"
