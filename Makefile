@@ -1,4 +1,4 @@
-EE_OBJS =  am_map.o d_items.o d_main.o d_net.o doomdef.o doomstat.o \
+EE_OBJS = am_map.o d_items.o d_main.o d_net.o doomdef.o doomstat.o \
 dstrings.o f_finale.o f_wipe.o g_game.o hu_lib.o hu_stuff.o i_main.o \
 i_net.o i_sound.o i_system.o i_video.o info.o m_argv.o m_bbox.o \
 m_cheat.o m_fixed.o m_menu.o m_misc.o m_random.o m_swap.o p_ceilng.o \
@@ -8,7 +8,7 @@ p_switch.o p_telept.o p_tick.o p_user.o r_bsp.o r_data.o r_draw.o \
 r_main.o r_plane.o r_segs.o r_sky.o r_things.o s_sound.o sounds.o \
 st_lib.o st_stuff.o tables.o v_video.o w_wad.o wi_stuff.o z_zone.o \
 
-EE_BIN = doom.elf
+EE_BIN = ps2doom.elf
 
 EE_INCS = -I$(PS2SDK)/ports/include/SDL
 EE_LDFLAGS = -L$(PS2SDK)/ports/lib -L$(PS2DEV)/gsKit/lib 
@@ -17,7 +17,7 @@ EE_LIBS = -lsdlmain -lsdl -lgskit -lcdvd -lps2ip -lnetman -lm
 all: $(EE_BIN)
 	
 clean:
-	rm -f $(EE_OBJS) $(EE_BIN)
+	rm -f $(EE_OBJS) $(EE_BIN) $(EE_OBJS_DIR)
 
 run:
 	ps2client execee host:$(EE_BIN)
