@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <kernel.h>
 #include <math.h>
-
+#include "ps2doom.h"
 
 int gethostname(char *name, int len)
 {

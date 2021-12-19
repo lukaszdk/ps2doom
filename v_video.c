@@ -215,6 +215,9 @@ V_DrawPatch
     byte*	dest;
     byte*	source; 
     int		w; 
+    if (patch == NULL)   /// cosmito
+        return;
+
 	 
     y -= SHORT(patch->topoffset); 
     x -= SHORT(patch->leftoffset); 

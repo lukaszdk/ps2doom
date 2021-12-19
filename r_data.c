@@ -507,7 +507,7 @@ void R_InitTextures (void)
     for (i=0 ; i<numtextures ; i++, directory++)
     {
 	if (!(i&63))
-	    printf (".");
+	    scr_printf (".");
 
 	if (i == numtextures1)
 	{
@@ -629,7 +629,7 @@ void R_InitSpriteLumps (void)
     for (i=0 ; i< numspritelumps ; i++)
     {
 	if (!(i&63))
-	    printf (".");
+	    scr_printf (".");
 
 	patch = W_CacheLumpNum (firstspritelump+i, PU_CACHE);
 	spritewidth[i] = SHORT(patch->width)<<FRACBITS;
@@ -667,13 +667,13 @@ void R_InitColormaps (void)
 void R_InitData (void)
 {
     R_InitTextures ();
-    printf ("\nInitTextures");
+    scr_printf("\nInitTextures");
     R_InitFlats ();
-    printf ("\nInitFlats");
+    scr_printf("\nInitFlats");
     R_InitSpriteLumps ();
-    printf ("\nInitSprites");
+    scr_printf("\nInitSprites");
     R_InitColormaps ();
-    printf ("\nInitColormaps");
+    scr_printf("\nInitColormaps");
 }
 
 

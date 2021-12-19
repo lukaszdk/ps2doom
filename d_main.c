@@ -30,17 +30,34 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #define	BGCOLOR		7
 #define	FGCOLOR		8
 
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <libpad.h>
 #include <SDL/SDL_timer.h>
-//extern int access(char *file, int mode);
+#include <kernel.h>
+#include <tamtypes.h>
+/// cosmito
+static char padBuf[256] __attribute__((aligned(64)));
+static char actAlign[6];
+static int actuators;
+int initializePad(int port, int slot);
+int padUtils_ReadButton(int port, int slot, u32 old_pad, u32 new_pad);
+int padUtils_ReadButtonWait(int port, int slot, u32 old_pad, u32 new_pad);
+void checkForWadFile(char* wadname, char** foundwadfiles, char* foundfile, int* foundwadfiles_index, int* nWadsFound);
+
+
+extern int mixer_period;
+extern int SAMPLERATE;
+extern int use_hdd;
+extern const char *hdd_wads_folder;
+
+/// cosmito
+char currentWadName[20];
 
 #define R_OK	4
 static int access(char *file, int mode)
 {
 	FILE *test_fp;
-
 	test_fp = fopen(file, "r");
 	if ( test_fp != NULL ) {
 		fclose(test_fp);
@@ -51,37 +68,27 @@ static int access(char *file, int mode)
 
 #include "include/doomdef.h"
 #include "include/doomstat.h"
-
 #include "include/dstrings.h"
 #include "include/sounds.h"
-
-
 #include "include/z_zone.h"
 #include "include/w_wad.h"
 #include "include/s_sound.h"
 #include "include/v_video.h"
-
 #include "include/f_finale.h"
 #include "include/f_wipe.h"
-
 #include "include/m_argv.h"
 #include "include/m_misc.h"
 #include "include/m_menu.h"
-
 #include "include/i_system.h"
-#include "include/i_sound.h"
-
+//#include "include/i_sound.h"
+#include "include/l_sound_sdl.h"
 #include "include/g_game.h"
-
 #include "include/hu_stuff.h"
 #include "include/wi_stuff.h"
 #include "include/st_stuff.h"
 #include "include/am_map.h"
-
 #include "include/p_setup.h"
 #include "include/r_local.h"
-
-
 #include "include/d_main.h"
 
 //
@@ -107,12 +114,6 @@ boolean         fastparm;	// checkparm of -fast
 boolean         drone;
 
 boolean		singletics = false; // debug flag to cancel adaptiveness
-
-
-
-//extern int soundVolume;
-//extern  int	sfxVolume;
-//extern  int	musicVolume;
 
 extern  boolean	inhelpscreens;
 
@@ -157,7 +158,7 @@ int 		eventtail;
 void D_PostEvent (event_t* ev)
 {
     events[eventhead] = *ev;
-    eventhead = (eventhead+1)&(MAXEVENTS-1);
+    eventhead = (++eventhead)&(MAXEVENTS-1);
 }
 
 
@@ -168,12 +169,12 @@ void D_PostEvent (event_t* ev)
 void D_ProcessEvents (void)
 {
     event_t*	ev;
-	
+
     // IF STORE DEMO, DO NOT ACCEPT INPUT
     if ( ( gamemode == commercial )
 	 && (W_CheckNumForName("map01")<0) )
       return;
-	
+
     for ( ; eventtail != eventhead ; eventtail = (++eventtail)&(MAXEVENTS-1) )
     {
 	ev = &events[eventtail];
@@ -214,91 +215,90 @@ void D_Display (void)
     boolean			redrawsbar;
 
     if (nodrawers)
-	return;                    // for comparative timing / profiling
-		
+        return;                    // for comparative timing / profiling
+
     redrawsbar = false;
-    
+
     // change the view size if needed
     if (setsizeneeded)
     {
-	R_ExecuteSetViewSize ();
-	oldgamestate = -1;                      // force background redraw
-	borderdrawcount = 3;
+        R_ExecuteSetViewSize ();
+        oldgamestate = -1;                      // force background redraw
+        borderdrawcount = 3;
     }
 
     // save the current screen if about to wipe
     if (gamestate != wipegamestate)
     {
-	wipe = true;
-	wipe_StartScreen(0, 0, SCREENWIDTH, SCREENHEIGHT);
+        wipe = true;
+        wipe_StartScreen(0, 0, SCREENWIDTH, SCREENHEIGHT);
     }
     else
-	wipe = false;
+        wipe = false;
 
     if (gamestate == GS_LEVEL && gametic)
-	HU_Erase();
-    
-	//Resolução da tela?
+        HU_Erase();
+
     // do buffered drawing
     switch (gamestate)
     {
-      case GS_LEVEL:
-	if (!gametic)
-	    break;
-	if (automapactive)
-	    AM_Drawer ();
-	if (wipe || (viewheight != 200 && fullscreen) )
-	    redrawsbar = true;
-	if (inhelpscreensstate && !inhelpscreens)
-	    redrawsbar = true;              // just put away the help screen
-	ST_Drawer (viewheight == 200, redrawsbar );
-	fullscreen = viewheight == 200;
-	break;
+    case GS_LEVEL:
+        if (!gametic)
+            break;
+        if (automapactive)
+            AM_Drawer ();
+        if (wipe || (viewheight != 200 && fullscreen) )
+            redrawsbar = true;
+        if (inhelpscreensstate && !inhelpscreens)
+            redrawsbar = true;              // just put away the help screen
+        ST_Drawer (viewheight == 200, redrawsbar );
+        fullscreen = viewheight == 200;
+        break;
 
-      case GS_INTERMISSION:
-	WI_Drawer ();
-	break;
+    case GS_INTERMISSION:
+        WI_Drawer ();
+        break;
 
-      case GS_FINALE:
-	F_Drawer ();
-	break;
+    case GS_FINALE:
+        F_Drawer ();
+        break;
 
-      case GS_DEMOSCREEN:
-	D_PageDrawer ();
-	break;
+    case GS_DEMOSCREEN:
+        D_PageDrawer ();
+        break;
     }
-    
+
     // draw buffered stuff to screen
     I_UpdateNoBlit ();
-    
+
     // draw the view directly
     if (gamestate == GS_LEVEL && !automapactive && gametic)
-	R_RenderPlayerView (&players[displayplayer]);
+        R_RenderPlayerView (&players[displayplayer]);
 
     if (gamestate == GS_LEVEL && gametic)
-	HU_Drawer ();
-    
+        HU_Drawer ();
+
     // clean up border stuff
     if (gamestate != oldgamestate && gamestate != GS_LEVEL)
-	I_SetPalette (W_CacheLumpName ("PLAYPAL",PU_CACHE));
+        I_SetPalette (W_CacheLumpName ("PLAYPAL",PU_CACHE));
 
     // see if the border needs to be initially drawn
     if (gamestate == GS_LEVEL && oldgamestate != GS_LEVEL)
     {
-	viewactivestate = false;        // view was not active
-	R_FillBackScreen ();    // draw the pattern into the back screen
+        viewactivestate = false;        // view was not active
+        R_FillBackScreen ();    // draw the pattern into the back screen
     }
 
     // see if the border needs to be updated to the screen
     if (gamestate == GS_LEVEL && !automapactive && scaledviewwidth != 320)
     {
-	if (menuactive || menuactivestate || !viewactivestate)
-	    borderdrawcount = 3;
-	if (borderdrawcount)
-	{
-	    R_DrawViewBorder ();    // erase old menu stuff
-	    borderdrawcount--;
-	}
+        if (menuactive || menuactivestate || !viewactivestate)
+            borderdrawcount = 3;
+        if (borderdrawcount)
+        {
+            R_DrawViewBorder ();    // erase old menu stuff
+            borderdrawcount--;
+        }
 
     }
 
@@ -306,16 +306,16 @@ void D_Display (void)
     viewactivestate = viewactive;
     inhelpscreensstate = inhelpscreens;
     oldgamestate = wipegamestate = gamestate;
-    
+
     // draw pause pic
     if (paused)
     {
-	if (automapactive)
-	    y = 4;
-	else
-	    y = viewwindowy+4;
-	V_DrawPatchDirect(viewwindowx+(scaledviewwidth-68)/2,
-			  y,0,W_CacheLumpName ("M_PAUSE", PU_CACHE));
+        if (automapactive)
+            y = 4;
+        else
+            y = viewwindowy+4;
+        V_DrawPatchDirect(viewwindowx+(scaledviewwidth-68)/2,
+            y,0,W_CacheLumpName ("M_PAUSE", PU_CACHE));
     }
 
 
@@ -327,10 +327,10 @@ void D_Display (void)
     // normal update
     if (!wipe)
     {
-	I_FinishUpdate ();              // page flip or blit buffer
-	return;
+        I_FinishUpdate ();              // page flip or blit buffer
+        return;
     }
-    
+
     // wipe update
     wipe_EndScreen(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
@@ -338,17 +338,19 @@ void D_Display (void)
 
     do
     {
-	do
-	{
-	    nowtime = I_GetTime ();
-	    tics = nowtime - wipestart;
-	} while (!tics);
-	wipestart = nowtime;
-	done = wipe_ScreenWipe(wipe_Melt
-			       , 0, 0, SCREENWIDTH, SCREENHEIGHT, tics);
-	I_UpdateNoBlit ();
-	M_Drawer ();                            // menu is drawn even on top of wipes
-	I_FinishUpdate ();                      // page flip or blit buffer
+        do
+        {
+            nowtime = I_GetTime ();
+            tics = nowtime - wipestart;
+DOMULTITASK;
+        } while (!tics);
+        wipestart = nowtime;
+        done = wipe_ScreenWipe(wipe_Melt
+            , 0, 0, SCREENWIDTH, SCREENHEIGHT, tics);
+        I_UpdateNoBlit ();
+        M_Drawer ();                            // menu is drawn even on top of wipes
+        I_FinishUpdate ();                      // page flip or blit buffer
+DOMULTITASK;        
     } while (!done);
 }
 
@@ -363,7 +365,7 @@ void D_DoomLoop (void)
 {
     if (demorecording)
 	G_BeginRecording ();
-		
+
     if (M_CheckParm ("-debugfile"))
     {
 	char    filename[20];
@@ -371,25 +373,31 @@ void D_DoomLoop (void)
 	printf ("debug output to: %s\n",filename);
 	debugfile = fopen (filename,"w");
     }
-	
+
     I_InitGraphics ();
 
     while (1)
     {
 	// frame syncronous IO operations
 	I_StartFrame ();                
-	
+
 	// process one or more tics
 	if (singletics)
 	{
 	    I_StartTic ();
+DOMULTITASK;
 	    D_ProcessEvents ();
-	    G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
-	    if (advancedemo)
+DOMULTITASK;
+        G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
+DOMULTITASK;
+        if (advancedemo)
 		D_DoAdvanceDemo ();
-	    M_Ticker ();
-	    G_Ticker ();
-	    gametic++;
+DOMULTITASK;
+        M_Ticker ();
+DOMULTITASK;
+        G_Ticker ();
+DOMULTITASK;
+        gametic++;
 	    maketic++;
 	}
 	else
@@ -398,11 +406,20 @@ void D_DoomLoop (void)
 	}
 
 	S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
-
+DOMULTITASK;
 	// Update display, next frame, with current state.
 	D_Display ();
-    }
+
+    ///
+	}
+	RotateThreadReadyQueue(42);
 }
+
+
+    ///
+
+    
+
 
 
 
@@ -461,7 +478,7 @@ void D_AdvanceDemo (void)
       demosequence = (demosequence+1)%7;
     else
       demosequence = (demosequence+1)%6;
-    
+
     switch (demosequence)
     {
       case 0:
@@ -542,14 +559,14 @@ void D_AddFile (char *file)
 {
     int     numwadfiles;
     char    *newfile;
-	
     for (numwadfiles = 0 ; wadfiles[numwadfiles] ; numwadfiles++)
 	;
 
     newfile = malloc (strlen(file)+1);
     strcpy (newfile, file);
-	
+
     wadfiles[numwadfiles] = newfile;
+    //printf("%s\n", newfile);
 }
 
 //
@@ -558,7 +575,309 @@ void D_AddFile (char *file)
 // to determine whether registered/commercial features
 // should be executed (notably loading PWAD's).
 //
-void IdentifyVersion (void)
+
+//void IdentifyVersion (void)
+//{
+//
+//    char*	doom1wad;
+//    char*	doomwad;
+//    char*	doomuwad;
+//    char*	doom2wad;
+//
+//    char*	doom2fwad;
+//    char*	plutoniawad;
+//    char*	tntwad;
+//
+//    char *home;
+//    char *doomwaddir;
+//	
+//#ifdef _EE
+//    //char elfFilename[100];
+//    //char deviceName[10];
+//    //char fullPath[256];
+//    extern char elfFilename[100];
+//    extern char deviceName[10];
+//    extern char fullPath[256];
+//#endif
+//
+//    doomwaddir = getenv("DOOMWADDIR");
+//
+//	#ifdef _EE
+//		//doomwaddir = "";
+//        //doomwaddir = "mass:";
+//        //GetElfFilename(myargv[0], deviceName, fullPath, elfFilename);     // now done at i_main.c
+//        doomwaddir = fullPath;
+//	#else
+//    if (!doomwaddir)
+//		doomwaddir = "./";
+//	#endif
+//
+////#ifdef PS2HDD
+//    if(use_hdd == 1)
+//        doomwaddir = "pfs0:";
+////#endif
+//
+//    // Commercial.
+//    doom2wad = malloc(strlen(doomwaddir)+1+9+1+5);
+//    sprintf(doom2wad, "%sdoom2.wad", doomwaddir);
+//
+//    // Retail.
+//    doomuwad = malloc(strlen(doomwaddir)+1+8+1+5);
+//    sprintf(doomuwad, "%sdoomu.wad", doomwaddir);
+//    
+//    // Registered.
+//    doomwad = malloc(strlen(doomwaddir)+1+8+1+5);
+//    sprintf(doomwad, "%sdoom.wad", doomwaddir);
+//    
+//    // Shareware.
+//    doom1wad = malloc(strlen(doomwaddir)+1+9+1+5);
+//    sprintf(doom1wad, "%sdoom1.wad", doomwaddir);
+//
+//     // Bug, dear Shawn.
+//    // Insufficient malloc, caused spurious realloc errors.
+//    plutoniawad = malloc(strlen(doomwaddir)+1+/*9*/12+1+5);
+//    sprintf(plutoniawad, "%splutonia.wad", doomwaddir);
+//
+int waitPadReady(int port, int slot) {
+    int state;
+    int lastState;
+    char stateString[16];
+
+    state = padGetState(port, slot);
+    lastState = -1;
+    while((state != PAD_STATE_STABLE) && (state != PAD_STATE_FINDCTP1)) {
+        if (state != lastState) {
+            padStateInt2String(state, stateString);
+            printf("Please wait, pad(%d,%d) is in state %s\n", 
+                       port, slot, stateString);
+        }
+        lastState = state;
+        state=padGetState(port, slot);
+    }
+    // Were the pad ever 'out of sync'?
+    if (lastState != -1) {
+        printf("Pad OK!\n");
+    }
+    return 0;
+}
+
+
+int initializePad(int port, int slot) {
+    int ret;
+    int modes;
+    int i;
+
+    waitPadReady(port, slot);
+
+    // How many different modes can this device operate in?
+    // i.e. get # entrys in the modetable
+    modes = padInfoMode(port, slot, PAD_MODETABLE, -1);
+    printf("The device has %d modes\n", modes);
+
+    if (modes > 0) {
+        printf("( ");
+        for (i = 0; i < modes; i++) {
+            printf("%d ", padInfoMode(port, slot, PAD_MODETABLE, i));
+        }
+        printf(")");
+    }
+
+    printf("It is currently using mode %d\n", 
+               padInfoMode(port, slot, PAD_MODECURID, 0));
+
+    // If modes == 0, this is not a Dual shock controller 
+    // (it has no actuator engines)
+    if (modes == 0) {
+        printf("This is a digital controller?\n");
+        return 1;
+    }
+
+    // Verify that the controller has a DUAL SHOCK mode
+    i = 0;
+    do {
+        if (padInfoMode(port, slot, PAD_MODETABLE, i) == PAD_TYPE_DUALSHOCK)
+            break;
+        i++;
+    } while (i < modes);
+    if (i >= modes) {
+        printf("This is no Dual Shock controller\n");
+        return 1;
+    }
+
+    // If ExId != 0x0 => This controller has actuator engines
+    // This check should always pass if the Dual Shock test above passed
+    ret = padInfoMode(port, slot, PAD_MODECUREXID, 0);
+    if (ret == 0) {
+        printf("This is no Dual Shock controller??\n");
+        return 1;
+    }
+
+    printf("Enabling dual shock functions\n");
+
+    // When using MMODE_LOCK, user cant change mode with Select button
+    padSetMainMode(port, slot, PAD_MMODE_DUALSHOCK, PAD_MMODE_LOCK);
+
+    waitPadReady(port, slot);
+    printf("infoPressMode: %d\n", padInfoPressMode(port, slot));
+
+    waitPadReady(port, slot);        
+    printf("enterPressMode: %d\n", padEnterPressMode(port, slot));
+
+    waitPadReady(port, slot);
+    actuators = padInfoAct(port, slot, -1, 0);
+    printf("# of actuators: %d\n",actuators);
+
+    if (actuators != 0) {
+        actAlign[0] = 0;   // Enable small engine
+        actAlign[1] = 1;   // Enable big engine
+        actAlign[2] = 0xff;
+        actAlign[3] = 0xff;
+        actAlign[4] = 0xff;
+        actAlign[5] = 0xff;
+
+        waitPadReady(port, slot);
+        printf("padSetActAlign: %d\n", 
+                   padSetActAlign(port, slot, actAlign));
+    }
+    else {
+        printf("Did not find any actuators.\n");
+    }
+
+    waitPadReady(port, slot);
+
+    return 1;
+}
+
+int padUtils_ReadButtonWait(int port, int slot, u32 old_pad, u32 new_pad)
+{
+    int butres = 0, read = 0;
+    read = padUtils_ReadButton(port, slot, old_pad, new_pad);
+
+    if(read != 0)
+    {
+        butres = read;      // memorize pressed button
+        while (padUtils_ReadButton(port, slot, old_pad, new_pad) != 0) {};
+    }
+    return butres;
+}
+
+int padUtils_ReadButton(int port, int slot, u32 old_pad, u32 new_pad)
+{
+    struct padButtonStatus buttons;
+    int ret;
+    u32 paddata;
+
+    ret = padRead(port, slot, &buttons);
+    if (ret != 0)
+    {
+        paddata = 0xffff ^ buttons.btns;
+
+        new_pad = paddata & ~old_pad;
+        old_pad = paddata;
+
+
+        if (new_pad & PAD_LEFT)
+        {
+            //scr_printf("LEFT\n");
+            return(PAD_LEFT);
+        }
+        if (new_pad & PAD_DOWN)
+        {
+            //scr_printf("DOWN\n");
+            return(PAD_DOWN);
+        }
+        if (new_pad & PAD_RIGHT)
+        {
+            //scr_printf("RIGHT\n");
+            return(PAD_RIGHT);
+        }
+        if (new_pad & PAD_UP)
+        {
+            //scr_printf("UP\n");
+            return(PAD_UP);
+        }
+        if (new_pad & PAD_START)
+        {
+            //scr_printf("START\n");
+            return(PAD_START);
+        }
+        if (new_pad & PAD_R3)
+        {
+            //scr_printf("R3\n");
+            return(PAD_R3);
+        }
+        if (new_pad & PAD_L3)
+        {
+            //scr_printf("L3\n");
+            return(PAD_L3);
+        }
+        if (new_pad & PAD_SELECT)
+        {
+            //scr_printf("SELECT\n");
+            return(PAD_SELECT);
+        }
+        if (new_pad & PAD_SQUARE)
+        {
+            //scr_printf("SQUARE\n");
+            return(PAD_SQUARE);
+        }
+        if (new_pad & PAD_CROSS)
+        {
+            //scr_printf("CROSS\n");
+            return(PAD_CROSS);
+        }
+        if (new_pad & PAD_CIRCLE)
+        {
+            //scr_printf("CIRCLE\n");
+            return(PAD_CIRCLE);
+        }
+        if (new_pad & PAD_TRIANGLE)
+        {
+            //scr_printf("TRIANGLE\n");
+            return(PAD_TRIANGLE);
+        }
+        if (new_pad & PAD_R1)
+        {
+            //scr_printf("R1\n");
+            return(PAD_R1);
+        }
+        if (new_pad & PAD_L1)
+        {
+            //scr_printf("L1\n");
+            return(PAD_L1);
+        }
+        if (new_pad & PAD_R2)
+        {
+            //scr_printf("R2\n");
+            return(PAD_R2);
+        }
+        if (new_pad & PAD_L2)
+        {
+            //scr_printf("L2\n");
+            return(PAD_L2);
+        }
+    }
+    else
+        return -1;
+
+    return 0;   // 0 means no button was pressed
+}
+
+void checkForWadFile(char* wadname, char** foundwadfiles, char* foundfile, int* foundwadfiles_index, int* nWadsFound)
+{
+    if ( !access (wadname, R_OK) )
+    {
+        sprintf("    %s\n", wadname);
+        *nWadsFound = *nWadsFound + 1;
+
+        foundfile = malloc( strlen(wadname)+1 );
+        sprintf(foundfile, "%s", wadname);
+        foundwadfiles[*foundwadfiles_index] = foundfile;
+        *foundwadfiles_index = *foundwadfiles_index + 1;
+    }
+}
+
+void IdentifyVersionAndSelect (void)        // cosmito
 {
 
     char*	doom1wad;
@@ -572,159 +891,39 @@ void IdentifyVersion (void)
 
     char *home;
     char *doomwaddir;
+
+    char fullPath[256];
+
     doomwaddir = getenv("DOOMWADDIR");
 
 	#ifdef _EE
-		doomwaddir = "";
+        doomwaddir = fullPath;
 	#else
     if (!doomwaddir)
 		doomwaddir = "./";
 	#endif
 
     // Commercial.
-    doom2wad = malloc(strlen(doomwaddir)+1+13+1);
-    sprintf(doom2wad, "%shost:doom2.wad", doomwaddir);
+    doom2wad = malloc(strlen(doomwaddir)+1+9+1+5);
+    sprintf(doom2wad, "%sdoom2.wad", doomwaddir);
 
     // Retail.
-    doomuwad = malloc(strlen(doomwaddir)+1+12+1);
-    sprintf(doomuwad, "%shost:doomu.wad", doomwaddir);
-    
+    doomuwad = malloc(strlen(doomwaddir)+1+8+1+5);
+    sprintf(doomuwad, "%sdoomu.wad", doomwaddir);
+
     // Registered.
-    doomwad = malloc(strlen(doomwaddir)+1+12+1);
-    sprintf(doomwad, "%shost:doom.wad", doomwaddir);
-    
+    doomwad = malloc(strlen(doomwaddir)+1+8+1+5);
+    sprintf(doomwad, "%sdoom.wad", doomwaddir);
+
     // Shareware.
-    doom1wad = malloc(strlen(doomwaddir)+1+13+1);
-    sprintf(doom1wad, "%shost:doom1.wad", doomwaddir);
-
-     // Bug, dear Shawn.
-    // Insufficient malloc, caused spurious realloc errors.
-    plutoniawad = malloc(strlen(doomwaddir)+1+/*9*/16+1);
-    sprintf(plutoniawad, "%shost:plutonia.wad", doomwaddir);
-
-    tntwad = malloc(strlen(doomwaddir)+1+13+1);
-    sprintf(tntwad, "%shost:tnt.wad", doomwaddir);
-
-
-    // French stuff.
-    doom2fwad = malloc(strlen(doomwaddir)+1+14+1);
-    sprintf(doom2fwad, "%shost:doom2f.wad", doomwaddir);
-
-    home = getenv("HOME");
-    if (!home)
-      home = ".";
-    sprintf(basedefault, "%shost:.doomrc", home);
-
-    if (M_CheckParm ("-shdev"))
-    {
-	gamemode = shareware;
-	devparm = true;
-	D_AddFile (DEVDATA"doom1.wad");
-	D_AddFile (DEVMAPS"data_se/texture1.lmp");
-	D_AddFile (DEVMAPS"data_se/pnames.lmp");
-	strcpy (basedefault,DEVDATA"default.cfg");
-	return;
-    }
-
-    if (M_CheckParm ("-regdev"))
-    {
-	gamemode = registered;
-	devparm = true;
-	D_AddFile (DEVDATA"doom.wad");
-	D_AddFile (DEVMAPS"data_se/texture1.lmp");
-	D_AddFile (DEVMAPS"data_se/texture2.lmp");
-	D_AddFile (DEVMAPS"data_se/pnames.lmp");
-	strcpy (basedefault,DEVDATA"default.cfg");
-	return;
-    }
-
-    if (M_CheckParm ("-comdev"))
-    {
-	gamemode = commercial;
-	devparm = true;
-	/* I don't bother
-	if(plutonia)
-	    D_AddFile (DEVDATA"plutonia.wad");
-	else if(tnt)
-	    D_AddFile (DEVDATA"tnt.wad");
-	else*/
-	    D_AddFile (DEVDATA"doom2.wad");
-	    
-	D_AddFile (DEVMAPS"cdata/texture1.lmp");
-	D_AddFile (DEVMAPS"cdata/pnames.lmp");
-	strcpy (basedefault,DEVDATA"default.cfg");
-	return;
-    }
-
-    if ( !access (doom2fwad,R_OK) )
-    {
-	gamemode = commercial;
-	// C'est ridicule!
-	// Let's handle languages in config files, okay?
-	language = french;
-	printf("French version\n");
-	D_AddFile (doom2fwad);
-	return;
-    }
-
-    if ( !access (doom2wad,R_OK) )
-    {
-	gamemode = commercial;
-	D_AddFile (doom2wad);
-	return;
-    }
-
-    if ( !access (plutoniawad, R_OK ) )
-    {
-      gamemode = commercial;
-      D_AddFile (plutoniawad);
-      return;
-    }
-
-    if ( !access ( tntwad, R_OK ) )
-    {
-      gamemode = commercial;
-      D_AddFile (tntwad);
-      return;
-    }
-
-    if ( !access (doomuwad,R_OK) )
-    {
-      gamemode = retail;
-      D_AddFile (doomuwad);
-      return;
-    }
-
-    if ( !access (doomwad,R_OK) )
-    {
-      gamemode = registered;
-      D_AddFile (doomwad);
-      return;
-    }
-
-    if ( !access (doom1wad,R_OK) )
-    {
-      gamemode = shareware;
-      D_AddFile (doom1wad);
-      return;
-    }
-
-    printf("Game mode indeterminate.\n");
-    gamemode = indetermined;
-
-    // We don't abort. Let's see what the PWAD contains.
-    //exit(1);
-    //I_Error ("Game mode indeterminate\n");
+    doom1wad = malloc(strlen(doomwaddir)+1+9+1+5);
 }
 
-//
-// Find a Response File
-//
 void FindResponseFile (void)
 {
     int             i;
 #define MAXARGVS        100
-	
+
     for (i = 1;i < myargc;i++)
 	if (myargv[i][0] == '@')
 	{
@@ -737,7 +936,7 @@ void FindResponseFile (void)
 	    char    *file;
 	    char    *moreargs[20];
 	    char    *firstargv;
-			
+
 	    // READ THE RESPONSE FILE INTO MEMORY
 	    handle = fopen (&myargv[i][1],"rb");
 	    if (!handle)
@@ -752,16 +951,16 @@ void FindResponseFile (void)
 	    file = malloc (size);
 	    fread (file,size,1,handle);
 	    fclose (handle);
-			
+
 	    // KEEP ALL CMDLINE ARGS FOLLOWING @RESPONSEFILE ARG
 	    for (index = 0,k = i+1; k < myargc; k++)
 		moreargs[index++] = myargv[k];
-			
+
 	    firstargv = myargv[0];
 	    myargv = malloc(sizeof(char *)*MAXARGVS);
 	    memset(myargv,0,sizeof(char *)*MAXARGVS);
 	    myargv[0] = firstargv;
-			
+
 	    infile = file;
 	    indexinfile = k = 0;
 	    indexinfile++;  // SKIP PAST ARGV[0] (KEEP IT)
@@ -776,11 +975,11 @@ void FindResponseFile (void)
 		      ((*(infile+k)<= ' ') || (*(infile+k)>'z')))
 		    k++;
 	    } while(k < size);
-			
+
 	    for (k = 0;k < index;k++)
 		myargv[indexinfile++] = moreargs[k];
 	    myargc = indexinfile;
-	
+
 	    // DISPLAY ARGS
 	    printf("%d command-line args:\n",myargc);
 	    for (k=1;k<myargc;k++)
@@ -790,7 +989,6 @@ void FindResponseFile (void)
 	}
 }
 
-
 //
 // D_DoomMain
 //
@@ -798,14 +996,17 @@ void D_DoomMain (void)
 {
     int             p;
     char                    file[256];
-
+    
+    
     FindResponseFile ();
 	
-    IdentifyVersion ();
-	
+    //IdentifyVersion ();
+    IdentifyVersionAndSelect();
+
     setbuf (stdout, NULL);
-    modifiedgame = false;
-	
+    
+	modifiedgame = false;
+
     nomonsters = M_CheckParm ("-nomonsters");
     respawnparm = M_CheckParm ("-respawn");
     fastparm = M_CheckParm ("-fast");
@@ -869,32 +1070,32 @@ void D_DoomMain (void)
 		 VERSION_NUM/100,VERSION_NUM%100);
 	break;
     }
-    
-    printf ("%s\n",title);
+
+    scr_printf ("%s\n",title);
 
     if (devparm)
-	printf(D_DEVSTR);
-    
+	scr_printf(D_DEVSTR);
+
     // turbo option
     if ( (p=M_CheckParm ("-turbo")) )
     {
 	int     scale = 200;
 	extern int forwardmove[2];
 	extern int sidemove[2];
-	
+
 	if (p<myargc-1)
 	    scale = atoi (myargv[p+1]);
 	if (scale < 10)
 	    scale = 10;
 	if (scale > 400)
 	    scale = 400;
-	printf ("turbo scale: %i%%\n",scale);
+	scr_printf ("turbo scale: %i%%\n",scale);
 	forwardmove[0] = forwardmove[0]*scale/100;
 	forwardmove[1] = forwardmove[1]*scale/100;
 	sidemove[0] = sidemove[0]*scale/100;
 	sidemove[1] = sidemove[1]*scale/100;
     }
-    
+
     // add any files specified on the command line with -file wadfile
     // to the wad list
     //
@@ -916,7 +1117,7 @@ void D_DoomMain (void)
 	    printf("Warping to Episode %s, Map %s.\n",
 		   myargv[p+1],myargv[p+2]);
 	    break;
-	    
+
 	  case commercial:
 	  default:
 	    p = atoi (myargv[p+1]);
@@ -928,7 +1129,7 @@ void D_DoomMain (void)
 	}
 	D_AddFile (file);
     }
-	
+
     p = M_CheckParm ("-file");
     if (p)
     {
@@ -948,16 +1149,16 @@ void D_DoomMain (void)
     {
 	sprintf (file,"%s.lmp", myargv[p+1]);
 	D_AddFile (file);
-	printf("Playing demo %s.lmp.\n",myargv[p+1]);
+	scr_printf("Playing demo %s.lmp.\n",myargv[p+1]);
     }
-    
+
     // get skill / episode / map from parms
     startskill = sk_medium;
     startepisode = 1;
     startmap = 1;
     autostart = false;
 
-		
+
     p = M_CheckParm ("-skill");
     if (p && p < myargc-1)
     {
@@ -972,7 +1173,7 @@ void D_DoomMain (void)
 	startmap = 1;
 	autostart = true;
     }
-	
+
     p = M_CheckParm ("-timer");
     if (p && p < myargc-1 && deathmatch)
     {
@@ -1000,25 +1201,26 @@ void D_DoomMain (void)
 	}
 	autostart = true;
     }
-    
+
     // init subsystems
-    printf ("V_Init: allocate screens.\n");
+    scr_printf ("V_Init: allocate screens.\n");
     V_Init ();
 
-	//#ifdef _EE
-	//	SDL_SYS_TimerInit();
-	//#endif
+	#ifdef _EE
+		SDL_SYS_TimerInit();
+	#endif
 
 
-    printf ("M_LoadDefaults: Load system defaults.\n");
+    scr_printf ("M_LoadDefaults: Load system defaults.\n");
     M_LoadDefaults ();              // load before initing other systems
 
-    printf ("Z_Init: Init zone memory allocation daemon. \n");
+    scr_printf ("Z_Init: Init zone memory allocation daemon. \n");
     Z_Init ();
 
-    printf ("W_Init: Init WADfiles.\n");
+    scr_printf ("W_Init: Init WADfiles.\n");
+
+
     W_InitMultipleFiles (wadfiles);
-printf("added\n");
     
 
     // Check for -file in shareware
@@ -1033,7 +1235,7 @@ printf("added\n");
 	    "dphoof","bfgga0","heada1","cybra1","spida1d1"
 	};
 	int i;
-	
+
 	if ( gamemode == shareware)
 	    I_Error("\nYou cannot -file with the shareware "
 		    "version. Register!");
@@ -1045,11 +1247,11 @@ printf("added\n");
 		if (W_CheckNumForName(name[i])<0)
 		    I_Error("\nThis is not the registered version.");
     }
-    
+
     // Iff additonal PWAD files are used, print modified banner
     if (modifiedgame)
     {
-	/*m*/printf (
+	/*m*/scr_printf (
 	    "===========================================================================\n"
 	    "ATTENTION:  This version of DOOM has been modified.  If you would like to\n"
 	    "get a copy of the original game, call 1-800-IDGAMES or see the readme file.\n"
@@ -1059,14 +1261,14 @@ printf("added\n");
 	    );
 	getchar ();
     }
-	
 
-    // Check and print which version is executed.
+
+    // Check and print which version is execuFted.
     switch ( gamemode )
     {
       case shareware:
       case indetermined:
-	printf (
+	scr_printf (
 	    "===========================================================================\n"
 	    "                                Shareware!\n"
 	    "===========================================================================\n"
@@ -1075,23 +1277,23 @@ printf("added\n");
       case registered:
       case retail:
       case commercial:
-	printf (
+	scr_printf (
 	    "===========================================================================\n"
 	    "                 Commercial product - do not distribute!\n"
 	    "         Please report software piracy to the SPA: 1-800-388-PIR8\n"
 	    "===========================================================================\n"
 	);
 	break;
-	
+
       default:
 	// Ouch.
 	break;
     }
 
-    printf ("M_Init: Init miscellaneous info.\n");
+    scr_printf ("M_Init: Init miscellaneous info.\n");
     M_Init ();
 
-    printf ("R_Init: Init DOOM refresh daemon - ");
+    scr_printf ("R_Init: Init DOOM refresh daemon - ");
     R_Init ();
 
     printf ("\nP_Init: Init Playloop state.\n");
@@ -1099,6 +1301,8 @@ printf("added\n");
 
     printf ("I_Init: Setting up machine state.\n");
     I_Init ();
+
+    // cosmito : SDL_Init is inited here. scr_printf calls results in strange characters then. 
 
     printf ("D_CheckNetGame: Checking network game status.\n");
     D_CheckNetGame ();
@@ -1122,7 +1326,7 @@ printf("added\n");
 	statcopy = (void*)atoi(myargv[p+1]);
 	printf ("External statistics registered.\n");
     }
-    
+
     // start the apropriate game based on parms
     p = M_CheckParm ("-record");
 
@@ -1131,7 +1335,7 @@ printf("added\n");
 	G_RecordDemo (myargv[p+1]);
 	autostart = true;
     }
-	
+
     p = M_CheckParm ("-playdemo");
     if (p && p < myargc-1)
     {
@@ -1139,24 +1343,26 @@ printf("added\n");
 	G_DeferedPlayDemo (myargv[p+1]);
 	D_DoomLoop ();  // never returns
     }
-	
+
     p = M_CheckParm ("-timedemo");
     if (p && p < myargc-1)
     {
 	G_TimeDemo (myargv[p+1]);
 	D_DoomLoop ();  // never returns
     }
-	
+
     p = M_CheckParm ("-loadgame");
     if (p && p < myargc-1)
     {
 	if (M_CheckParm("-cdrom"))
-	    sprintf(file, "c:\\doomdata\\"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+	    //sprintf(file, "c:\\doomdata\\"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+        sprintf(file, "c:\\doomdata\\%s%c.dsg", currentWadName, myargv[p+1][0]);
 	else
-	    sprintf(file, SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+        //sprintf(file, "mc0:PS2DOOM/"SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
+        sprintf(file, "mc0:PS2DOOM/%s%c.dsg",currentWadName,myargv[p+1][0]);
 	G_LoadGame (file);
     }
-	
+
 
     if ( gameaction != ga_loadgame )
     {

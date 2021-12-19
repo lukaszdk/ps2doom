@@ -29,7 +29,8 @@ rcsid[] = "$Id: m_misc.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include <stdlib.h>
 #include <ctype.h>
-
+#include <fcntl.h>
+#include <tamtypes.h>
 extern int access(char *file, int mode);
 
 #include "include/doomdef.h"
@@ -105,18 +106,15 @@ M_DrawText
 #define O_BINARY 0
 #endif
 
-boolean
-M_WriteFile
-( char const*	name,
-  void*		source,
-  int		length )
+boolean M_WriteFile( char const* name, void* source, int length)
 {
     FILE       *handle;
+
     int		count;
 	
     handle = fopen ( name, "wb");
 
-    if (handle == NULL)
+    if (/*handle == NULL || */ handle < 0)
 	return false;
 
     count = fwrite (source, 1, length, handle);
@@ -132,28 +130,38 @@ M_WriteFile
 //
 // M_ReadFile
 //
-int
-M_ReadFile
-( char const*	name,
-  byte**	buffer )
+int M_ReadFile(char const* name, byte**	buffer )
 {
     FILE *handle;
     int count, length;
     byte	*buf;
 	
-    handle = fopen (name, "rb");
-    if (handle == NULL)
+    //handle = fopen (name, "rb");
+    handle = fioOpen(name, O_RDONLY);     /// cosmito : for mc IO use fio*
 	I_Error ("Couldn't read file %s", name);
-    fseek(handle, 0, SEEK_END);
-    length = ftell(handle);
-    rewind(handle);
+        I_Error ("Couldn't read file %s", name);
+
+    //fseek(handle, 0, SEEK_END);
+    //length = ftell(handle);
+    //rewind(handle);
+    length = fioLseek(handle, 0, SEEK_END);
+     if (handle == NULL)
+    {
+        //I_Error ("Couldn't read file %s", name);
+        pf("Couldn't read file %s", name);
+        return 0;
+    } 
     buf = Z_Malloc (length, PU_STATIC, NULL);
     count = fread (buf, 1, length, handle);
     fclose (handle);
-	
+
     if (count < length)
-	I_Error ("Couldn't read file %s", name);
-		
+	{
+        //I_Error ("Couldn't read file %s", name);
+        pf("Couldn't read file %s", name);
+        return 0;
+    }    
+
     *buffer = buf;
     return length;
 }
@@ -177,6 +185,9 @@ extern int	key_fire;
 extern int	key_use;
 extern int	key_strafe;
 extern int	key_speed;
+
+extern int  key_weaponnext;           // cosmito : added
+extern int  key_weaponprevious;       // cosmito : added
 
 extern int	mousebfire;
 extern int	mousebstrafe;
@@ -220,7 +231,7 @@ default_t	defaults[] =
 {
     {"mouse_sensitivity",&mouseSensitivity, 5},
     {"sfx_volume",&snd_SfxVolume, 8},
-    {"music_volume",&snd_MusicVolume, 8},
+    {"music_volume",&snd_MusicVolume, 15},
     {"show_messages",&showMessages, 1},
     
 
@@ -230,6 +241,11 @@ default_t	defaults[] =
     {"key_down",&key_down, KEY_DOWNARROW},
     {"key_strafeleft",&key_strafeleft, ','},
     {"key_straferight",&key_straferight, '.'},
+
+    
+    // cosmito : added
+    {"key_weaponnext",&key_weaponnext, 'p'},     // key to select next weapon with ammo
+    {"key_weaponprevious",&key_weaponprevious, 'o'},     // key to select previous weapon with ammo
 
     {"key_fire",&key_fire, KEY_RCTRL},
     {"key_use",&key_use, ' '},
@@ -254,7 +270,7 @@ default_t	defaults[] =
 
 
 
-    {"usegamma",&usegamma, 0},
+    {"usegamma",&usegamma, 7},
 
 #ifndef __BEOS__
     {"chatmacro0", (int *) &chat_macros[0], (int) HUSTR_CHATMACRO0 },
@@ -300,7 +316,8 @@ void M_SaveDefaults (void)
 		     * (char **) (defaults[i].location));
 	}
     }
-	
+	return;         /// cosmito : currently disabled
+
     fclose (f);
 }
 

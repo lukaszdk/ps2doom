@@ -43,13 +43,15 @@ SDL_Surface *screen;
 // Fake mouse handling.
 boolean		grabMouse;
 
+extern SDL_Joystick *joystick;      // cosmito : shared between i_video.c and i_system.c for joystick staffing
+
 // Blocky mode,
 // replace each 320x200 pixel with multiply*multiply pixels.
 // According to Dave Taylor, it still is a bonehead thing
 // to use ....
 static int	multiply=1;
 static int joy_x=0, joy_y=0;
-
+static int strafe_x=0;
 #define JOYVAL	5000
 
 //
@@ -156,37 +158,47 @@ void I_GetEvent(SDL_Event *Event)
 
 			switch(Event->jbutton.button)
 			{
-				case 0:
-					event.data1 = KEY_RCTRL;
-				break;
+				case 0:                             // 'Square' PS2 button
+					event.data1 = SDLK_o;
 
-				case 1:
-					event.data1 = KEY_ENTER;
+				case 1:                             // 'Cross' PS2 button
+					event.data1 = KEY_RSHIFT;
 				break;
 	
-				case 2:
-					event.data1 = SDLK_SPACE;
-				break;
-
-				case 3:
+				case 3:                             // '^' PS2 button
 					event.data1 = KEY_ESCAPE;
 				break;
 
-				case 6:
-					event.data1 = SDLK_x;
-				break;
+                case 4:                             // 'Select' PS2 button
+                    event.data1 = KEY_TAB;			// activates the map
+                    break;
 
-				case 7:
+                case 5:                             // 'Start' PS2 button
+					event.data1 = KEY_ENTER;
+                    break;
+
+                case 6:                             // 'L1' PS2 button
+					event.data1 = SDLK_n;
+
+				case 7:                             // 'R1' PS2 button
 					event.data1 = KEY_RCTRL;
-				break;
 
-				case 8:
+				case 8:                             // 'L2' PS2 button
 					event.data1 = SDLK_y;
 				break;
 
-				case 9:
+				case 9:                             // 'R2' PS2 button
 					event.data1 = SDLK_SPACE;
 				break;
+                
+				//case 10:                          /// Using dlanor suggestion : It's easy to knock off this button during gameplay.   // 'Analog Left click' PS2 button
+                //    event.data1 = KEY_TAB;
+                break;
+
+                case 11:                             // 'Analog Right click' PS2 button
+                    event.data1 = KEY_F11;
+                break;
+
 
 
 			}
@@ -201,23 +213,31 @@ void I_GetEvent(SDL_Event *Event)
 			switch(Event->jbutton.button)
 			{
 				case 0:
-					event.data1 = KEY_RCTRL;
+					event.data1 = SDLK_o;
 				break;
 
 				case 1:
-					event.data1 = KEY_ENTER;
+					event.data1 = KEY_RSHIFT;
 				break;
 		
 				case 2:
-					event.data1 = KEY_RCTRL;
+					event.data1 = SDLK_p;
 				break;
 
 				case 3:
 					event.data1 = KEY_ESCAPE;
 				break;
+                
+				case 4:                             // 'Select' PS2 button
+                	event.data1 = KEY_TAB;
+                break;
+
+				case 5:                             // 'Start' PS2 button
+                    event.data1 = KEY_ENTER;
+                break;
 
 				case 6:
-					event.data1 = SDLK_x;
+					event.data1 = SDLK_n;
 				break;
 
 				case 7:
@@ -231,6 +251,13 @@ void I_GetEvent(SDL_Event *Event)
 				case 9:
 					event.data1 = SDLK_SPACE;
 				break;
+				    
+                //case 10:                             // 'Analog Left click' PS2 button
+                //    event.data1 = KEY_TAB;
+
+                case 11:                             // 'Analog Right click' PS2 button
+                    event.data1 = KEY_F11;
+                break;
 
 			}
 
@@ -251,10 +278,16 @@ void I_GetEvent(SDL_Event *Event)
 				joy_x = 0;
 
 				if( (Event->jaxis.value > JOYVAL) )
+                {
 					joy_x = 1;
+                	//printf("  RIGHT\n");
+                }
 				else
 					if( ( Event->jaxis.value < -JOYVAL) )
-						joy_x = -1;
+                    {
+                        joy_x = -1;
+                      //printf("LEFT\n");
+                    }
 			}
 
 			if( Event->jaxis.axis == 1)
@@ -267,13 +300,41 @@ void I_GetEvent(SDL_Event *Event)
 					if( ( Event->jaxis.value < -JOYVAL) )
 						joy_y = -1;
 			}	
+            /// strafe with right analog stick
+            if( Event->jaxis.axis == 2)
+			{
+                //event.data1 = 0;
 
+                Sint16 val = Event->jaxis.value / 3000;
+                //printf(" event.jaxis.axis: %i val: %i\n", Event->jaxis.axis, val /*Event->jaxis.value*/);
+
+                if (abs(val) < 3)   // eixo do strafe.  se modulo < 3, nao move
+                {
+                    strafe_x = 0;
+                    //event.data1 = 0;      // se positivo, direita                    
+                }
+                else if ( val > 0 ) // se negativo, esquerda
+                {
+                    strafe_x = 1;
+                    //event.data1 = 1;
+                    //1printf("  strafe DIR\n");
+                }
+                else
+                {
+                    strafe_x = -1;
+                    //event.data1 = -1;
+                    //1printf("  strafe ESQ\n");
+                }
+			}
+
+            event.data1 = strafe_x;
 			event.data2 = joy_x;
 			event.data3 = joy_y;
 			event.type = ev_joystick;
 				
 			D_PostEvent(&event);
 
+		//printf("D_PostEvent *%d\n", event.data1);
 		} break;
 
 
@@ -330,6 +391,106 @@ void I_GetEvent(SDL_Event *Event)
 
 }
 
+// cosmito : from lsdldoom, PS2 port
+void I_PollJoystick(void)
+{
+  //  boolean strafeonrightjoy = true;        // TBD
+
+  //  event_t ev;
+  //  Sint16 xaxisl, yaxisl, xaxisr;
+  //  Uint8 hat;
+
+  //  //if (!usejoystick || (!joystick)) return;
+  //  ev.type = ev_joystick;
+
+  //  ev.data1 = 0;
+  //  // rm -- treat buttons like key inputs (easier than recoding main)
+  //  //ev.data1 =
+  //  //	(SDL_JoystickGetButton(joystick, 0)<<0) |
+  //  //	(SDL_JoystickGetButton(joystick, 1)<<1) |
+  //  //	(SDL_JoystickGetButton(joystick, 2)<<2) |
+  //  //	(SDL_JoystickGetButton(joystick, 3)<<3);
+
+  //  hat = SDL_JoystickGetHat(joystick, 0);
+  //  //printf("hat %d\n", hat);
+  //  if ( hat == SDL_HAT_CENTERED )
+  //  {
+  //      if (strafeonrightjoy == false)
+  //          xaxisl = SDL_JoystickGetAxis(joystick, 0) / 3000;
+  //      else		
+  //          xaxisl = SDL_JoystickGetAxis(joystick, 2) / 3000;
+
+  //      if (abs(xaxisl) < 3)
+  //          ev.data1 = 0;
+  //      else if ( xaxisl > 0 )
+		//	ev.data1 = 1;
+		//else
+		//	ev.data1 = -1;
+
+  //      yaxisl = SDL_JoystickGetAxis(joystick, 1) / 3000;
+  //      if (abs(yaxisl) < 2) 
+  //          ev.data3 = 0;
+  //      else if ( yaxisl > 0 )
+  //          ev.data3 = 1;
+  //      else
+  //          ev.data3 = -1;
+  //      if (strafeonrightjoy == false)
+  //          xaxisr = SDL_JoystickGetAxis(joystick, 2) / 3000;
+  //      else		
+  //          xaxisr = SDL_JoystickGetAxis(joystick, 0) / 3000;
+  //      //if (xaxisr != 0)
+  //      //    printf("%d\n", xaxisr);
+  //      if (abs(xaxisr) < 2)
+  //          ev.data2 = 0;
+  //      else if ( xaxisr > 0 )
+  //          ev.data2 = 1;
+  //      else
+  //          ev.data2 = -1;
+  //  }
+  //  else
+  //  {
+  //      if ( hat & SDL_HAT_UP )
+  //          ev.data3 = -1;
+  //      if ( hat & SDL_HAT_RIGHT )
+  //          ev.data2 = 1;
+  //      if ( hat & SDL_HAT_DOWN )
+  //          ev.data3 = 1;
+  //      if ( hat & SDL_HAT_LEFT )
+  //          ev.data2 = -1;
+  //  }
+  //  D_PostEvent(&ev);
+                                                                // nao funciona
+    boolean strafeonrightjoy = true;        // TBD
+
+    event_t ev;
+    Sint16 xaxisl, yaxisl, xaxisr;
+    Uint8 hat;
+
+    ev.type = ev_keydown;
+
+    ev.data1 = 0;
+
+    hat = SDL_JoystickGetHat(joystick, 0);
+    if ( hat == SDL_HAT_CENTERED )
+    {
+        if (strafeonrightjoy == false)
+            xaxisl = SDL_JoystickGetAxis(joystick, 0) / 3000;
+        else		
+            xaxisl = SDL_JoystickGetAxis(joystick, 2) / 3000;
+
+        if (abs(xaxisl) < 3)
+            ev.data1 = 0;
+        else if ( xaxisl > 0 )
+			ev.data1 = SDLK_o;
+		else
+            ev.data1 = SDLK_p;
+
+    D_PostEvent(&ev);
+
+    }
+}
+
+
 //
 // I_StartTic
 //
@@ -341,6 +502,7 @@ void I_StartTic (void)
 
     while ( SDL_PollEvent(&Event) )
 	I_GetEvent(&Event);
+	//I_PollJoystick();     // cosmito : from lsdldoom, PS2 port
 }
 
 

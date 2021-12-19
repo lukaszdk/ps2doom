@@ -33,8 +33,8 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #include "include/doomdef.h"
 #include "include/m_misc.h"
 #include "include/i_video.h"
-#include "include/i_sound.h"
-
+//#include "include/i_sound.h"
+#include "include/l_sound_sdl.h"
 #include "include/d_net.h"
 #include "include/g_game.h"
 
@@ -48,6 +48,9 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 int	mb_used = 6;
 
+
+
+SDL_Joystick *joystick;
 
 int I_strncasecmp(char *str1, char *str2, int len)
 {
@@ -108,13 +111,14 @@ int  I_GetTime (void)
 //
 void I_Init (void)
 {
-    if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 )
+    //if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 )
+    if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 )
         I_Error("Could not initialize SDL: %s", SDL_GetError());
 
     I_InitSound();
     //  I_InitGraphics();
 
-	SDL_Joystick *joystick;
+	//SDL_Joystick *joystick;
 
 	joystick = SDL_JoystickOpen(0);
 

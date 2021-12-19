@@ -1,0 +1,264 @@
+     // Bug, dear Shawn.
+    // Insufficient malloc, caused spurious realloc errors.
+    plutoniawad = malloc(strlen(doomwaddir)+1+/*9*/12+1+5);
+    sprintf(plutoniawad, "%splutonia.wad", doomwaddir);
+
+    tntwad = malloc(strlen(doomwaddir)+1+9+1+5);
+    sprintf(tntwad, "%stnt.wad", doomwaddir);
+
+
+    // French stuff.
+    doom2fwad = malloc(strlen(doomwaddir)+1+10+1+5);
+    sprintf(doom2fwad, "%sdoom2f.wad", doomwaddir);
+
+    home = getenv("HOME");
+    if (!home)
+      home = ".";
+    sprintf(basedefault, "%s.doomrc", home);
+
+    if (M_CheckParm ("-shdev"))
+    {
+        gamemode = shareware;
+        devparm = true;
+        D_AddFile (DEVDATA"doom1.wad");
+        D_AddFile (DEVMAPS"data_se/texture1.lmp");
+        D_AddFile (DEVMAPS"data_se/pnames.lmp");
+        strcpy (basedefault,DEVDATA"default.cfg");
+        return;
+    }
+
+    if (M_CheckParm ("-regdev"))
+    {
+        gamemode = registered;
+        devparm = true;
+        D_AddFile (DEVDATA"doom.wad");
+        D_AddFile (DEVMAPS"data_se/texture1.lmp");
+        D_AddFile (DEVMAPS"data_se/texture2.lmp");
+        D_AddFile (DEVMAPS"data_se/pnames.lmp");
+        strcpy (basedefault,DEVDATA"default.cfg");
+        return;
+    }
+
+    if (M_CheckParm ("-comdev"))
+    {
+        gamemode = commercial;
+        devparm = true;
+        /* I don't bother
+        if(plutonia)
+        D_AddFile (DEVDATA"plutonia.wad");
+        else if(tnt)
+        D_AddFile (DEVDATA"tnt.wad");
+        else*/
+        D_AddFile (DEVDATA"doom2.wad");
+
+        D_AddFile (DEVMAPS"cdata/texture1.lmp");
+        D_AddFile (DEVMAPS"cdata/pnames.lmp");
+        strcpy (basedefault,DEVDATA"default.cfg");
+        return;
+    }
+
+    /// pad init
+    //ret = SifLoadModule("rom0:SIO2MAN", 0, NULL);
+    //if (ret < 0) {
+    //    printf("sifLoadModule sio failed: %d\n", ret);
+    //    SleepThread();
+    //}    
+
+    int ret = SifLoadModule("rom0:XPADMAN", 0, NULL);
+    if (ret < 0) {
+        printf("sifLoadModule pad failed: %d\n", ret);
+        SleepThread();
+    }
+
+    printf("padInit(0);\n");
+    padInit(0);
+
+    int port = 0; // 0 -> Connector 1, 1 -> Connector 2
+    printf("int port = 0;\n");
+
+    int slot = 0; // Always zero if not using multitap
+
+    printf("PortMax: %d\n", padGetPortMax());
+    printf("SlotMax: %d\n", padGetSlotMax(port));
+
+    if((ret = padPortOpen(port, slot, padBuf)) == 0) {
+        printf("padOpenPort failed: %d\n", ret);
+        SleepThread();
+    }
+
+    if(!initializePad(port, slot)) {
+        printf("pad initalization failed!\n");
+        SleepThread();
+    }
+
+
+    /// start wad prompt
+    scr_printf_nocursor("Point to a WAD with 'dpad Up' and 'dpad Up' and select with 'X' or 'O'\n");
+
+    int ymin = 6, nWadsFound = 0;
+    int y = ymin;
+    scr_setXY(0,y);
+
+    char* foundwadfiles[MAXWADFILES];
+    char* foundfile = NULL;
+    int foundwadfiles_index = 0;
+
+    checkForWadFile(doom2fwad, foundwadfiles, foundfile, &foundwadfiles_index, &nWadsFound);
+    checkForWadFile(doom2wad, foundwadfiles, foundfile, &foundwadfiles_index, &nWadsFound);
+    checkForWadFile(plutoniawad, foundwadfiles, foundfile, &foundwadfiles_index, &nWadsFound);
+    checkForWadFile(tntwad, foundwadfiles, foundfile, &foundwadfiles_index, &nWadsFound);
+    checkForWadFile(doomuwad, foundwadfiles, foundfile, &foundwadfiles_index, &nWadsFound);
+    checkForWadFile(doomwad, foundwadfiles, foundfile, &foundwadfiles_index, &nWadsFound);
+    checkForWadFile(doom1wad, foundwadfiles, foundfile, &foundwadfiles_index, &nWadsFound);
+
+    int index = 0;
+    int ymax = y + nWadsFound - 1;
+
+    if (nWadsFound > 0)
+    {
+        scr_setXY(0,y);
+        scr_printf_nocursor("->");
+
+        int butres = 0;
+        u32 old_pad = 0;
+        u32 new_pad = 0;
+
+        int timeout = 100;     // TBD : read from config?
+        if (nWadsFound == 1)
+            timeout = 0;
+
+        int wait_for_user = 0;
+        while(timeout != 0 || wait_for_user == 1)
+        {
+            butres = padUtils_ReadButtonWait(port, slot, old_pad, new_pad);
+            if(butres != 0)
+            {
+                wait_for_user = 1;
+            }
+
+            if(butres == PAD_UP)
+            {
+                scr_setXY(0,y);
+                scr_printf_nocursor("  ");
+                y--;
+                if(y < ymin)
+                    y = ymin;
+                scr_setXY(0,y);
+                scr_printf_nocursor("->");
+            }
+            else if(butres == PAD_DOWN)
+            {
+                scr_setXY(0,y);
+                scr_printf_nocursor("  ");
+                y++;
+                if(y > ymax)
+                    y = ymax;
+                scr_setXY(0,y);
+                scr_printf_nocursor("->");
+            }
+            else if(butres == PAD_CROSS || butres == PAD_CIRCLE)
+            {
+                break;
+            }
+
+            gsKit_vsync();
+            if(timeout != 0)
+                timeout--;
+        }
+
+        scr_setXY(0,ymax+1);
+        scr_printf_nocursor("\n\n");
+        padPortClose(port, slot);
+
+        // find out which wad selected
+        index = y - ymin;
+        char* selected_wad = foundwadfiles[index];
+
+
+        if ( strcmp(doom1wad, selected_wad) == 0 )
+        {
+            gamemode = shareware;
+            sprintf(currentWadName, "doom1sav");
+            D_AddFile (doom1wad);
+            return;
+        }
+
+        if ( strcmp(doom2fwad, selected_wad) == 0 )
+        {
+            gamemode = commercial;
+            // C'est ridicule!
+            // Let's handle languages in config files, okay?
+            language = french;
+            printf("French version\n");
+
+            //// halves sample playing frequency to avoid lack of memory for the upsampled sounds
+            //mixer_period = 2;
+            //SAMPLERATE = SAMPLERATE	/ 2;
+            //printf("doom2f detected : halving sample playing frequency to %dHz **************** \n", SAMPLERATE);
+
+            D_AddFile (doom2fwad);
+            sprintf(currentWadName, "doom2fsav");
+            return;
+        }
+
+        if ( strcmp(doom2wad, selected_wad) == 0 )
+        {
+            gamemode = commercial;
+
+            // halves sample playing frequency to avoid lack of memory for the upsampled sounds
+            //mixer_period = 2;
+            //SAMPLERATE = SAMPLERATE	/ 2;
+            //printf("doom2 detected : halving sample playing frequency to %dHz **************** \n", SAMPLERATE);
+
+            sprintf(currentWadName, "doom2sav");
+            //printf("\n\n           ->> %s\n\n", currentWadName);
+
+            D_AddFile (doom2wad);
+            return;
+        }
+
+        if ( strcmp(plutoniawad, selected_wad) == 0 )
+        {
+            gamemode = commercial;
+            sprintf(currentWadName, "plutoniasav");
+            D_AddFile (plutoniawad);
+            return;
+        }
+
+        if ( strcmp(tntwad, selected_wad) == 0 )
+        {
+            gamemode = commercial;
+            sprintf(currentWadName, "tntsav");
+
+            D_AddFile (tntwad);
+            return;
+        }
+
+        if ( strcmp(doomuwad, selected_wad) == 0 )
+        {
+            gamemode = retail;
+            sprintf(currentWadName, "doomusav");
+            D_AddFile (doomuwad);
+            return;
+        }
+
+        if ( strcmp(doomwad, selected_wad) == 0 )
+        {
+            gamemode = registered;
+            sprintf(currentWadName, "doomsav");
+            D_AddFile (doomwad);
+            return;
+        }
+    }
+
+    if(nWadsFound == 0)
+    {
+        printf("Game mode indeterminate.\n");
+        gamemode = indetermined;
+        sprintf(currentWadName, "indetersav");
+        padPortClose(port, slot);
+
+        // We don't abort. Let's see what the PWAD contains.
+        //exit(1);
+        //I_Error ("Game mode indeterminate\n");
+    }

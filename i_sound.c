@@ -58,7 +58,7 @@ static int SAMPLECOUNT=		512;
 int 		lengths[NUMSFX];
 
 // The actual output device.
-int	audio_fd;
+//int	audio_fd;
 
 
 // The channel step amount...

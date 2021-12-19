@@ -67,14 +67,11 @@ rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #include "include/r_sky.h"
 
 
-
 #include "include/g_game.h"
-
+#include "include/p_pspr.h"     // cosmito
 
 #define SAVEGAMESIZE	0x2c000
 #define SAVESTRINGSIZE	24
-
-
 
 boolean	G_CheckDemoStatus (void); 
 void	G_ReadDemoTiccmd (ticcmd_t* cmd); 
@@ -157,6 +154,9 @@ int		key_use;
 int		key_strafe;
 int		key_speed; 
  
+int     key_weaponnext;           // cosmito : added
+int     key_weaponprevious;       // cosmito : added
+
 int             mousebfire; 
 int             mousebstrafe; 
 int             mousebforward; 
@@ -202,10 +202,11 @@ int             joyxmove;
 int		joyymove;
 boolean         joyarray[5]; 
 boolean*	joybuttons = &joyarray[1];		// allow [-1] 
- 
+static int   joyxside;      /// cosmito : for strafe
 int		savegameslot; 
 char		savedescription[32]; 
- 
+int joyxside_byjoy;         /// cosmito
+int joyxside_bykey;         /// cosmito
  
 #define	BODYQUESIZE	32
 
@@ -277,32 +278,42 @@ void G_BuildTiccmd (ticcmd_t* cmd)
     // let movement keys cancel each other out
     if (strafe) 
     { 
-	if (gamekeydown[key_right]) 
-	{
-	    // fprintf(stderr, "strafe right\n");
-	    side += sidemove[speed]; 
-	}
-	if (gamekeydown[key_left]) 
-	{
-	    //	fprintf(stderr, "strafe left\n");
-	    side -= sidemove[speed]; 
-	}
-	if (joyxmove > 0) 
-	    side += sidemove[speed]; 
-	if (joyxmove < 0) 
-	    side -= sidemove[speed]; 
- 
+        /// lsdldoom strafe nao usa isto
+        if (gamekeydown[key_right])
+        {
+            // fprintf(stderr, "strafe right\n");
+            side += sidemove[speed];
+        }
+        if (gamekeydown[key_left])
+        {
+            //	fprintf(stderr, "strafe left\n");
+            side -= sidemove[speed];
+        }
+        if (joyxmove > 0)
+            side += sidemove[speed];
+        if (joyxmove < 0)
+            side -= sidemove[speed];
     } 
     else 
     { 
-	if (gamekeydown[key_right]) 
-	    cmd->angleturn -= angleturn[tspeed]; 
-	if (gamekeydown[key_left]) 
-	    cmd->angleturn += angleturn[tspeed]; 
-	if (joyxmove > 0) 
-	    cmd->angleturn -= angleturn[tspeed]; 
-	if (joyxmove < 0) 
-	    cmd->angleturn += angleturn[tspeed]; 
+        if (gamekeydown[key_right])
+            cmd->angleturn -= angleturn[tspeed];
+        if (gamekeydown[key_left])
+            cmd->angleturn += angleturn[tspeed];
+
+        //printf("joy_x = %d\n", joy_x);
+
+        if (joyxmove > 0)
+        {
+            cmd->angleturn -= angleturn[tspeed];
+            //printf("angleturn ESQ, joy_x = %d\n", joy_x);
+        }
+        if (joyxmove < 0)
+        {
+            cmd->angleturn += angleturn[tspeed];
+            //printf("angleturn DIR, joy_x = %d\n", joy_x);
+        }
+
     } 
  
     if (gamekeydown[key_up]) 
@@ -434,6 +445,41 @@ void G_BuildTiccmd (ticcmd_t* cmd)
 	sendsave = false; 
 	cmd->buttons = BT_SPECIAL | BTS_SAVEGAME | (savegameslot<<BTS_SAVESHIFT); 
     } 
+    
+        /// cosmito : next/prev weapon section
+    int newweapon = wp_nochange;
+    if (gamekeydown[key_weaponnext])                                 
+    {
+//        newweapon = P_NextWeapon(&players[consoleplayer]);
+    }
+
+    if (gamekeydown[key_weaponprevious])                                 
+    {
+//        newweapon = P_PreviousWeapon(&players[consoleplayer]);
+    } 
+
+	if (newweapon != wp_nochange)
+	{
+		cmd->buttons |= BT_CHANGE;
+		cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
+	}
+
+    if (newweapon != wp_nochange)
+	{
+		cmd->buttons |= BT_CHANGE;
+		cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
+	}
+    ///
+        /// cosmito : from lsdldoom strafe support
+    if ( joyxside > 0 )
+    {
+        side += sidemove[speed];        
+    }
+    if ( joyxside < 0 )
+    {
+        side -= sidemove[speed];
+    }
+
 } 
  
 
@@ -564,7 +610,10 @@ boolean G_Responder (event_t* ev)
 	    return true; 
 	} 
 	if (ev->data1 <NUMKEYS) 
-	    gamekeydown[ev->data1] = true; 
+    //{
+        gamekeydown[ev->data1] = true;
+    //  printf("    gamekeydown[ev->data1] = true;  %d\n", ev->data1);
+    //}
 	return true;    // eat key down events 
  
       case ev_keyup: 
@@ -581,19 +630,41 @@ boolean G_Responder (event_t* ev)
 	return true;    // eat events 
  
       case ev_joystick: 
-	joybuttons[0] = ev->data1 & 1; 
-	joybuttons[1] = ev->data1 & 2; 
-	joybuttons[2] = ev->data1 & 4; 
-	joybuttons[3] = ev->data1 & 8; 
+	//joybuttons[0] = ev->data1 & 1;        /// cosmito : might interefere with strafe info, so it's commented
+	//joybuttons[1] = ev->data1 & 2;
+	//joybuttons[2] = ev->data1 & 4;
+	//joybuttons[3] = ev->data1 & 8;
 	joyxmove = ev->data2; 
 	joyymove = ev->data3; 
 	return true;    // eat events 
- 
+//printf(" joyxmove = %d\n", joyxmove);
+
+    // ev->data1 info is now irrelevant :
+    // for strafe, account for joyxside_byjoy and joyxside_bykey
+    joyxside = 0;
+    if ((joyxside_byjoy == 0 && joyxside_bykey == 0) || (joyxside_byjoy + joyxside_bykey == 0))
+        joyxside = 0;
+    else
+    {
+        if (joyxside_byjoy == -1 || joyxside_bykey == -1)
+            joyxside = -1;
+        else
+        {
+            if (joyxside_byjoy == 1 || joyxside_bykey == 1)
+                joyxside = 1;
+        }
+    }
+
+    /// cosmito : note: in lsdldoom, for strafe support joybuttons aren't set. only this is made.
+  	//  case ev_joystick:
+	//	joyxside = ev->data1;     /// cosmito : joyxside is a trick for doing strafe in lsdldoom
+	//	joyxmove = ev->data2;
+	//	joyymove = ev->data3;
       default: 
 	break; 
     } 
  
-    return false; 
+return false;
 } 
  
  
@@ -1207,9 +1278,14 @@ void G_DoLoadGame (void)
 	 
     gameaction = ga_nothing; 
 	 
+    pf("G_DoLoadGame\n"); 
     length = M_ReadFile (savename, &savebuffer); 
     save_p = savebuffer + SAVESTRINGSIZE;
-    
+    if (length == 0)
+    {
+        pf("invalid filename or bad file\n");
+        return;
+    }
     // skip the description field 
     memset (vcheck,0,sizeof(vcheck)); 
     sprintf (vcheck,"version %i",VERSION_NUM); 
@@ -1275,11 +1351,15 @@ void G_DoSaveGame (void)
     int		length; 
     int		i; 
 	
-    if (M_CheckParm("-cdrom"))
-	sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",savegameslot);
-    else
-	sprintf (name,SAVEGAMENAME"%d.dsg",savegameslot); 
-    description = savedescription; 
+//    if (M_CheckParm("-cdrom"))
+        //sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",savegameslot);
+//        sprintf(name,"c:\\doomdata\\%s%d.dsg",currentWadName,savegameslot);
+//    else
+        //sprintf (name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",savegameslot);
+//        sprintf (name,"mc0:PS2DOOM/%s%d.dsg",currentWadName,savegameslot);
+    description = savedescription;
+
+printf("savename : %s\n", name);        ///
 	 
     save_p = savebuffer = screens[1]+0x4000; 
 	 

@@ -288,7 +288,13 @@ Z_Malloc
     return (void *) ((byte *)base + sizeof(memblock_t));
 }
 
-
+// cosmito from lsdldoom
+void *(Z_Calloc)(size_t n1, size_t n2, int tag, void **user, const char *file, int line)
+{
+	return
+		//(n1*=n2) ? memset((Z_Malloc)(n1, tag, user, file, line), 0, n1) : NULL;		// cosmito
+		(n1*=n2) ? memset((Z_Malloc)(n1, tag, user), 0, n1) : NULL;
+}
 
 //
 // Z_FreeTags

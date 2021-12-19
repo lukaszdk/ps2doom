@@ -477,7 +477,7 @@ P_BlockLinesIterator
     int			offset;
     short*		list;
     line_t*		ld;
-	
+
     if (x<0
 	|| y<0
 	|| x>=bmapwidth
@@ -485,9 +485,9 @@ P_BlockLinesIterator
     {
 	return true;
     }
-    
+
     offset = y*bmapwidth+x;
-	
+
     offset = *(blockmap+offset);
 
     for ( list = blockmaplump+offset ; *list != -1 ; list++)
@@ -498,7 +498,7 @@ P_BlockLinesIterator
 	    continue; 	// line has already been checked
 
 	ld->validcount = validcount;
-		
+
 	if ( !func(ld) )
 	    return false;
     }
@@ -516,7 +516,7 @@ P_BlockThingsIterator
   boolean(*func)(mobj_t*) )
 {
     mobj_t*		mobj;
-	
+
     if ( x<0
 	 || y<0
 	 || x>=bmapwidth
@@ -524,7 +524,7 @@ P_BlockThingsIterator
     {
 	return true;
     }
-    
+
 
     for (mobj = blocklinks[y*bmapwidth+x] ;
 	 mobj ;
@@ -565,7 +565,7 @@ PIT_AddLineIntercepts (line_t* ld)
     int			s2;
     fixed_t		frac;
     divline_t		dl;
-	
+
     // avoid precision problems with two routines
     if ( trace.dx > FRACUNIT*16
 	 || trace.dy > FRACUNIT*16
@@ -580,17 +580,17 @@ PIT_AddLineIntercepts (line_t* ld)
 	s1 = P_PointOnLineSide (trace.x, trace.y, ld);
 	s2 = P_PointOnLineSide (trace.x+trace.dx, trace.y+trace.dy, ld);
     }
-    
+
     if (s1 == s2)
 	return true;	// line isn't crossed
-    
+
     // hit the line
     P_MakeDivline (ld, &dl);
     frac = P_InterceptVector (&trace, &dl);
 
     if (frac < 0)
 	return true;	// behind source
-	
+
     // try to early out the check
     if (earlyout
 	&& frac < FRACUNIT
@@ -598,8 +598,8 @@ PIT_AddLineIntercepts (line_t* ld)
     {
 	return false;	// stop checking
     }
-    
-	
+
+
     intercept_p->frac = frac;
     intercept_p->isaline = true;
     intercept_p->d.line = ld;
@@ -619,24 +619,24 @@ boolean PIT_AddThingIntercepts (mobj_t* thing)
     fixed_t		y1;
     fixed_t		x2;
     fixed_t		y2;
-    
+
     int			s1;
     int			s2;
-    
+
     boolean		tracepositive;
 
     divline_t		dl;
-    
+
     fixed_t		frac;
-	
+
     tracepositive = (trace.dx ^ trace.dy)>0;
-		
+
     // check a corner to corner crossection for hit
     if (tracepositive)
     {
 	x1 = thing->x - thing->radius;
 	y1 = thing->y + thing->radius;
-		
+
 	x2 = thing->x + thing->radius;
 	y2 = thing->y - thing->radius;			
     }
@@ -644,22 +644,22 @@ boolean PIT_AddThingIntercepts (mobj_t* thing)
     {
 	x1 = thing->x - thing->radius;
 	y1 = thing->y - thing->radius;
-		
+
 	x2 = thing->x + thing->radius;
 	y2 = thing->y + thing->radius;			
     }
-    
+
     s1 = P_PointOnDivlineSide (x1, y1, &trace);
     s2 = P_PointOnDivlineSide (x2, y2, &trace);
 
     if (s1 == s2)
 	return true;		// line isn't crossed
-	
+
     dl.x = x1;
     dl.y = y1;
     dl.dx = x2-x1;
     dl.dy = y2-y1;
-    
+
     frac = P_InterceptVector (&trace, &dl);
 
     if (frac < 0)
@@ -688,11 +688,11 @@ P_TraverseIntercepts
     fixed_t		dist;
     intercept_t*	scan;
     intercept_t*	in;
-	
+
     count = intercept_p - intercepts;
-    
+
     in = 0;			// shut up compiler warning
-	
+
     while (count--)
     {
 	dist = MAXINT;
@@ -704,7 +704,7 @@ P_TraverseIntercepts
 		in = scan;
 	    }
 	}
-	
+
 	if (dist > maxfrac)
 	    return true;	// checked everything in range		
 
@@ -725,7 +725,7 @@ P_TraverseIntercepts
 
 	in->frac = MAXINT;
     }
-	
+
     return true;		// everything was traversed
 }
 
@@ -752,31 +752,31 @@ P_PathTraverse
     fixed_t	yt1;
     fixed_t	xt2;
     fixed_t	yt2;
-    
+
     fixed_t	xstep;
     fixed_t	ystep;
-    
+
     fixed_t	partial;
-    
+
     fixed_t	xintercept;
     fixed_t	yintercept;
-    
+
     int		mapx;
     int		mapy;
-    
+
     int		mapxstep;
     int		mapystep;
 
     int		count;
-		
+
     earlyout = flags & PT_EARLYOUT;
-		
+
     validcount++;
     intercept_p = intercepts;
-	
+
     if ( ((x1-bmaporgx)&(MAPBLOCKSIZE-1)) == 0)
 	x1 += FRACUNIT;	// don't side exactly on a line
-    
+
     if ( ((y1-bmaporgy)&(MAPBLOCKSIZE-1)) == 0)
 	y1 += FRACUNIT;	// don't side exactly on a line
 
@@ -816,7 +816,7 @@ P_PathTraverse
 
     yintercept = (y1>>MAPBTOFRAC) + FixedMul (partial, ystep);
 
-	
+
     if (yt2 > yt1)
     {
 	mapystep = 1;
@@ -836,13 +836,13 @@ P_PathTraverse
 	xstep = 256*FRACUNIT;
     }	
     xintercept = (x1>>MAPBTOFRAC) + FixedMul (partial, xstep);
-    
+
     // Step through map blocks.
     // Count is present to prevent a round off error
     // from skipping the break.
     mapx = xt1;
     mapy = yt1;
-	
+
     for (count = 0 ; count < 64 ; count++)
     {
 	if (flags & PT_ADDLINES)
@@ -850,19 +850,19 @@ P_PathTraverse
 	    if (!P_BlockLinesIterator (mapx, mapy,PIT_AddLineIntercepts))
 		return false;	// early out
 	}
-	
+
 	if (flags & PT_ADDTHINGS)
 	{
 	    if (!P_BlockThingsIterator (mapx, mapy,PIT_AddThingIntercepts))
 		return false;	// early out
 	}
-		
+
 	if (mapx == xt2
 	    && mapy == yt2)
 	{
 	    break;
 	}
-	
+
 	if ( (yintercept >> FRACBITS) == mapy)
 	{
 	    yintercept += ystep;
@@ -873,11 +873,8 @@ P_PathTraverse
 	    xintercept += xstep;
 	    mapy += mapystep;
 	}
-		
+
     }
     // go through the sorted list
     return P_TraverseIntercepts ( trav, FRACUNIT );
 }
-
-
-

@@ -41,11 +41,6 @@ rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 #endif
 #include "include/w_wad.h"
 
-
-
-
-
-
 //
 // GLOBALS
 //
@@ -171,7 +166,7 @@ void W_AddFile (char *filename)
 	return;
     }
 
-    printf (" adding %s\n",filename);
+    scr_printf (" adding %s\n",filename);
     startlump = numlumps;
 	
     if (I_strncasecmp (filename+strlen(filename)-3 , "wad", 3 ) )
@@ -308,8 +303,13 @@ void W_InitMultipleFiles (char** filenames)
 	W_AddFile (*filenames);
 
     if (!numlumps)
-	I_Error ("W_InitFiles: no files found");
-    
+	//I_Error ("W_InitFiles: no files found");
+    {
+        scr_clear();
+        scr_printf ("\n\nERROR at W_InitFiles: no files found\n\n");
+        scr_printf ("Put a .WAD file along with PS2Doom.elf before running it or check if HDD paths are correct at ps2doom.config.\n\n");
+        SleepThread();
+    }
     // set up caching
     size = numlumps * sizeof(*lumpcache);
     lumpcache = malloc (size);
@@ -408,8 +408,8 @@ int W_GetNumForName (char* name)
     i = W_CheckNumForName (name);
     
     if (i == -1)
-      I_Error ("W_GetNumForName: %s not found!", name);
-      
+      //I_Error ("W_GetNumForName: %s not found!", name);
+      printf ("W_GetNumForName: %s not found!", name);
     return i;
 }
 
@@ -491,14 +491,13 @@ W_ReadLump
     else
 	handle = (FILE *)l->handle;
 
-	// Hack to make I/O quicker	
-	ps2_fseek (handle, l->position, SEEK_SET);
-    c = ps2_fread (dest, 1, l->size, handle);
+	//// Hack to make I/O quicker	
+	//ps2_fseek (handle, l->position, SEEK_SET);
+ //   c = ps2_fread (dest, 1, l->size, handle);
 
-	/*	
+	
     fseek (handle, l->position, SEEK_SET);
     c = fread (dest, 1, l->size, handle);
-	*/
 
     if (c < l->size)
 	I_Error ("W_ReadLump: only read %i of %i on lump %i",
@@ -524,8 +523,11 @@ W_CacheLumpNum
     byte*	ptr;
 
     if ((unsigned)lump >= numlumps)
-	I_Error ("W_CacheLumpNum: %i >= numlumps",lump);
-		
+    {
+        //I_Error ("W_CacheLumpNum: %i >= numlumps",lump);      // cosmito
+        printf("W_CacheLumpNum: %i >= numlumps",lump);      // cosmito  : for doom.wad, HELP2 is not found so return null
+        return NULL;
+    }
     if (!lumpcache[lump])
     {
 	// read the lump in
@@ -548,10 +550,7 @@ W_CacheLumpNum
 //
 // W_CacheLumpName
 //
-void*
-W_CacheLumpName
-( char*		name,
-  int		tag )
+void* W_CacheLumpName (char* name, int tag)
 {
     return W_CacheLumpNum (W_GetNumForName(name), tag);
 }
