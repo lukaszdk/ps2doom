@@ -14,7 +14,7 @@ jobs:
     - name: Install dependencies
       run: |
         apk add build-base git zip gawk
-    #i need to change this library 
+    # i need to change this library 
     - name: Git clone sjpcm lib
       run: |
         git clone https://github.com/ps2homebrew/isjpcm.git && cd isjpcm 
@@ -26,7 +26,7 @@ jobs:
     - run: git fetch --prune --unshallow
 
     - name: Make
-      run: make all
+      run: make all clean
      
     - name: Get short SHA
       id: slug
