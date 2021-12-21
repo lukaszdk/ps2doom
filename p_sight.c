@@ -345,5 +345,3 @@ P_CheckSight
     // the head node is the last node output
     return P_CrossBSPNode (numnodes-1);	
 }
-
-

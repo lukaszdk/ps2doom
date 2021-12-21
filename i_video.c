@@ -26,8 +26,8 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include <stdlib.h>
 
-#include <SDL/SDL.h>
-
+#include <SDL.h>
+#include <SDL_keyboard.h>
 #include "include/m_swap.h"
 #include "include/doomstat.h"
 #include "include/i_system.h"
@@ -42,7 +42,7 @@ SDL_Surface *screen;
 
 // Fake mouse handling.
 boolean		grabMouse;
-
+int config_buttons_int[];
 extern SDL_Joystick *joystick;      // cosmito : shared between i_video.c and i_system.c for joystick staffing
 
 // Blocky mode,
@@ -50,12 +50,20 @@ extern SDL_Joystick *joystick;      // cosmito : shared between i_video.c and i_
 // According to Dave Taylor, it still is a bonehead thing
 // to use ....
 static int	multiply=1;
+
 static int joy_x=0, joy_y=0;
-static int strafe_x=0;
+static int last_key = 0;        // cosmito
+static Uint8 prev_jhat_value = 0;
+
 #define JOYVAL	5000
 
+extern int joyxside_byjoy;
+extern int joyxside_bykey;
+
+int swap_analogsticks;
+
 //
-//  Translates the key 
+//  Translates the key
 //
 
 int xlatekey(SDL_keysym *key)
@@ -84,7 +92,7 @@ int xlatekey(SDL_keysym *key)
       case SDLK_F10:	rc = KEY_F10;		break;
       case SDLK_F11:	rc = KEY_F11;		break;
       case SDLK_F12:	rc = KEY_F12;		break;
-	
+
       case SDLK_BACKSPACE:
       case SDLK_DELETE:	rc = KEY_BACKSPACE;	break;
 
@@ -99,19 +107,19 @@ int xlatekey(SDL_keysym *key)
       case SDLK_RSHIFT:
 	rc = KEY_RSHIFT;
 	break;
-	
+
       case SDLK_LCTRL:
       case SDLK_RCTRL:
 	rc = KEY_RCTRL;
 	break;
-	
+
       case SDLK_LALT:
       case SDLK_LMETA:
       case SDLK_RALT:
       case SDLK_RMETA:
 	rc = KEY_RALT;
 	break;
-	
+
       default:
         rc = key->sym;
 	break;
@@ -139,13 +147,18 @@ void I_StartFrame (void)
 
 
 
-
 /* This processes SDL events */
 void I_GetEvent(SDL_Event *Event)
 {
     Uint8 buttonstate;
     event_t event;
 
+    int axis0 = 0;
+    int axis1 = 1;
+    int axis2 = 2;
+
+
+DOMULTITASK;
 	//printf("Event->type: %i\n", Event->type);
 
     switch (Event->type)
@@ -153,216 +166,473 @@ void I_GetEvent(SDL_Event *Event)
 		/* PS2 joystick support */
 
 		case SDL_JOYBUTTONDOWN:
-		{
-			// printf("button: %i\n", Event->jbutton.button);
+            {
+                //printf("button: %i\n", Event->jbutton.button);
 
-			switch(Event->jbutton.button)
-			{
-				case 0:                             // 'Square' PS2 button
-					event.data1 = SDLK_o;
-
-				case 1:                             // 'Cross' PS2 button
-					event.data1 = KEY_RSHIFT;
-				break;
-	
-				case 3:                             // '^' PS2 button
-					event.data1 = KEY_ESCAPE;
-				break;
-
+                /*
+                switch(Event->jbutton.button)
+                {
+                case 0:                             // 'Square' PS2 button
+                event.data1 = SDLK_o;
+                break;
+                case 1:                             // 'Cross' PS2 button
+                event.data1 = KEY_RSHIFT;
+                break;
+                case 2:                             // 'Circle' PS2 button
+                event.data1 = SDLK_p;
+                break;
+                case 3:                             // '^' PS2 button
+                event.data1 = KEY_ESCAPE;
+                break;
                 case 4:                             // 'Select' PS2 button
-                    event.data1 = KEY_TAB;			// activates the map
-                    break;
-
+                event.data1 = KEY_TAB;			// activates the map
+                break;
                 case 5:                             // 'Start' PS2 button
-					event.data1 = KEY_ENTER;
-                    break;
-
+                event.data1 = KEY_ENTER;
+                break;
                 case 6:                             // 'L1' PS2 button
-					event.data1 = SDLK_n;
-
-				case 7:                             // 'R1' PS2 button
-					event.data1 = KEY_RCTRL;
-
-				case 8:                             // 'L2' PS2 button
-					event.data1 = SDLK_y;
-				break;
-
-				case 9:                             // 'R2' PS2 button
-					event.data1 = SDLK_SPACE;
-				break;
-                
-				//case 10:                          /// Using dlanor suggestion : It's easy to knock off this button during gameplay.   // 'Analog Left click' PS2 button
+                event.data1 = SDLK_n;
+                break;
+                case 7:                             // 'R1' PS2 button
+                event.data1 = KEY_RCTRL;
+                break;
+                case 8:                             // 'L2' PS2 button
+                event.data1 = SDLK_y;
+                break;
+                case 9:                             // 'R2' PS2 button
+                event.data1 = SDLK_SPACE;
+                break;
+                //case 10:                          /// Using dlanor suggestion : It's easy to knock off this button during gameplay.   // 'Analog Left click' PS2 button
                 //    event.data1 = KEY_TAB;
                 break;
-
                 case 11:                             // 'Analog Right click' PS2 button
-                    event.data1 = KEY_F11;
+                event.data1 = KEY_F11;
                 break;
-
-
-
-			}
-			event.type = ev_keydown;
-
-			D_PostEvent(&event);
-
-		} break;
+                }
+                */
+                
+                if ( config_buttons_int[Event->jbutton.button] != -1)
+                {    
+                    event.data1 = config_buttons_int[Event->jbutton.button];
+                    if (event.data1 > 255)
+                    {
+                        //joyxside_bykey = (event.data1 & 256) - 1;  // strafe by key
+                        //if (joyxside_bykey == 255)
+                        //    joyxside_bykey = -1;
+                        // do this better later
+                        joyxside_bykey = event.data1;  // strafe by key
+                        if (joyxside_bykey == STRAFELEFT)
+                            joyxside_bykey = -1;
+                        else
+                            if (joyxside_bykey == STRAFERIGHT)
+                                joyxside_bykey = 1;
+                                //printf("event.data1 = %d\n", event.data1);
+                                //printf("joyxside_bykey = %d\n", joyxside_bykey);
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keydown;                   // other actions
+                
+                    D_PostEvent(&event);
+                }
+            }
+            break;
 
 		case SDL_JOYBUTTONUP:
 		{
-			switch(Event->jbutton.button)
-			{
-				case 0:
-					event.data1 = SDLK_o;
-				break;
+			//switch(Event->jbutton.button)
+			//{
+			//	case 0:
+			//		event.data1 = SDLK_o;
+			//	break;
 
-				case 1:
-					event.data1 = KEY_RSHIFT;
-				break;
-		
-				case 2:
-					event.data1 = SDLK_p;
-				break;
+			//	case 1:
+			//		event.data1 = KEY_RSHIFT;
+			//	break;
 
-				case 3:
-					event.data1 = KEY_ESCAPE;
-				break;
+			//	case 2:
+			//		event.data1 = SDLK_p;
+			//	break;
+
+			//	case 3:
+			//		event.data1 = KEY_ESCAPE;
+			//	break;
+            //  case 4:                             // 'Select' PS2 button
+            //      event.data1 = KEY_TAB;
+            //      break;
+            //  case 5:                             // 'Start' PS2 button
+            //      event.data1 = KEY_ENTER;
+            //  break;
+
+			//	case 6:
+			//		event.data1 = SDLK_n;
+			//	break;
+
+			//	case 7:
+			//		event.data1 = KEY_RCTRL;
+			//	break;
+
+			//	case 8:
+			//		event.data1 = SDLK_y;
+			//	break;
+
+			//	case 9:
+			//		event.data1 = SDLK_SPACE;
+			//	break;
                 
-				case 4:                             // 'Select' PS2 button
-                	event.data1 = KEY_TAB;
-                break;
+            //  //case 10:                             // 'Analog Left click' PS2 button
+            //  //    event.data1 = KEY_TAB;
+            //  break;
 
-				case 5:                             // 'Start' PS2 button
-                    event.data1 = KEY_ENTER;
-                break;
+            //  case 11:                             // 'Analog Right click' PS2 button
+            //      event.data1 = KEY_F11;
+            //  break;
+			//}
 
-				case 6:
-					event.data1 = SDLK_n;
-				break;
+            //if ( config_buttons_int[Event->jbutton.button] != -1)
+            //{
+            //    if (Event->jbutton.button == 6)     // example : strafe with l1
+            //    {
+            //        joyxside_bykey = 0;
+            //        event.type = ev_joystick;
+            //        //printf("SDL_JOYBUTTONUP D_PostEvent *ev_joystick\n");
+            //    }
+            //    else
+            //    {
+            //        // general procedure code
+            //        event.data1 = config_buttons_int[Event->jbutton.button];
+            //        event.type = ev_keyup;
+            //        //printf("SDL_JOYBUTTONUP D_PostEvent *ev_keyup\n"); 
+            //    }
+            //    D_PostEvent(&event);
+            //}
 
-				case 7:
-					event.data1 = KEY_RCTRL;
-				break;
+            //if ( config_buttons_int[Event->jbutton.button] != -1)
+            //{
+            //    if (Event->jbutton.button == 6)     // example : strafe with l1
+            //    {
+            //        joyxside_bykey = 0;
+            //        event.type = ev_joystick;
+            //        //printf("SDL_JOYBUTTONUP D_PostEvent *ev_joystick\n");
+            //    }
+            //    else
+            //    {
+            //        // general procedure code
+            //        event.data1 = config_buttons_int[Event->jbutton.button];
+            //        event.type = ev_keyup;
+            //        //printf("SDL_JOYBUTTONUP D_PostEvent *ev_keyup\n"); 
+            //    }
+            //    D_PostEvent(&event);
+            //}
+            
+            if ( config_buttons_int[Event->jbutton.button] != -1)
+            {
+                event.data1 = config_buttons_int[Event->jbutton.button];
+                if (event.data1 > 255)
+                {
+                    joyxside_bykey = 0;         // strafe by key
+                    event.type = ev_joystick;
+                }
+                else
+                    event.type = ev_keyup;      // other actions
 
-				case 8:
-					event.data1 = SDLK_y;
-				break;
-
-				case 9:
-					event.data1 = SDLK_SPACE;
-				break;
-				    
-                //case 10:                             // 'Analog Left click' PS2 button
-                //    event.data1 = KEY_TAB;
-
-                case 11:                             // 'Analog Right click' PS2 button
-                    event.data1 = KEY_F11;
-                break;
-
-			}
-
-			event.type = ev_keyup;
-
-			D_PostEvent(&event);
+                D_PostEvent(&event);
+            }
 
 		} break;
 
 
 		case SDL_JOYAXISMOTION:
-		{
-			// printf(" event.jaxis.axis : %i value: %i\n", Event->jaxis.axis, Event->jaxis.value);
-	
+        {
+            if( Event->jaxis.axis == axis0)
+            {
+                joy_x = 0;
 
-			if( Event->jaxis.axis == 0)
-			{
-				joy_x = 0;
-
-				if( (Event->jaxis.value > JOYVAL) )
+                if( (Event->jaxis.value > JOYVAL) )
                 {
-					joy_x = 1;
-                	//printf("  RIGHT\n");
+                    joy_x = 1;
+                    //printf("right\n");
                 }
-				else
-					if( ( Event->jaxis.value < -JOYVAL) )
+                else
+                    if( ( Event->jaxis.value < -JOYVAL) )
                     {
                         joy_x = -1;
-                      //printf("LEFT\n");
+                        //printf("left\n");
                     }
-			}
+            }
 
-			if( Event->jaxis.axis == 1)
-			{
-				joy_y = 0;
+            if( Event->jaxis.axis == axis1)
+            {
+                joy_y = 0;
 
-				if( (Event->jaxis.value > JOYVAL) )
-					joy_y = 1;
-				else
-					if( ( Event->jaxis.value < -JOYVAL) )
-						joy_y = -1;
-			}	
-            /// strafe with right analog stick
-            if( Event->jaxis.axis == 2)
-			{
-                //event.data1 = 0;
+                if( (Event->jaxis.value > JOYVAL) )
+                    joy_y = 1;
+                else
+                    if( ( Event->jaxis.value < -JOYVAL) )
+                        joy_y = -1;
+            }
 
-                Sint16 val = Event->jaxis.value / 3000;
-                //printf(" event.jaxis.axis: %i val: %i\n", Event->jaxis.axis, val /*Event->jaxis.value*/);
-
-                if (abs(val) < 3)   // eixo do strafe.  se modulo < 3, nao move
+            if( Event->jaxis.axis == axis2)
+            {
+                Sint16 val = Event->jaxis.value / 3000;     // cosmito : well, 3000 should be replaced by JOYVAL for consistency... TBD : Test later
+                if (abs(val) < 3)
                 {
-                    strafe_x = 0;
-                    //event.data1 = 0;      // se positivo, direita                    
+                    if (last_key == 0)     // last_key also acts like a flag : when == 0, means previously was instructed a strafe action, if != -0, holds the key code
+                    {
+                        joyxside_byjoy = 0;      // strafe information : if == 0 no strafe
+                    }
+                    else
+                    {
+                        event_t eventkey;
+                        eventkey.data1 = last_key;
+                        eventkey.type = ev_keyup;     // other actions
+                        last_key = 0;
+                        D_PostEvent(&eventkey);
+                    }
                 }
-                else if ( val > 0 ) // se negativo, esquerda
+                else if ( val > 0 )
                 {
-                    strafe_x = 1;
-                    //event.data1 = 1;
-                    //1printf("  strafe DIR\n");
+                    int v = config_buttons_int[19];
+                    if (v != -1)
+                    {
+                        if (v > 255)                    // trick : see i_main.c config_actions[]
+                        {
+                            joyxside_byjoy = 1;		// strafe information : if > 0 strafe right
+                        }
+                        else
+                        {
+                            event_t eventkey;
+                            eventkey.data1 = v;
+                            last_key = v;
+                            eventkey.type = ev_keydown;     // other actions
+                            D_PostEvent(&eventkey);
+                        }
+                    }
                 }
                 else
                 {
-                    strafe_x = -1;
-                    //event.data1 = -1;
-                    //1printf("  strafe ESQ\n");
+                    int v = config_buttons_int[18];
+                    if (v != -1)
+                    {
+                        if (v > 255)                    // trick : see i_main.c config_actions[]
+                        {
+                            joyxside_byjoy = -1;		// strafe information : if < 0 strafe left
+                        }
+                        else
+                        {
+                            event_t eventkey;
+                            eventkey.data1 = v;
+                            last_key = v;
+                            eventkey.type = ev_keydown;     // other actions
+                            D_PostEvent(&eventkey);
+                        }
+                    }
                 }
-			}
+            }
 
-            event.data1 = strafe_x;
-			event.data2 = joy_x;
-			event.data3 = joy_y;
-			event.type = ev_joystick;
-				
-			D_PostEvent(&event);
-
-		//printf("D_PostEvent *%d\n", event.data1);
-		} break;
+            //event.data1 = joyxside_byjoy;   // actually, event.data1 is not relevant anymore. info for strafe is directly read at joyxside_byjoy and joyxside_bykey
+            event.data2 = joy_x;
+            event.data3 = joy_y;
+            event.type = ev_joystick;
+            D_PostEvent(&event);
 
 
+        } break;
 
 
-      case SDL_KEYDOWN:
-	event.type = ev_keydown;
-	event.data1 = xlatekey(&Event->key.keysym);
-	D_PostEvent(&event);
+        // cosmito : for handling dpad
+        case SDL_JOYHATMOTION:
+        {
+            //printf("Event->jhat.value = %d\n", Event->jhat.value);
+            //printf("prev.value =        %d\n\n", prev_jhat_value);
+            //printf("logic =        %d\n\n", ((Event->jhat.value & SDL_HAT_LEFT) == SDL_HAT_LEFT) );
+
+            if ( (((prev_jhat_value & SDL_HAT_LEFT) ^ (Event->jhat.value & SDL_HAT_LEFT)) == SDL_HAT_LEFT) && ((Event->jhat.value & SDL_HAT_LEFT) == SDL_HAT_LEFT) )
+            {
+                if(config_buttons_int[12] != -1)
+                {
+                    event.data1 = config_buttons_int[12];
+                    if (event.data1 > 255)
+                    {
+                        joyxside_bykey = event.data1;  // strafe by key
+                        if (joyxside_bykey == STRAFELEFT)
+                            joyxside_bykey = -1;
+                        else
+                            if (joyxside_bykey == STRAFERIGHT)
+                                joyxside_bykey = 1;
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keydown;                   // other actions
+                    D_PostEvent(&event);
+                }
+            }
+
+            else if ( (((prev_jhat_value & SDL_HAT_LEFT) ^ (Event->jhat.value & SDL_HAT_LEFT)) == SDL_HAT_LEFT) && ((Event->jhat.value & SDL_HAT_LEFT) == 0) )
+            {
+                if(config_buttons_int[12] != -1)
+                {
+                    event.data1 = config_buttons_int[12];
+                    if (event.data1 > 255)
+                    {
+                        joyxside_bykey = 0;
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keyup;
+                    D_PostEvent(&event);
+                }
+            }
+
+            if ( (((prev_jhat_value & SDL_HAT_RIGHT) ^ (Event->jhat.value & SDL_HAT_RIGHT)) == SDL_HAT_RIGHT) && ((Event->jhat.value & SDL_HAT_RIGHT) == SDL_HAT_RIGHT) )
+            {
+                if(config_buttons_int[13] != -1)
+                {
+                    event.data1 = config_buttons_int[13];
+                    if (event.data1 > 255)
+                    {
+                        joyxside_bykey = event.data1;  // strafe by key
+                        if (joyxside_bykey == STRAFELEFT)
+                            joyxside_bykey = -1;
+                        else
+                            if (joyxside_bykey == STRAFERIGHT)
+                                joyxside_bykey = 1;
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keydown;                   // other actions
+                    D_PostEvent(&event);
+                }
+            }
+            else if ( (((prev_jhat_value & SDL_HAT_RIGHT) ^ (Event->jhat.value & SDL_HAT_RIGHT)) == SDL_HAT_RIGHT) && ((Event->jhat.value & SDL_HAT_RIGHT) == 0) )
+            {
+                if(config_buttons_int[13] != -1)
+                {
+                    event.data1 = config_buttons_int[13];
+                    if (event.data1 > 255)
+                    {
+                        joyxside_bykey = 0;
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keyup;
+                    D_PostEvent(&event);
+                }
+            }
+
+            if ( (((prev_jhat_value & SDL_HAT_UP) ^ (Event->jhat.value & SDL_HAT_UP)) == SDL_HAT_UP) && ((Event->jhat.value & SDL_HAT_UP) == SDL_HAT_UP) )
+            {
+                // TBD : modifier
+                
+                /*if(config_buttons_int[14] != -1)
+                {
+                    event.data1 = config_buttons_int[14];
+                    event.type = ev_keydown;
+                    D_PostEvent(&event);
+                }*/
+                if(config_buttons_int[14] != -1)
+                {
+                    event.data1 = config_buttons_int[14];
+                    if (event.data1 > 255)
+                    {
+                        joyxside_bykey = event.data1;  // strafe by key
+                        if (joyxside_bykey == STRAFELEFT)
+                            joyxside_bykey = -1;
+                        else
+                            if (joyxside_bykey == STRAFERIGHT)
+                                joyxside_bykey = 1;
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keydown;                   // other actions
+                    D_PostEvent(&event);
+                }
+            }
+            else if ( (((prev_jhat_value & SDL_HAT_UP) ^ (Event->jhat.value & SDL_HAT_UP)) == SDL_HAT_UP) && ((Event->jhat.value & SDL_HAT_UP) == 0) )
+            {
+                if(config_buttons_int[14] != -1)
+                {
+                    event.data1 = config_buttons_int[14];
+                    if (event.data1 > 255)
+                    {
+                        joyxside_bykey = 0;
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keyup;
+                    D_PostEvent(&event);
+                }
+            }
+
+            if ( (((prev_jhat_value & SDL_HAT_DOWN) ^ (Event->jhat.value & SDL_HAT_DOWN)) == SDL_HAT_DOWN) && ((Event->jhat.value & SDL_HAT_DOWN) == SDL_HAT_DOWN) )
+            {
+                /*if(config_buttons_int[15] != -1)
+                {
+                    event.data1 = config_buttons_int[15];
+                    event.type = ev_keydown;
+                    D_PostEvent(&event);
+                }*/
+                if(config_buttons_int[15] != -1)
+                {
+                    event.data1 = config_buttons_int[15];
+                    if (event.data1 > 255)
+                    {
+                        joyxside_bykey = event.data1;  // strafe by key
+                        if (joyxside_bykey == STRAFELEFT)
+                            joyxside_bykey = -1;
+                        else
+                            if (joyxside_bykey == STRAFERIGHT)
+                                joyxside_bykey = 1;
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keydown;                   // other actions
+                    D_PostEvent(&event);
+                }
+            }
+            else if ( (((prev_jhat_value & SDL_HAT_DOWN) ^ (Event->jhat.value & SDL_HAT_DOWN)) == SDL_HAT_DOWN) && ((Event->jhat.value & SDL_HAT_DOWN) == 0) )
+            {
+                if(config_buttons_int[15] != -1)
+                {
+                    event.data1 = config_buttons_int[15];
+                    if (event.data1 > 255)
+                    {
+                        joyxside_bykey = 0;
+                        event.type = ev_joystick;
+                    }
+                    else
+                        event.type = ev_keyup;
+                    D_PostEvent(&event);
+                }
+            }
+        }
+        prev_jhat_value = Event->jhat.value;
         break;
 
-      case SDL_KEYUP:
-	event.type = ev_keyup;
-	event.data1 = xlatekey(&Event->key.keysym);
-	D_PostEvent(&event);
-	break;
 
-      case SDL_MOUSEBUTTONDOWN:
-      case SDL_MOUSEBUTTONUP:
-	buttonstate = SDL_GetMouseState(NULL, NULL);
-	event.type = ev_mouse;
-	event.data1 = 0
-	    | (buttonstate & SDL_BUTTON(1) ? 1 : 0)
-	    | (buttonstate & SDL_BUTTON(2) ? 2 : 0)
-	    | (buttonstate & SDL_BUTTON(3) ? 4 : 0);
-	event.data2 = event.data3 = 0;
-	D_PostEvent(&event);
-	break;
+    case SDL_KEYDOWN:
+        event.type = ev_keydown;
+	    event.data1 = xlatekey(&Event->key.keysym);
+	    D_PostEvent(&event);
+        break;
+
+    case SDL_KEYUP:
+	    event.type = ev_keyup;
+	    event.data1 = xlatekey(&Event->key.keysym);
+        D_PostEvent(&event);
+    	break;
+
+    case SDL_MOUSEBUTTONDOWN:
+    case SDL_MOUSEBUTTONUP:
+	    buttonstate = SDL_GetMouseState(NULL, NULL);
+	    event.type = ev_mouse;
+	    event.data1 = 0
+	        | (buttonstate & SDL_BUTTON(1) ? 1 : 0)
+	        | (buttonstate & SDL_BUTTON(2) ? 2 : 0)
+	        | (buttonstate & SDL_BUTTON(3) ? 4 : 0);
+	    event.data2 = event.data3 = 0;
+	    D_PostEvent(&event);
+	    break;
 
 #if (SDL_MAJOR_VERSION >= 0) && (SDL_MINOR_VERSION >= 9)
       case SDL_MOUSEMOTION:
@@ -391,106 +661,6 @@ void I_GetEvent(SDL_Event *Event)
 
 }
 
-// cosmito : from lsdldoom, PS2 port
-void I_PollJoystick(void)
-{
-  //  boolean strafeonrightjoy = true;        // TBD
-
-  //  event_t ev;
-  //  Sint16 xaxisl, yaxisl, xaxisr;
-  //  Uint8 hat;
-
-  //  //if (!usejoystick || (!joystick)) return;
-  //  ev.type = ev_joystick;
-
-  //  ev.data1 = 0;
-  //  // rm -- treat buttons like key inputs (easier than recoding main)
-  //  //ev.data1 =
-  //  //	(SDL_JoystickGetButton(joystick, 0)<<0) |
-  //  //	(SDL_JoystickGetButton(joystick, 1)<<1) |
-  //  //	(SDL_JoystickGetButton(joystick, 2)<<2) |
-  //  //	(SDL_JoystickGetButton(joystick, 3)<<3);
-
-  //  hat = SDL_JoystickGetHat(joystick, 0);
-  //  //printf("hat %d\n", hat);
-  //  if ( hat == SDL_HAT_CENTERED )
-  //  {
-  //      if (strafeonrightjoy == false)
-  //          xaxisl = SDL_JoystickGetAxis(joystick, 0) / 3000;
-  //      else		
-  //          xaxisl = SDL_JoystickGetAxis(joystick, 2) / 3000;
-
-  //      if (abs(xaxisl) < 3)
-  //          ev.data1 = 0;
-  //      else if ( xaxisl > 0 )
-		//	ev.data1 = 1;
-		//else
-		//	ev.data1 = -1;
-
-  //      yaxisl = SDL_JoystickGetAxis(joystick, 1) / 3000;
-  //      if (abs(yaxisl) < 2) 
-  //          ev.data3 = 0;
-  //      else if ( yaxisl > 0 )
-  //          ev.data3 = 1;
-  //      else
-  //          ev.data3 = -1;
-  //      if (strafeonrightjoy == false)
-  //          xaxisr = SDL_JoystickGetAxis(joystick, 2) / 3000;
-  //      else		
-  //          xaxisr = SDL_JoystickGetAxis(joystick, 0) / 3000;
-  //      //if (xaxisr != 0)
-  //      //    printf("%d\n", xaxisr);
-  //      if (abs(xaxisr) < 2)
-  //          ev.data2 = 0;
-  //      else if ( xaxisr > 0 )
-  //          ev.data2 = 1;
-  //      else
-  //          ev.data2 = -1;
-  //  }
-  //  else
-  //  {
-  //      if ( hat & SDL_HAT_UP )
-  //          ev.data3 = -1;
-  //      if ( hat & SDL_HAT_RIGHT )
-  //          ev.data2 = 1;
-  //      if ( hat & SDL_HAT_DOWN )
-  //          ev.data3 = 1;
-  //      if ( hat & SDL_HAT_LEFT )
-  //          ev.data2 = -1;
-  //  }
-  //  D_PostEvent(&ev);
-                                                                // nao funciona
-    boolean strafeonrightjoy = true;        // TBD
-
-    event_t ev;
-    Sint16 xaxisl, yaxisl, xaxisr;
-    Uint8 hat;
-
-    ev.type = ev_keydown;
-
-    ev.data1 = 0;
-
-    hat = SDL_JoystickGetHat(joystick, 0);
-    if ( hat == SDL_HAT_CENTERED )
-    {
-        if (strafeonrightjoy == false)
-            xaxisl = SDL_JoystickGetAxis(joystick, 0) / 3000;
-        else		
-            xaxisl = SDL_JoystickGetAxis(joystick, 2) / 3000;
-
-        if (abs(xaxisl) < 3)
-            ev.data1 = 0;
-        else if ( xaxisl > 0 )
-			ev.data1 = SDLK_o;
-		else
-            ev.data1 = SDLK_p;
-
-    D_PostEvent(&ev);
-
-    }
-}
-
-
 //
 // I_StartTic
 //
@@ -502,9 +672,7 @@ void I_StartTic (void)
 
     while ( SDL_PollEvent(&Event) )
 	I_GetEvent(&Event);
-	//I_PollJoystick();     // cosmito : from lsdldoom, PS2 port
 }
-
 
 //
 // I_UpdateNoBlit
@@ -617,7 +785,7 @@ void I_FinishUpdate (void)
 
 	ilineptr = (unsigned int *) (screens[0]);
 	for (i=0 ; i<3 ; i++) {
-	    olineptrs[i] = 
+	    olineptrs[i] =
 		(unsigned int *)&((Uint8 *)screen->pixels)[i*screen->pitch];
         }
 
@@ -719,7 +887,7 @@ void I_InitGraphics(void)
 
 	#ifdef _EE
 		video_flags |= SDL_FULLSCREEN;
-	#endif 
+	#endif
 
     if (M_CheckParm("-2"))
 	multiply = 2;

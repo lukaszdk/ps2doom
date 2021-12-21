@@ -287,7 +287,7 @@ void P_PlayerThink (player_t* player)
         //  (read: not in the middle of an attack).
         newweapon = (cmd->buttons&BT_WEAPONMASK)>>BT_WEAPONSHIFT;
         //pf("newweapon = (cmd->buttons&BT_WEAPONMASK)>>BT_WEAPONSHIFT = %d\n", newweapon);
-
+        
         int demo_compatibility = 0;
         if (demo_compatibility)     /// cosmito : this check was missing from original sources. If the code inside runs, it makes the next/prev weapon to fail is supershotgun is owned. I added this check from PrBoom sources
         {
@@ -389,5 +389,3 @@ void P_PlayerThink (player_t* player)
     else
 	player->fixedcolormap = 0;
 }
-
-

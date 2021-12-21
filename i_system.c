@@ -27,28 +27,25 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_timer.h>
+#include <SDL.h>
+#include <SDL_timer.h>
 
 #include "include/doomdef.h"
 #include "include/m_misc.h"
 #include "include/i_video.h"
-//#include "include/i_sound.h"
+
+//#include "i_sound.h"		// cosmito
 #include "include/l_sound_sdl.h"
+
 #include "include/d_net.h"
 #include "include/g_game.h"
 
-#ifdef __GNUG__
-#pragma implementation "i_system.h"
-#endif
 #include "include/i_system.h"
 
 
 
 
 int	mb_used = 6;
-
-
 
 SDL_Joystick *joystick;
 
@@ -129,6 +126,13 @@ void I_Init (void)
 //
 void I_Quit (void)
 {
+    // Just a simple back to browser, from uLauncELF4.13 sources (TBD : check for latest code) - cosmito
+
+	__asm__ __volatile__(
+    "	li $3, 0x04;"
+    "	syscall;"
+    "	nop;" );
+
     D_QuitNetGame ();
     I_ShutdownSound();
     I_ShutdownMusic();

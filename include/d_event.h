@@ -84,10 +84,12 @@ typedef enum
     // If true, the next 3 bits hold weapon num.
     BT_CHANGE		= 4,
     // The 3bit weapon mask and shift, convenience.
+
     /// cosmito : from PrBoom : needed for next/prev weapon
     BT_WEAPONMASK_OLD   = (8+16+32),//e6y
     BT_WEAPONMASK   = (8+16+32+64), // extended to pick up SSG        // phares
     ///  
+    
     BT_WEAPONSHIFT	= 3,
 
     // Pause the game.
@@ -123,3 +125,4 @@ extern  gameaction_t    gameaction;
 // $Log:$
 //
 //-----------------------------------------------------------------------------
+

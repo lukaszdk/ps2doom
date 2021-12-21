@@ -46,8 +46,7 @@ rcsid[] = "$Id: s_sound.c,v 1.10 1999/10/12 13:01:14 cphipps Exp $";
 //#include "lprintf.h"   // cosmito
 
 #include "include/z_zone.h"   // cosmito
-#include <stdlib.h>
-#include <stdio.h>
+
 // when to clip out sounds
 // Does not fit the large outdoor areas.
 #define S_CLIPPING_DIST (1200<<FRACBITS)
@@ -139,18 +138,18 @@ void S_Init(int sfxVolume, int musicVolume)
 		I_SetChannels();
 
 		S_SetSfxVolume(sfxVolume);
-    }
+
 		// Allocating the internal channels for mixing
 		// (the maximum numer of sounds rendered
 		// simultaneously) within zone memory.
 		// CPhipps - calloc
-//		channels =
-			//(channel_t *) Z_Calloc(numChannels,sizeof(channel_t), PU_STATIC, 0);
+		channels =
+			(channel_t *) Z_Calloc(numChannels,sizeof(channel_t), PU_STATIC, 0);
 
 		// Note that sounds have not been cached (yet).
-//		for (i=1 ; i<NUMSFX ; i++)
-//			S_sfx[i].lumpnum = S_sfx[i].usefulness = -1;
-	
+		for (i=1 ; i<NUMSFX ; i++)
+			S_sfx[i].lumpnum = S_sfx[i].usefulness = -1;
+	}
 
 	// CPhipps - music init reformatted
 	if (mus_card && !nomusicparm) {

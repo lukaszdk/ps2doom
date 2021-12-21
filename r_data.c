@@ -35,6 +35,7 @@ extern void *alloca(int);
 #endif
 #endif /* __BEOS__ */
 
+
 #include "include/m_swap.h"
 
 #include "include/i_system.h"
@@ -50,7 +51,6 @@ extern void *alloca(int);
 #include "include/r_sky.h"
 
 #include "include/r_data.h"
-
 //
 // Graphics.
 // DOOM graphics for walls and sprites
@@ -667,13 +667,13 @@ void R_InitColormaps (void)
 void R_InitData (void)
 {
     R_InitTextures ();
-    scr_printf("\nInitTextures");
+    scr_printf ("\nInitTextures");
     R_InitFlats ();
-    scr_printf("\nInitFlats");
+    scr_printf ("\nInitFlats");
     R_InitSpriteLumps ();
-    scr_printf("\nInitSprites");
+    scr_printf ("\nInitSprites");
     R_InitColormaps ();
-    scr_printf("\nInitColormaps");
+    scr_printf ("\nInitColormaps");
 }
 
 
@@ -856,7 +856,3 @@ void R_PrecacheLevel (void)
 	}
     }
 }
-
-
-
-

@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id:$
@@ -29,9 +29,6 @@
 /// cosmito
 #define DOMULTITASK RotateThreadReadyQueue(42)
 #define pf printf
-// cosmito : extra defines
-#define STRAFELEFT      256 + 0
-#define STRAFERIGHT     256 + 1
 
 //
 // Global parameters/defines.
@@ -50,7 +47,7 @@ typedef enum
   // DOOM 2 german edition not handled
   retail,	// DOOM 1 retail, E4, M36
   indetermined	// Well, no IWAD found.
-  
+
 } GameMode_t;
 
 
@@ -87,7 +84,7 @@ typedef enum
 // The integrated sound support is experimental,
 //  and unfinished. Default is synchronous.
 // Experimental asynchronous timer based is
-//  handled by SNDINTR. 
+//  handled by SNDINTR.
 #ifndef SNDSERV     /// cosmito
 #define SNDSERV  1
 #endif              /// cosmito
@@ -116,9 +113,9 @@ typedef enum
 // Defines suck. C sucks.
 // C++ might sucks for OOP, but it sure is a better C.
 // So there.
-#define SCREENWIDTH  640
+#define SCREENWIDTH  320
 //SCREEN_MUL*BASE_WIDTH //320
-#define SCREENHEIGHT 448
+#define SCREENHEIGHT 200
 //(int)(SCREEN_MUL*BASE_WIDTH*INV_ASPECT_RATIO) //200
 
 
@@ -132,7 +129,7 @@ typedef enum
 
 // The current state of the game: whether we are
 // playing, gazing at the intermission screen,
-// the game final animation, or a demo. 
+// the game final animation, or a demo.
 typedef enum
 {
     GS_LEVEL,
@@ -176,9 +173,9 @@ typedef enum
     it_blueskull,
     it_yellowskull,
     it_redskull,
-    
+
     NUMCARDS
-    
+
 } card_t;
 
 
@@ -199,7 +196,7 @@ typedef enum
     wp_supershotgun,
 
     NUMWEAPONS,
-    
+
     // No pending weapon change.
     wp_nochange
 
@@ -214,7 +211,7 @@ typedef enum
     am_cell,	// Plasma rifle, BFG.
     am_misl,	// Missile launcher.
     NUMAMMO,
-    am_noammo	// Unlimited for chainsaw / fist.	
+    am_noammo	// Unlimited for chainsaw / fist.
 
 } ammotype_t;
 
@@ -229,7 +226,7 @@ typedef enum
     pw_allmap,
     pw_infrared,
     NUMPOWERS
-    
+
 } powertype_t;
 
 
@@ -245,7 +242,7 @@ typedef enum
     INVISTICS	= (60*TICRATE),
     INFRATICS	= (120*TICRATE),
     IRONTICS	= (60*TICRATE)
-    
+
 } powerduration_t;
 
 
@@ -287,6 +284,11 @@ typedef enum
 #define KEY_RALT	(0x80+0x38)
 
 #define KEY_LALT	KEY_RALT
+
+
+// cosmito : extra defines
+#define STRAFELEFT      256 + 0
+#define STRAFERIGHT     256 + 1
 
 
 //#define PS2_SQUARE 0

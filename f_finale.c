@@ -734,5 +734,3 @@ void F_Drawer (void)
     }
 			
 }
-
-

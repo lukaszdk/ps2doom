@@ -342,7 +342,7 @@ int I_StartSound( int		id,
 
 	//Mix_VolumeChunk(S_sfx[id].data, vol * snd_SfxVolume);     // TBD later
 
-    //channel = Mix_PlayChannel(slot, S_sfx[id].data, 0);     // S_sfx[id].data � um chunk (ver linha 446 : S_sfx[i].data = Mix_QuickLoad_RAW(data, lengths[i]);)
+    //channel = Mix_PlayChannel(slot, S_sfx[id].data, 0);     // S_sfx[id].data é um chunk (ver linha 446 : S_sfx[i].data = Mix_QuickLoad_RAW(data, lengths[i]);)
 
     Mix_Chunk *chunk;
     chunk = (Mix_Chunk *)S_sfx[id].data;
@@ -456,7 +456,7 @@ void I_InitSound()
 { 
 	int i;	
 	boolean nomusicparm = 1;		/// TBD : cosmito : ugly hardwired
-	int debug_memusage = 0;
+
 	//// Secure and configure sound device first.
 	//fprintf( stderr, "I_InitSound: ");
 
@@ -503,7 +503,6 @@ debug_memusage = debug_memusage + lengths[i];
 			// Previously loaded already?
 			S_sfx[i].data = S_sfx[i].link->data;
 			lengths[i] = lengths[(S_sfx[i].link - S_sfx)/sizeof(sfxinfo_t)];
-		debug_memusage = debug_memusage + lengths[i];
 		}
 	}
 
@@ -536,7 +535,7 @@ printf(" .... Used %d bytes for sounds\n\n", debug_memusage);
 
 #ifdef HAVE_MIXER
 //#include "SDL_mixer.h"
-#include "include/mmus2mid.h"
+#include "mmus2mid.h"
 
 static Mix_Music *music[2] = { NULL, NULL };
 #endif

@@ -334,11 +334,11 @@ int mmus2mid(const UBYTE *mus, MIDI *mididata, UWORD division, int nocomp)
 	// copy the MUS header from the MUS buffer to the MUSh header structure
 
 	memcpy(&MUSh,mus,sizeof(MUSheader));
-//	MUSh.ScoreLength = doom_wtohs(MUSh.ScoreLength);
-//	MUSh.ScoreStart  = doom_wtohs(MUSh.ScoreStart);
-//	MUSh.channels    = doom_wtohs(MUSh.channels);
-//	MUSh.SecChannels = doom_wtohs(MUSh.SecChannels);
-//	MUSh.InstrCnt    = doom_wtohs(MUSh.InstrCnt);
+	MUSh.ScoreLength = doom_wtohs(MUSh.ScoreLength);
+	MUSh.ScoreStart  = doom_wtohs(MUSh.ScoreStart);
+	MUSh.channels    = doom_wtohs(MUSh.channels);
+	MUSh.SecChannels = doom_wtohs(MUSh.SecChannels);
+	MUSh.InstrCnt    = doom_wtohs(MUSh.InstrCnt);
 
 	// check some things and set length of MUS buffer from internal data
 

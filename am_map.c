@@ -988,8 +988,8 @@ AM_drawFline
     register int ax;
     register int ay;
     register int d;
-    //static fuck;
-    static int debug;
+    
+    static int fuck = 0;
 
     // For debugging only
     if (      fl->a.x < 0 || fl->a.x >= f_w
@@ -997,7 +997,7 @@ AM_drawFline
 	   || fl->b.x < 0 || fl->b.x >= f_w
 	   || fl->b.y < 0 || fl->b.y >= f_h)
     {
-	fprintf(stderr, "fuck %d \r", debug++);
+	fprintf(stderr, "fuck %d \r", fuck++);
 	return;
     }
 

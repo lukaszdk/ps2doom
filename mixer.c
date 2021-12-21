@@ -2,7 +2,7 @@
 
 #include "include/mixer_thread.h"
 #include <kernel.h>
-#include "include/sjpcm.h"
+#include <sjpcm.h>
 
 static sint16 mixbuffer_L[_MIXER_BUFSIZE] __attribute__((aligned (64)));
 static sint16 mixbuffer_R[_MIXER_BUFSIZE] __attribute__((aligned (64)));

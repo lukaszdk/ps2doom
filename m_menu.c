@@ -67,6 +67,8 @@ extern boolean		message_dontfuckwithme;
 
 extern boolean		chat_on;		// in heads-up code
 
+
+
 //
 // defaulted values
 //
@@ -512,12 +514,11 @@ void M_ReadSaveStrings(void)
     int             count;
     int             i;
     char    name[256];
-	
+	char		currentWadName[20];
     for (i = 0;i < load_end;i++)
     {
 	//sprintf(name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",i);
-//	sprintf(name,"mc0:PS2DOOM/%s%d.dsg",currentWadName,i);
-
+	sprintf(name,"mc0:PS2DOOM/%s%d.dsg",currentWadName,i);
 
 	//handle = fopen (name, "r");
     handle = fioOpen(name, O_RDONLY);
@@ -579,13 +580,13 @@ void M_DrawSaveLoadBorder(int x,int y)
 void M_LoadSelect(int choice)
 {
     char    name[256];
-	
+	char		currentWadName[20];
     if (M_CheckParm("-cdrom"))
         //sprintf(name,"c:\\doomdata\\"SAVEGAMENAME"%d.dsg",choice);
-//        sprintf(name,"c:\\doomdata\\%s%d.dsg",currentWadName,choice);
-//    else
+        sprintf(name,"c:\\doomdata\\%s%d.dsg",currentWadName,choice);
+    else
         //sprintf(name,"mc0:PS2DOOM/"SAVEGAMENAME"%d.dsg",choice);
-//        sprintf(name,"mc0:PS2DOOM/%s%d.dsg",currentWadName,choice);
+        sprintf(name,"mc0:PS2DOOM/%s%d.dsg",currentWadName,choice);
     G_LoadGame (name);
     M_ClearMenus ();
 }
@@ -1141,7 +1142,6 @@ void M_ChangeDetail(int choice)
     return;
     
     /*R_SetViewSize (screenblocks, detailLevel);
-
     if (!detailLevel)
 	players[consoleplayer].message = DETAILHI;
     else
@@ -1358,165 +1358,165 @@ boolean M_Responder (event_t* ev)
     static  int     lasty = 0;
     static  int     mousex = 0;
     static  int     lastx = 0;
-	
+
     ch = -1;
-	
+
     if (ev->type == ev_joystick && joywait < I_GetTime())
     {
-	if (ev->data3 == -1)
-	{
-	    ch = KEY_UPARROW;
-	    joywait = I_GetTime() + 5;
-	}
-	else if (ev->data3 == 1)
-	{
-	    ch = KEY_DOWNARROW;
-	    joywait = I_GetTime() + 5;
-	}
-		
-	if (ev->data2 == -1)
-	{
-	    ch = KEY_LEFTARROW;
-	    joywait = I_GetTime() + 2;
-	}
-	else if (ev->data2 == 1)
-	{
-	    ch = KEY_RIGHTARROW;
-	    joywait = I_GetTime() + 2;
-	}
-		
-	if (ev->data1&1)
-	{
-	    ch = KEY_ENTER;
-	    joywait = I_GetTime() + 5;
-	}
-	if (ev->data1&2)
-	{
-	    ch = KEY_BACKSPACE;
-	    joywait = I_GetTime() + 5;
-	}
+        if (ev->data3 == -1)
+        {
+            ch = KEY_UPARROW;
+            joywait = I_GetTime() + 5;
+        }
+        else if (ev->data3 == 1)
+        {
+            ch = KEY_DOWNARROW;
+            joywait = I_GetTime() + 5;
+        }
+
+        if (ev->data2 == -1)
+        {
+            ch = KEY_LEFTARROW;
+            joywait = I_GetTime() + 2;
+        }
+        else if (ev->data2 == 1)
+        {
+            ch = KEY_RIGHTARROW;
+            joywait = I_GetTime() + 2;
+        }
+
+        if (ev->data1&1)
+        {
+            ch = KEY_ENTER;
+            joywait = I_GetTime() + 5;
+        }
+        if (ev->data1&2)
+        {
+            ch = KEY_BACKSPACE;
+            joywait = I_GetTime() + 5;
+        }
     }
     else
     {
-	if (ev->type == ev_mouse && mousewait < I_GetTime())
-	{
-	    mousey += ev->data3;
-	    if (mousey < lasty-30)
-	    {
-		ch = KEY_DOWNARROW;
-		mousewait = I_GetTime() + 5;
-		mousey = lasty -= 30;
-	    }
-	    else if (mousey > lasty+30)
-	    {
-		ch = KEY_UPARROW;
-		mousewait = I_GetTime() + 5;
-		mousey = lasty += 30;
-	    }
-		
-	    mousex += ev->data2;
-	    if (mousex < lastx-30)
-	    {
-		ch = KEY_LEFTARROW;
-		mousewait = I_GetTime() + 5;
-		mousex = lastx -= 30;
-	    }
-	    else if (mousex > lastx+30)
-	    {
-		ch = KEY_RIGHTARROW;
-		mousewait = I_GetTime() + 5;
-		mousex = lastx += 30;
-	    }
-		
-	    if (ev->data1&1)
-	    {
-		ch = KEY_ENTER;
-		mousewait = I_GetTime() + 15;
-	    }
-			
-	    if (ev->data1&2)
-	    {
-		ch = KEY_BACKSPACE;
-		mousewait = I_GetTime() + 15;
-	    }
-	}
-	else
-	    if (ev->type == ev_keydown)
-	    {
-		ch = ev->data1;
-	    }
-    }
-    
-    if (ch == -1)
-	return false;
+        if (ev->type == ev_mouse && mousewait < I_GetTime())
+        {
+            mousey += ev->data3;
+            if (mousey < lasty-30)
+            {
+                ch = KEY_DOWNARROW;
+                mousewait = I_GetTime() + 5;
+                mousey = lasty -= 30;
+            }
+            else if (mousey > lasty+30)
+            {
+                ch = KEY_UPARROW;
+                mousewait = I_GetTime() + 5;
+                mousey = lasty += 30;
+            }
 
-    
+            mousex += ev->data2;
+            if (mousex < lastx-30)
+            {
+                ch = KEY_LEFTARROW;
+                mousewait = I_GetTime() + 5;
+                mousex = lastx -= 30;
+            }
+            else if (mousex > lastx+30)
+            {
+                ch = KEY_RIGHTARROW;
+                mousewait = I_GetTime() + 5;
+                mousex = lastx += 30;
+            }
+
+            if (ev->data1&1)
+            {
+                ch = KEY_ENTER;
+                mousewait = I_GetTime() + 15;
+            }
+
+            if (ev->data1&2)
+            {
+                ch = KEY_BACKSPACE;
+                mousewait = I_GetTime() + 15;
+            }
+        }
+        else
+            if (ev->type == ev_keydown)
+            {
+                ch = ev->data1;
+            }
+    }
+
+    if (ch == -1)
+        return false;
+
+
     // Save Game string input
     if (saveStringEnter)
     {
-	switch(ch)
-	{
-	  case KEY_BACKSPACE:
-	    if (saveCharIndex > 0)
-	    {
-		saveCharIndex--;
-		savegamestrings[saveSlot][saveCharIndex] = 0;
-	    }
-	    break;
-				
-	  case KEY_ESCAPE:
-	    saveStringEnter = 0;
-	    strcpy(&savegamestrings[saveSlot][0],saveOldString);
-	    break;
-				
-	  case KEY_ENTER:
-	    saveStringEnter = 0;
-	    if (savegamestrings[saveSlot][0])
-		M_DoSave(saveSlot);
-	    break;
-				
-	  default:
-	    ch = toupper(ch);
-	    if (ch != 32)
-		if (ch-HU_FONTSTART < 0 || ch-HU_FONTSTART >= HU_FONTSIZE)
-		    break;
-	    if (ch >= 32 && ch <= 127 &&
-		saveCharIndex < SAVESTRINGSIZE-1 &&
-		M_StringWidth(savegamestrings[saveSlot]) <
-		(SAVESTRINGSIZE-2)*8)
-	    {
-		savegamestrings[saveSlot][saveCharIndex++] = ch;
-		savegamestrings[saveSlot][saveCharIndex] = 0;
-	    }
-	    break;
-	}
-	return true;
+        switch(ch)
+        {
+        case KEY_BACKSPACE:
+            if (saveCharIndex > 0)
+            {
+                saveCharIndex--;
+                savegamestrings[saveSlot][saveCharIndex] = 0;
+            }
+            break;
+
+        case KEY_ESCAPE:
+            saveStringEnter = 0;
+            strcpy(&savegamestrings[saveSlot][0],saveOldString);
+            break;
+
+        case KEY_ENTER:
+            saveStringEnter = 0;
+            if (savegamestrings[saveSlot][0])
+                M_DoSave(saveSlot);
+            break;
+
+        default:
+            ch = toupper(ch);
+            if (ch != 32)
+                if (ch-HU_FONTSTART < 0 || ch-HU_FONTSTART >= HU_FONTSIZE)
+                    break;
+            if (ch >= 32 && ch <= 127 &&
+                saveCharIndex < SAVESTRINGSIZE-1 &&
+                M_StringWidth(savegamestrings[saveSlot]) <
+                (SAVESTRINGSIZE-2)*8)
+            {
+                savegamestrings[saveSlot][saveCharIndex++] = ch;
+                savegamestrings[saveSlot][saveCharIndex] = 0;
+            }
+            break;
+        }
+        return true;
     }
-    
+
     // Take care of any messages that need input
     if (messageToPrint)
     {
-	if (messageNeedsInput == true &&
-	    !(ch == ' ' || ch == 'n' || ch == 'y' || ch == KEY_ESCAPE))
-	    return false;
-		
-	menuactive = messageLastMenuActive;
-	messageToPrint = 0;
-	if (messageRoutine)
-	    messageRoutine(ch);
-			
-	menuactive = false;
-	S_StartSound(NULL,sfx_swtchx);
-	return true;
+        if (messageNeedsInput == true &&
+            !(ch == ' ' || ch == 'n' || ch == 'y' || ch == KEY_ESCAPE))
+            return false;
+
+        menuactive = messageLastMenuActive;
+        messageToPrint = 0;
+        if (messageRoutine)
+            messageRoutine(ch);
+
+        menuactive = false;
+        S_StartSound(NULL,sfx_swtchx);
+        return true;
     }
-	
+
     if (devparm && ch == KEY_F1)
     {
-	G_ScreenShot ();
-	return true;
+        G_ScreenShot ();
+        return true;
     }
-		
-    
+
+
     // F-Keys
     if (!menuactive)
         switch(ch)
@@ -1606,20 +1606,20 @@ boolean M_Responder (event_t* ev)
 
     }
 
-    
+
     // Pop-up menu?
     if (!menuactive)
     {
-	if (ch == KEY_ESCAPE)
-	{
-	    M_StartControlPanel ();
-	    S_StartSound(NULL,sfx_swtchn);
-	    return true;
-	}
-	return false;
+        if (ch == KEY_ESCAPE)
+        {
+            M_StartControlPanel ();
+            S_StartSound(NULL,sfx_swtchn);
+            return true;
+        }
+        return false;
     }
 
-    
+
     // Keys usable within menu
     switch (ch)
     {
@@ -1711,7 +1711,7 @@ boolean M_Responder (event_t* ev)
                     return true;
                 }
                 break;
-	
+
     }
 
     return false;
@@ -1898,4 +1898,3 @@ void M_Init (void)
     }
     
 }
-

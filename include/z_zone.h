@@ -28,7 +28,7 @@
 #define __Z_ZONE__
 
 #include <stdio.h>
-#include <stdlib.h>
+
 //
 // ZONE MEMORY
 // PU - purge tags.
@@ -47,6 +47,8 @@
 void *(Z_Calloc)(size_t n, size_t n2, int tag, void **user, const char *, int);
 #define Z_Calloc(a,b,c,d)  (Z_Calloc)   (a,b,c,d,__FILE__,__LINE__)
 #define calloc(n1,n2)      Z_Calloc(n1,n2,PU_STATIC,0)
+
+
 void	Z_Init (void);
 void*	Z_Malloc (int size, int tag, void *ptr);
 void    Z_Free (void *ptr);

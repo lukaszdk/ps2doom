@@ -55,7 +55,11 @@ rcsid[] = "$Id: p_pspr.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 //
 // P_SetPsprite
 //
-void P_SetPsprite(player_t* player, int	position, statenum_t stnum) 
+void
+P_SetPsprite
+( player_t*	player,
+  int		position,
+  statenum_t	stnum ) 
 {
     pspdef_t*	psp;
     state_t*	state;
@@ -154,17 +158,21 @@ void P_BringUpWeapon (player_t* player)
 int P_NextWeapon(player_t *player)
 {
     int demo_compatibility = 1;
+
+    
     //pf("next():\n");
     //pf("player->readyweapon = %d\n", player->readyweapon);
 
     int currentweapon = player->readyweapon;
     int newweapon = currentweapon + 1;
+
     //player->ammo[0] = 50;
     //player->ammo[1] = 50;
     //player->ammo[2] = 50;
     //player->ammo[3] = 50;
 
     //pf("newweapon = currentweapon + 1 = %d\n", newweapon);
+
     if (newweapon == NUMWEAPONS)
     {
         if (player->weaponowned[wp_chaingun] && player->ammo[am_clip])      /// cosmito : to comply to below (wp_chaingun should follow wp_supershotgun)
@@ -181,16 +189,17 @@ int P_NextWeapon(player_t *player)
         /// cosmito : bypass wp_supershotgun
     if (currentweapon == wp_chainsaw)
             newweapon = wp_fist;
+
     //printf("currentweapon : %d\n", currentweapon);
     //printf("newweapon     : %d\n", newweapon);
-
+    
     switch(newweapon)
     {
         // ?
         //case 1:
         //  if (!player->powers[pw_strength])      // allow chainsaw override
         //    break;
-
+        
     case wp_pistol:
         if (player->ammo[am_clip])
             break;
@@ -202,33 +211,33 @@ int P_NextWeapon(player_t *player)
             break;
         else
             newweapon++;
-
+        
     case wp_chaingun:
         if (player->weaponowned[wp_chaingun] && player->ammo[am_clip])
             break;
         else
             newweapon++;
-
+        
     case wp_missile:
         if (player->weaponowned[wp_missile] && player->ammo[am_misl])
             break;
         else
             newweapon++;
-
+        
     case wp_plasma:
         if (player->weaponowned[wp_plasma] && player->ammo[am_cell] &&
             gamemode != shareware)
             break;
         else
             newweapon++;
-
+        
     case wp_bfg:
         if (player->weaponowned[wp_bfg] && gamemode != shareware &&
             player->ammo[am_cell] >= (demo_compatibility ? 41 : 40))
             break;
         else
             newweapon++;
-
+        
     case wp_chainsaw:
         if (player->weaponowned[wp_chainsaw])
             break;
@@ -236,14 +245,14 @@ int P_NextWeapon(player_t *player)
             //newweapon++;
             /// cosmito : leap wp_supershotgun
             newweapon = wp_fist;
-
+        
     case wp_supershotgun:
         if (player->weaponowned[wp_supershotgun] && gamemode == commercial &&
             player->ammo[am_shell] >= (demo_compatibility ? 3 : 2))
-            {
-                break;
-            }
-
+        {
+                    //pf(" *** break\n");
+            break;
+        }
         else
         {
             //pf(" *** newweapon++;\n");
@@ -252,9 +261,11 @@ int P_NextWeapon(player_t *player)
                 newweapon = wp_fist;
         }
     }
-
+        
+    //pf("next : newweapon = %d\n", newweapon);
     return newweapon;
 }
+
 //{
 //    int demo_compatibility = 1;
 //
@@ -345,15 +356,18 @@ int P_NextWeapon(player_t *player)
 //    return newweapon;
 //}
 
+
 ////////////////////////////////////////////////////////////////////////////////////
 // cosmito : selects previous weapon with ammo
 int P_PreviousWeapon(player_t *player)
+
 {
     int demo_compatibility = 1;
 
+    int newweapon = player->readyweapon;
+
     int currentweapon = player->readyweapon;
-    int newweapon = currentweapon - 1;
-    //pf("\n\ncurrentweapon = %d\n", currentweapon );
+//pf("\n\ncurrentweapon = %d\n", currentweapon );
 
     //player->ammo[0] = 90;
     //player->ammo[1] = 90;
@@ -372,6 +386,7 @@ int P_PreviousWeapon(player_t *player)
 
     newweapon = newweapon - 1;
 //pf("newweapon = %d\n", newweapon );
+
     if (newweapon < wp_fist)
     {
         //newweapon = NUMWEAPONS - 1;
@@ -381,7 +396,7 @@ int P_PreviousWeapon(player_t *player)
 
     switch(newweapon)
     {
-
+        
         case wp_supershotgun:
 //pf("case wp_supershotgun:");
             if (player->weaponowned[wp_supershotgun] && gamemode == commercial &&
@@ -396,7 +411,7 @@ int P_PreviousWeapon(player_t *player)
                 break;
             else
                 newweapon--;
-
+            
         case wp_bfg:
 //pf("case wp_bfg:");            
             if (player->weaponowned[wp_bfg] && gamemode != shareware &&
@@ -404,7 +419,7 @@ int P_PreviousWeapon(player_t *player)
                 break;
             else
                 newweapon--;
-
+            
         case wp_plasma:
 //pf("case wp_plasma:");            
             if (player->weaponowned[wp_plasma] && player->ammo[am_cell] &&
@@ -412,43 +427,45 @@ int P_PreviousWeapon(player_t *player)
                 break;
             else
                 newweapon--;
-
+            
         case wp_missile:
 //pf("case wp_missile:");            
             if (player->weaponowned[wp_missile] && player->ammo[am_misl])
                 break;
             else
                 newweapon--;
-
+            
         case wp_chaingun:
 //pf("case wp_chaingun:");            
             if (player->weaponowned[wp_chaingun] && player->ammo[am_clip])
                 break;
             else
                 newweapon--;
-
+            
         case wp_shotgun:
 //pf("case wp_shotgun:");            
             if (player->weaponowned[wp_shotgun] && player->ammo[am_shell])
                 break;
             else
                 newweapon--;
-
+            
         case wp_pistol:
 //pf("case wp_pistol:");            
             if (player->ammo[am_clip])
                 break;
             else
                 newweapon--;
-
+            
             // ?
             //case 1:
             //  if (!player->powers[pw_strength])      // allow chainsaw override
             //    break;   
     }
-    
+
+    //pf("newweapon = %d\n\n", newweapon);                
     return newweapon;
-    
+}
+
 //{
 //    int demo_compatibility = 1;
 //
@@ -553,7 +570,6 @@ int P_PreviousWeapon(player_t *player)
 //    pf("newweapon = %d\n\n", newweapon);                
 //    return newweapon;
 //}
-}
 
 //
 // P_CheckAmmo
@@ -1277,5 +1293,3 @@ void P_MovePsprites (player_t* player)
     player->psprites[ps_flash].sx = player->psprites[ps_weapon].sx;
     player->psprites[ps_flash].sy = player->psprites[ps_weapon].sy;
 }
-
-

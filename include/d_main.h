@@ -32,13 +32,10 @@
 #endif
 
 
-
 #define MAXWADFILES             20
 extern char*		wadfiles[MAXWADFILES];
 
 void D_AddFile (char *file);
-int SDL_SYS_TimerInit(void);
-
 
 //
 // D_DoomMain()

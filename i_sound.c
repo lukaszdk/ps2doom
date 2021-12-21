@@ -42,6 +42,7 @@ rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 #include "include/doomdef.h"
 
 
+
 // The number of internal mixing channels,
 //  the samples calculated for each mixing step,
 //  the size of the 16bit, 2 hardware channel (stereo)
@@ -58,7 +59,7 @@ static int SAMPLECOUNT=		512;
 int 		lengths[NUMSFX];
 
 // The actual output device.
-//int	audio_fd;
+int	audio_fd;
 
 
 // The channel step amount...
@@ -105,10 +106,7 @@ int*		channelrightvol_lookup[NUM_CHANNELS];
 // This function loads the sound data from the WAD lump,
 //  for single sound.
 //
-void*
-getsfx
-( char*         sfxname,
-  int*          len )
+void* getsfx( char*sfxname, int* len )
 {
     unsigned char*      sfx;
     unsigned char*      paddedsfx;
@@ -682,4 +680,3 @@ int I_QrySongPlaying(int handle)
   handle = 0;
   return looping || musicdies > gametic;
 }
-
