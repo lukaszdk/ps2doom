@@ -78,6 +78,9 @@
         "alloca.h": "c",
         "doomdata.h": "c",
         "mixer_thread.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "bdm.h": "c",
+        "audsrv.h": "c",
+        "math.h": "c"
     }
 }

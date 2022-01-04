@@ -36,6 +36,7 @@ rcsid[] = "$Id: i_main.c,v 1.4 1997/02/03 22:45:10 b1 Exp $";
 #include <sifrpc.h>
 
 //#ifdef PS2HDD
+
 #include <debug.h>
 #include <libhdd.h>
 #include <libpwroff.h>
@@ -44,10 +45,14 @@ rcsid[] = "$Id: i_main.c,v 1.4 1997/02/03 22:45:10 b1 Exp $";
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h>
+#include <io_common.h>
+#include <fileio.h>
+#include <fileXio.h>
 
 #define MAX_PARTITIONS   100
-int FILEXIO_MOUNT;
-#define O_RDONLY	     00
 //#endif
 
 
@@ -65,7 +70,51 @@ static char s_pUDNL   [] __attribute__(   (  section( ".data" ), aligned( 1 )  )
 #include "include/cosmitoFileIO.h"
 
 
-extern int SAMPLECOUNT =		512;
+//Declare usbd module //
+extern unsigned char usbd[];
+extern unsigned int size_usbd;
+
+//Declare usbhdfsd module //
+extern unsigned char usbhdfsd[];
+extern unsigned int size_usbhdfsd;
+
+extern unsigned char usbmass_bd_irx;
+extern unsigned int size_usbmass_bd_irx;
+
+extern unsigned char SJPCM[];
+extern unsigned int size_SJPCM;
+
+extern unsigned char freesd[];
+extern unsigned int size_freesd;
+
+//#ifdef PS2HDD
+/*Declare iomanX module*/
+extern unsigned char iomanX[];
+extern unsigned int size_iomanX;
+/*Declare fileXio module*/
+extern unsigned char fileXio[];
+extern unsigned int size_fileXio;
+/*Declare ps2dev9 module*/
+extern unsigned char ps2dev9[];
+extern unsigned int size_ps2dev9;
+/*Declare ps2atad module*/
+extern unsigned char ps2atad[];
+extern unsigned int size_ps2atad;
+/*Declare ps2hdd module*/
+extern unsigned char ps2hdd[];
+extern unsigned int size_ps2hdd;
+/*Declare ps2fsmodule*/
+extern unsigned char ps2fs[];
+extern unsigned int size_ps2fs;
+/*Declare poweroff module*/
+extern unsigned char poweroff[];
+extern unsigned int size_poweroff;
+/*Declare cdvd module*/
+extern unsigned char cdvd[];
+extern unsigned int size_cdvd;
+//#endif
+
+extern int SAMPLECOUNT = 512;
 
 int getDisplayModeFromELFName(char **argv);
 
@@ -190,46 +239,6 @@ int main( int argc, char**	argv )
     //-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,     0xac, 0xae, 0xad, 0xaf,    -1, -1, -1, -1
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     };
-    //Declare usbd module //
-unsigned char usbd;
-unsigned int size_usbd;
-
-//Declare usbhdfsd module //
-unsigned char usbhdfsd;
-unsigned int size_usbhdfsd;
-
-unsigned char SJPCM;
-unsigned int size_SJPCM;
-
-unsigned char freesd;
-unsigned int size_freesd;
-
-//#ifdef PS2HDD
-/*Declare iomanX module*/
-unsigned char iomanX;
-unsigned int size_iomanX;
-/*Declare fileXio module*/
-unsigned char fileXio;
-unsigned int size_fileXio;
-/*Declare ps2dev9 module*/
-unsigned char ps2dev9;
-unsigned int size_ps2dev9;
-/*Declare ps2atad module*/
-unsigned char ps2atad;
-unsigned int size_ps2atad;
-/*Declare ps2hdd module*/
-unsigned char ps2hdd;
-unsigned int size_ps2hdd;
-/*Declare ps2fsmodule*/
-unsigned char ps2fs;
-unsigned int size_ps2fs;
-/*Declare poweroff module*/
-unsigned char poweroff;
-unsigned int size_poweroff;
-/*Declare cdvd module*/
-unsigned char cdvd;
-unsigned int size_cdvd;
-//#endif
 
     config_t cfg;       // libconfig
     const char *hdd_path_to_partition;
@@ -295,10 +304,10 @@ unsigned int size_cdvd;
 //    }
 //#endif
 
-    // USB mass support
+     // USB mass support
     SifExecModuleBuffer(usbd, size_usbd, 0, NULL, &ret);
     SifExecModuleBuffer(usbhdfsd, size_usbhdfsd, 0, NULL, &ret);
-
+   
     // MC support   (from ps2sdk mc_example.c)
     int mc_Type, mc_Free, mc_Format;
 	ret = SifLoadModule("rom0:XSIO2MAN", 0, NULL);
