@@ -367,7 +367,7 @@ int main( int argc, char**	argv )
         printf("file '%s' not found. Going to try 'mc0:PS2DOOM/ps2doom.config'\n", configfile);
         sprintf(configfile, "%s", "mc0:PS2DOOM/ps2doom.config");
 
-        fp = fopen(configfile, "rb");
+        fp = fioOpen(configfile, "rb");
         if(!fp)
         {
             // Using default actions for buttons
@@ -400,7 +400,7 @@ int main( int argc, char**	argv )
         int x;
         config_init(&cfg);
         x = config_read(&cfg, fp);
-        fclose(fp);
+        fioClose(fp);
         if(x)
         {
             // Process each ps2doom.controls config entries
