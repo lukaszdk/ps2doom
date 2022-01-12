@@ -1115,14 +1115,17 @@ void IdentifyVersionAndSelect (void)        // cosmito
     }
 
     /// pad init
-    //ret = SifLoadModule("rom0:SIO2MAN", 0, NULL);
-    //if (ret < 0) {
-    //    printf("sifLoadModule sio failed: %d\n", ret);
-    //    SleepThread();
-    //}    
+    int ret;
+    ret = SifLoadModule("rom0:SIO2MAN", 0, NULL);
+    if (ret < 0) 
+    {
+      printf("sifLoadModule sio failed: %d\n", ret);
+      SleepThread();
+    }    
 
-    int ret = SifLoadModule("rom0:XPADMAN", 0, NULL);
-    if (ret < 0) {
+    ret = SifLoadModule("rom0:XPADMAN", 0, NULL);
+    if (ret < 0) 
+    {
         printf("sifLoadModule pad failed: %d\n", ret);
         SleepThread();
     }
@@ -1403,11 +1406,8 @@ void D_DoomMain (void)
     int             p;
     char                    file[256];
 
-    //init_scr();
-
     FindResponseFile ();
 	
-    //IdentifyVersion ();
     IdentifyVersionAndSelect();
 	
     setbuf (stdout, NULL);

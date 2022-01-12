@@ -1,85 +1,89 @@
+
 EE_OBJS = am_map.o cosmitoFileIO.o d_items.o d_main.o d_net.o doomdef.o doomstat.o \
-dstrings.o f_finale.o f_wipe.o g_game.o hu_lib.o hu_stuff.o i_main.o \
-i_net.o i_sound.o i_system.o i_video.o info.o m_argv.o m_bbox.o \
+dstrings.o f_finale.o f_wipe.o g_game.o hu_lib.o hu_stuff.o  \
+i_main.o i_net.o i_sound.o i_system.o i_video.o info.o m_argv.o m_bbox.o \
 m_cheat.o m_fixed.o m_menu.o m_misc.o m_random.o m_swap.o mixer_thread.o mixer.o mmus2mid.o p_ceilng.o \
 p_doors.o p_enemy.o p_floor.o p_inter.o p_lights.o p_map.o p_maputl.o \
 p_mobj.o p_plats.o p_pspr.o p_saveg.o p_setup.o p_sight.o p_spec.o \
 p_switch.o p_telept.o p_tick.o p_user.o ps2doom.o r_bsp.o r_data.o r_draw.o \
 r_main.o r_plane.o r_segs.o r_sky.o r_things.o s_sound.o sjpcm_rpc.o sounds.o \
-st_lib.o st_stuff.o tables.o v_video.o w_wad.o w_mmap.o wi_stuff.o z_zone.o usbd.s usbhdfsd.s \
+st_lib.o st_stuff.o tables.o v_video.o w_wad.o w_mmap.o wi_stuff.o z_zone.o \
 
 EE_BIN = ps2doom.elf
-
-EE_INCS = -I$(PS2SDK)/ports/include/freetype2 -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -I$(PS2SDK)/ports/include/SDL -I$(PS2SDK)/ports/include -I$(PS2DEV)/isjpcm/include/ -I$(PS2DEV)/isjpcm/
-EE_LDFLAGS = -L$(PS2SDK)/ports/lib -L$(PS2DEV)/gsKit/lib -L$(PS2DEV)/isjpcm/lib/
-EE_LIBS = -lsdlmain -lsdlmixer -lsdl -lgskit -lcdvd -lm -lps2ip -ldebug -lconfig -lmc -lc -lhdd -lfileXio -lpoweroff -lsjpcm
-EE_CFLAGS = -DUSE_RWOPS -DHAVE_CONFIG_H -DHAVE_MIXER -Wall
+BIN2S = $(PS2SDK)/bin/bin2s
+EE_BIN_DIR = bin/ps2doom.elf
+EE_INCS = -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -I$(PS2SDK)/ports/include/SDL -I$(PS2SDK)/ports/include -I$(PS2DEV)/isjpcm/include/ 
+EE_LDFLAGS = -L$(PS2SDK)/ports/lib -L$(PS2DEV)/gsKit/lib -L$(PS2DEV)/isjpcm/lib/ -L$(PS2SDK)/iop/lib/ -L$(PS2SDK)/ee/lib/
+EE_LIBS = -lsdlmain -lsdlmixer -lsdl -lgskit -lcdvd -lm -lps2ip -ldebug -lconfig -lmc -lc -lhdd -lfileXio -lpoweroff -lsjpcm 
+EE_CFLAGS = -DUSE_RWOPS -DHAVE_CONFIG_H -DHAVE_MIXER -Wall 
 
 all: $(EE_BIN)
 	mv $(EE_BIN) bin/
 
 #poweroff Module
-
-poweroff.s:
-	bin2s $(PS2SDK)/iop/irx/poweroff.irx poweroff.s poweroff
+poweroff.s: $(PS2SDK)/iop/irx/poweroff.irx
+	$(BIN2S) $< $@ poweroff_irx
 
 #IRX Modules
-freesio2.s:
-	bin2s $(PS2SDK)/iop/irx/freesio2.irx freesio2.s freesio2
+freesio2.s: $(PS2SDK)/iop/irx/freesio2.irx
+	$(BIN2S) $< $@ freesio2_irx
 	
-iomanX.s:
-	bin2s $(PS2SDK)/iop/irx/iomanX.irx iomanX.s iomanX
+iomanX.s: $(PS2SDK)/iop/irx/iomanX.irx
+	$(BIN2S) $< $@ iomanX_irx 
 	
-fileXio.s:
-	bin2s $(PS2SDK)/iop/irx/fileXio.irx fileXio.s fileXio
+filexio_irx.s: $(PS2SDK)/iop/irx/fileXio.irx
+	$(BIN2S) $< $@ filexio_irx
 
-freepad.s:
-	bin2s $(PS2SDK)/iop/irx/freepad.irx freepad.s freepad
+freepad.s: $(PS2SDK)/iop/irx/freepad.irx
+	$(BIN2S) $< $@ freepad_irx
 
-mcman.s:
-	bin2s $(PS2SDK)/iop/irx/mcman.irx mcman.s mcman
+mcman_irx.s: $(PS2SDK)/iop/irx/mcman.irx
+	$(BIN2S) $< $@ mcman_irx
 
-mcsrv.s:
-	bin2s $(PS2SDK)/iop/irx/mcserv.irx mcsrv.s mcserv
-	
-ps2dev9.s:
-	bin2s $(PS2SDK)/iop/irx/ps2dev9.irx ps2dev9.s ps2dev9
+mcserv_irx.s: $(PS2SDK)/iop/irx/mcserv.irx
+	$(BIN2S) $< $@ mcserv_irx
 
-ps2atad: 
-	bin2s $(PS2SDK)/iop/irx/ps2atad.irx ps2atad.s ps2atad
+ps2dev9.s: $(PS2SDK)/iop/irx/ps2dev9.irx
+	$(BIN2S) $< $@ ps2dev9_irx 
 
-ps2fs: 
-	bin2s $(PS2SDK)/iop/irx/ps2fs.irx ps2fs.s ps2fs
+ps2atad: $(PS2SDK)/iop/irx/ps2atad.irx
+	$(BIN2S) $< $@ ps2atad_irx
 
-ps2hdd:
-	bin2s $(PS2SDK)/iop/irx/ps2hdd.irx ps2hdd.s ps2hdd
+ps2fs_irx.s: $(PS2SDK)/iop/irx/ps2fs-xosd.irx
+	$(BIN2S) $< $@ ps2fs_irx
 
-ps2ip-nm.s:
-	bin2s $(PS2SDK)/iop/irx/ps2ip-nm.irx ps2ip-nm.s ps2ipnm
+ps2hdd_irx.s: $(PS2SDK)/iop/irx/ps2hdd-xosd.irx
+	$(BIN2S) $< $@ ps2hdd_irx
 
-ps2ips.s:
-	bin2s $(PS2SDK)/iop/irx/ps2ips.irx ps2ips.s ps2ips
+ps2ip-nm.s: $(PS2SDK)/iop/irx/ps2ip-nm.irx
+	$(BIN2S) $< $@ ps2ip-nm_irx
 
-netman.s:
-	bin2s $(PS2SDK)/iop/irx/netman.irx netman.s netman
+ps2ips.s: $(PS2SDK)/iop/irx/ps2ips.irx
+	$(BIN2S) $< $@ ps2ips_irx 
 
-smap.s:
-	bin2s $(PS2SDK)/iop/irx/smap.irx smap.s smap
+netman.s: $(PS2SDK)/iop/irx/netman.irx 
+	$(BIN2S) $< $@ netman_irx 
 
+smap.s: $(PS2SDK)/iop/irx/smap.irx 
+	$(BIN2S) $< $@ smap_irx 
 
-ps2http.s:
-	bin2s $(PS2SDK)/iop/irx/ps2http.irx ps2http.s ps2http
+ps2http.s: bin2s $(PS2SDK)/iop/irx/ps2http.irx 
+	$(BIN2S) $< $@ ps2http_irx
 
-#thx KrahJohlito
-usbd.s:
-	bin2s $(PS2SDK)/iop/irx/usbd.irx usbd.s usbd
+usbd_irx.s: $(PS2SDK)/iop/irx/usbd.irx
+	$(BIN2S) $< $@ usbd_irx
 
-usbhdfsd.s:
-	bin2s $(PS2SDK)/iop/irx/usbhdfsd.irx usbhdfsd.s usbhdfsd
+usbhdfsd_irx.s: $(PS2SDK)/iop/irx/usbhdfsd.irx
+	$(BIN2S) $< $@ usb_mass_irx
 
+usbmass_bd.s: $(PS2SDK)/iop/irx/usbmass_bd.irx
+	$(BIN2S) $< $@ usbmass_bd_irx
+ 
+isjpcm.s: $(PS2DEV)/isjpcm/bin/isjpcm.irx
+	$(BIN2S) $< $@ isjpcm_irx
 
 clean:
-	rm -f $(EE_OBJS) $(EE_BIN)
+	rm -f $(EE_OBJS) $(EE_BIN_DIR)
 
 run:
 	ps2client execee host:$(EE_BIN)
@@ -87,6 +91,5 @@ run:
 reset:
 	ps2client reset
 
-	
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal
