@@ -26,7 +26,7 @@ jobs:
     - run: git fetch --prune --unshallow
 
     - name: Make
-      run: make all
+      run: make all clean
      
     - name: Get short SHA
       id: slug
