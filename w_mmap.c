@@ -28,18 +28,25 @@ const void* W_LockLumpNum(int lump)
   //printf(" (len = W_LumpLength(lump)) : lump = %d, len = %d\n", lump, len);    // cosmito : debug
   const void *data = W_CacheLumpNum(lump, tag);
   //printf("data : %p\n\n", data);    // cosmito : debug
-  if (!cachelump[lump].cache) {             // o cache nao esta a ser alocado. no prboom faz-se assim
- /*
- prboom :
-D_DoomMainSetup/W_Init/W_InitCache
-void W_InitCache(void)
-{
-  // set up caching
-  cachelump = calloc(numlumps, sizeof *cachelump);
-  if (!cachelump)
-    I_Error ("W_Init: Couldn't allocate lumpcache");
-etc
+  
+/*
+** EN-US: the cache is not gonna be allocated. in prboom do this:
+** PT-BR: o cache não está a ser alocado. no prboom se faz assim:
+**   D_DoomMainSetup/W_Init/W_InitCache
+** 
+**   void W_InitCache(void)
+**   {
+**     // set up caching
+**     cachelump = calloc(numlumps, sizeof *cachelump);
+**     if (!cachelump)
+**     I_Error ("W_Init: Couldn't allocate lumpcache");
+**     etc
+**   }  
 */
+
+  if (!cachelump[lump].cache) 
+  { 
+
 
     // read the lump in
     Z_Malloc(len, PU_CACHE, &cachelump[lump].cache);

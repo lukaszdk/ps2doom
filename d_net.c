@@ -731,7 +731,7 @@ void TryRunTics (void)
     }// demoplayback
 	
     // wait for new tics if needed
-    while (lowtic < gametic/ticdup + counts)	
+    while (lowtic < gametic/ticdup + counts)
     {
 	NetUpdate ();   
 	lowtic = MAXINT;
