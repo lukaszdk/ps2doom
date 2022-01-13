@@ -746,7 +746,7 @@ void TryRunTics (void)
 	if (I_GetTime ()/ticdup - entertic >= 20)
 	{
 	    M_Ticker ();
-        DOMULTITASK;
+//        DOMULTITASK;
 	    return;
 	} 
     }
@@ -764,7 +764,7 @@ void TryRunTics (void)
 	    G_Ticker ();
 	    gametic++;
 	    
-        DOMULTITASK;
+//        DOMULTITASK;
 
 	    // modify command for duplicated tics
 	    if (i != ticdup-1)
