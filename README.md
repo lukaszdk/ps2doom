@@ -28,13 +28,21 @@ L1 and L2 are for entering savegame names.
 Credits
 ===========
 id Software for the source release 
+
 Lukasz D.K for the quick port
+
 Cosmito for upgrade the port 
+
 Adison(aka: dirsors) for the patches and fixes
+
 fjtrujy 
-Wally modder for ideas and the direction 
+
+Wally modder for ideas and direction 
+
 André(Aka: Wolf3s) ideas and patches
+
 TnA plastic Motivation and ideas
+
 El irsa and squidware for helping me in question of porting the newlib
 
 Copyright
