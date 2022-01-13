@@ -83,7 +83,10 @@ isjpcm.s: $(PS2DEV)/isjpcm/bin/isjpcm.irx
 	$(BIN2S) $< $@ isjpcm_irx
 
 clean:
-	rm -f $(EE_OBJS) $(EE_BIN_DIR)
+	rm -f $(EE_OBJS) 
+
+bin:
+	rm -f $(EE_BIN_DIR)
 
 run:
 	ps2client execee host:$(EE_BIN)

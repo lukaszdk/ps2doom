@@ -27,16 +27,13 @@ rcsid[] = "$Id: i_main.c,v 1.4 1997/02/03 22:45:10 b1 Exp $";
 #include <SDL.h>
 
 #include "include/doomdef.h"
-
 #include "include/m_argv.h"
-#include <libconfig.h>
-
 #include "include/d_main.h"
+#include "include/w_wad.h"
+
 
 #include <sifrpc.h>
-
-//#ifdef PS2HDD
-
+#include <libconfig.h>
 #include <debug.h>
 #include <libhdd.h>
 #include <libpwroff.h>
@@ -46,6 +43,7 @@ rcsid[] = "$Id: i_main.c,v 1.4 1997/02/03 22:45:10 b1 Exp $";
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h>
 #include <io_common.h>
@@ -53,9 +51,10 @@ rcsid[] = "$Id: i_main.c,v 1.4 1997/02/03 22:45:10 b1 Exp $";
 #include <fileXio.h>
 #include <iopcontrol.h>
 #include <iopheap.h>
-#define MAX_PARTITIONS   100
+
 //#endif
 
+#define MAX_PARTITIONS   100
 
 static char s_pUDNL   [] __attribute__(   (  section( ".data" ), aligned( 1 )  )   ) = "rom0:UDNL rom0:EELOADCNF";
 
@@ -219,6 +218,7 @@ char config_probestring[200];
 
 /// -------------------------
 
+
 #define DEBUG_LIBCONFIG
 
 const char *hdd_wads_folder;
@@ -236,12 +236,140 @@ void ResetIOP()
 	SifInitIopHeap();
 }
 
+int getFileSize(int fd) 
+{
+	int size = fioLseek(fd, 0, SEEK_END);
+	fioLseek(fd, 0, SEEK_SET);
+	return size;
+}
+
 void InitDoomed_screen()
 {
+    int fd;
+    int MC0F;
+    int MC1F;
+    int MC0T;
+    int MC1T;
+    char MC0EXEC;
+    char MC1EXEC;
+    char folder; 
+    char device;
+    char target;
+    char path;
+    char MC0DIR = "mc0:/";
+    char MC1DIR = "mc1:/";
+    float BOOT; 
+    float BOOT2;
+    int FMCB;
+    int revision;
+
     init_scr();
     scr_printf("--==== PS2DOOM v1.0.5.0 ====--\n\n\n");
     scr_printf("A Doom PS2 port started by Lukasz Bruun, improved by cosmito and modified by wolf3s\n\n\n");
-    scr_printf ("thanks to Wally modder, Dirsors, fjtrujy, Howling Wolf & Chelsea, Squidware and el irsa and the good old friend tna plastic");
+    scr_printf ("thanks to Wally modder, Dirsors, fjtrujy, Howling Wolf & Chelsea, Squidware, el irsa and the good old friend TnA plastic");
+    fioClose(fd);
+
+    fd = fioOpen("mc0:/FORTUNA/icon.icn", O_RDONLY);
+	if (getFileSize(fd) == 51040){
+		MC0T = 1;
+		strcpy(revision, "rev1");
+	} else if (getFileSize(fd) == 16876){
+		MC0T = 1;
+		strcpy(revision, "rev2");
+	}
+	fioClose(fd);
+	fd = fioOpen("mc1:/FORTUNA/icon.icn", O_RDONLY);
+	if (getFileSize(fd) == 51040){
+		MC1T = 1;
+		strcpy(revision, "rev1");
+	} else if (getFileSize(fd) == 16876){
+		MC1T = 1;
+		strcpy(revision, "rev2");
+	}
+	if(MC0T == 1){ scr_printf("FORTUNA %s detected on Memory Card 1! \n"); }
+	if(MC1T == 1){ scr_printf("FORTUNA %s detected on Memory Card 2! \n"); }
+	fioClose(fd);
+	strncat(MC0DIR,S_IEXEC,25);
+	fd = fioOpen(MC0DIR, O_RDONLY);
+	if (fd <= 0){
+	} else 
+    {
+		scr_printf("FMCB detected on Memory Card 1! \n");
+		MC0F = 1;
+	}
+	fioClose(fd);
+	strncat(MC1DIR,S_IEXEC,25);
+	fd = fioOpen(MC1DIR, O_RDONLY);
+	if (fd <= 0){
+	} else {
+		scr_printf("FMCB detected on Memory Card 2! \n");
+		MC1F = 1;
+	}
+	fioClose(fd);
+	fd = fioOpen("mc0:/FORTUNA/BOOT2.ELF", O_RDONLY);
+	if (fd <= 0){
+	} else {
+		scr_printf("BOOT2.ELF available on Memory Card 1! \n");
+		MC0T = 1;
+		BOOT2 = 1;
+	}
+	fioClose(fd);
+	fd = fioOpen("mc1:/FORTUNA/BOOT2.ELF", O_RDONLY);
+	if (fd <= 0){
+	} else {
+		scr_printf("BOOT2.ELF available on Memory Card 2! \n");
+		MC1T = 1;
+		BOOT2 = 1;
+	}
+	if (FMCB == 1){
+		if (MC0F == 1){	
+			char *args[3];
+			strncpy(MC0EXEC,"-x ",3);
+			strncat(MC0EXEC,MC0DIR,33);
+			args[0] = "-m rom0:SIO2MAN";
+			args[1] = "-m rom0:MCMAN";
+			args[2] = MC0EXEC;
+			scr_printf("Launching FMCB ... \n");
+			LoadExecPS2("moduleload", 3, args);
+			}
+		if (MC1F == 1){
+			char *args[3];
+			strncpy(MC1EXEC,"-x ",3);
+			strncat(MC1EXEC,MC1DIR,33);
+			args[0] = "-m rom0:SIO2MAN";
+			args[1] = "-m rom0:MCMAN";
+			args[2] = MC1EXEC;
+			scr_printf("Launching FMCB ... \n");
+			LoadExecPS2("moduleload", 3, args);
+			}
+
+	}
+	if (BOOT2 == 1 && FMCB == 0)
+    {
+		if (MC0T == 1)
+        {
+			strncpy(device,"mc0:",5);
+			strncpy(folder,"/FORTUNA/",10);
+			target = device;
+			strncat(target,folder,14);
+			path = target;
+			strcat(target,"BOOT2.ELF");
+		}
+		if (MC1T == 1)
+        {
+			strncpy(device,"mc1:",5);
+			strncpy(folder,"/FORTUNA/",10);
+			target = device;
+			strncat(target,folder,14);
+			path = target;
+			strcat(target,"BOOT2.ELF");
+			}
+		scr_printf("Launching BOOT2.ELF ... \n");
+		SifLoadElf(target,path);	
+	}
+    strncat(S_IEXEC,"/osdmain.elf",12);
+	fioClose(fd);
+
 }
 
 int LoadModuleFio()
@@ -444,15 +572,6 @@ int getDisplayModeFromELFName(char **argv)
 
 int main( int argc, char**	argv ) 
 {
-    FILE *fp;
-    int i, j, nj;
-    const char *s;
-    char configfile[256];
-    int mc_Type, mc_Free, mc_Format;
-    config_t cfg;       // libconfig
-    char elfFilename[100];
-    char deviceName[10];
-    char fullPath[256];
     int use_hdd;
     int swap_analogsticks;
     int config_buttons_int[] = 
@@ -462,41 +581,52 @@ int main( int argc, char**	argv )
     };
     int ret;
     int forceDisplayMode = -1;
+    int mc_Type, mc_Free, mc_Format;
+    int i, j, nj;
+    int fd;
+    int CdStatus;
+    
+    const char *s;
+    char configfile[256];
+    char *target, *path, *SYSEXEC;
+    char elfFilename[100];
+    char device[50];
+    char deviceName[10];
+    char fullPath[256];
+    char folder[50];
+    char *MC0DIR = "mc0:/";
+	char *MC1DIR = "mc1:/";
+    char *MASS0DIR = "mass0:/";
+    char *MASS1DIR = "mass1:/";
+    char *MC0EXEC[100];
+	char *MC1EXEC[100];
+    char* doom1wad;
+    char* doomwad;
+    char* doomuwad;
+    char* doom2wad;
+    char* doom2fwad;
+    char* plutoniawad;
+    char* tntwad;
+    char *home;
+    char *doomwaddir;
+
     myargc = argc; 
     myargv = argv; 
     s32 main_thread_id;
-    
-    GetElfFilename(argv[0], deviceName, fullPath, elfFilename);
+	config_t cfg;       // libconfig
+    FILE *fp;
 
+    GetElfFilename(argv[0], deviceName, fullPath, elfFilename);
     main_thread_id = GetThreadId();
 
 	SifInitRpc(0); 
-
+    LoadModuleFio();
     InitDoomed_screen();
+
     
     printf("sample: kicking IRXs\n");
-    LoadModuleFio();
 
-//#ifdef PS2HDD
-//	SifExecModuleBuffer(poweroff, size_poweroff, 0, NULL, &ret);
-//    SifExecModuleBuffer(iomanX, size_iomanX, 0, NULL, &ret);
-//	SifExecModuleBuffer(fileXio, size_fileXio, 0, NULL, &ret);
-//	SifExecModuleBuffer(ps2dev9, size_ps2dev9, 0, NULL, &ret);
-//	SifExecModuleBuffer(ps2atad, size_ps2atad, 0, NULL, &ret);
-//	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
-//    SifExecModuleBuffer(ps2hdd, size_ps2hdd, sizeof(hddarg), hddarg, &ret);
-//	if (ret < 0)
-//    {
-//        printf("Failed to load module: PS2HDD.IRX");
-//        scr_printf("Failed to load module: PS2HDD.IRX");
-//    }
-//	static char pfsarg[] = "-m" "\0" "4" "\0" "-o" "\0" "10" "\0" "-n" "\0" "40";
-//	SifExecModuleBuffer(ps2fs, size_ps2fs, sizeof(pfsarg), pfsarg, &ret);
-//	if (ret < 0)
-//    {
-//        scr_printf("Failed to load module: PS2FS.IRX");
-//        printf("Failed to load module: PS2FS.IRX");
-//    }
+//load hdd device 
 //#endif
     loadHdd_modules_and_load();
 
@@ -658,7 +788,6 @@ int main( int argc, char**	argv )
 
     return 0;
 } 
-
 
 
 
