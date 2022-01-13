@@ -48,9 +48,14 @@ El irsa and squidware for helping me in question of porting the newlib
 Copyright
 ==============
 Copyright (C) 1993 - 1996 id Software, Inc.
+
 Copyright (C) 2006 - 2011 Lukasz D.K.
+
 Copyright (C) 2016 - 2021 cosmito 
+
 Copyright (C) 2016 - 2022 Adilson Enio Pierog(Aka: dirsors)
+
 Copyright (C) 2021 - 2022 André Guilherme Mendes Da Luz bastos(aka: Wolf3s)
+
 Copyright (C) 2021 - 2022 Wally modder 
 
