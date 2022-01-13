@@ -30,6 +30,7 @@ rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <fcntl.h>
 
 #include "include/m_swap.h"
 #include "include/doomtype.h"
@@ -524,10 +525,7 @@ W_ReadLump
 //
 // W_CacheLumpNum
 //
-void*
-W_CacheLumpNum
-( int		lump,
-  int		tag )
+void *W_CacheLumpNum(int lump, int tag)
 {
 	byte*	ptr;
 
