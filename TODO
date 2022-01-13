@@ -4,7 +4,7 @@
   list.
 
 - get DOOM Public License from id
-
+Done
 -----------------------------------------------
 
 - remove m_fixed, switch to floating point
@@ -15,10 +15,11 @@
   scales implied by the graphics. Rather do
   GLDOOM and use texture mapping.
 
-- fix aspect ratio?
+- adjust aspect ratio?
   320x200 is nothing viable nowadays.
   A 320x240 base (4:3) would be a lot better.
   See above on width/height.
+  Done
  
 - limited look up/down by y-shearing?
   Prolly not worth it, rather switch to GLDOOM.
