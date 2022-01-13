@@ -478,6 +478,7 @@ void CheckAbort (void)
 	I_StartTic (); 
 	
     I_StartTic ();
+  
     for (; eventtail != eventhead ; eventtail =+ MAXEVENTS-1 ) 
     { 
 		ev = &events[eventtail]; 

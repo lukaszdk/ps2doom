@@ -1,14 +1,16 @@
-PS2 Doom
-========
+PS2 Doom WIP
+============
 
 Quick PlayStation 2 port - More information available at my [website](http://lukasz.dk/2008/02/11/doom-playstation-2-port/)
 
 Requires PS2SDK, gsKit and SDL for PS2 to compile.
 
-Build with: make all 
+Build with: make all
 
 Some very hackish stuff in w_wad.c / W_ReadLump function, to speed up loading,
 which will probably break loading from multiple files.
+
+Discord server: https://discord.gg/YNTdx5dXF6
 
 ```
 Controls:
