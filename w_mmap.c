@@ -2,7 +2,8 @@
 
 #include "include/z_zone.h"
 #include "include/i_system.h"
-
+#include "include/w_wad.h"
+#include <string.h>
 static struct
 {
   void *cache;
@@ -23,8 +24,9 @@ static struct
 const void* W_LockLumpNum(int lump)
 {
   size_t len = W_LumpLength(lump);
+  int tag;
   //printf(" (len = W_LumpLength(lump)) : lump = %d, len = %d\n", lump, len);    // cosmito : debug
-  const void *data = W_CacheLumpNum(lump);
+  const void *data = W_CacheLumpNum(lump, tag);
   //printf("data : %p\n\n", data);    // cosmito : debug
   if (!cachelump[lump].cache) {             // o cache nao esta a ser alocado. no prboom faz-se assim
  /*

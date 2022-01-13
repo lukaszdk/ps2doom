@@ -524,10 +524,7 @@ W_ReadLump
 //
 // W_CacheLumpNum
 //
-void*
-W_CacheLumpNum
-( int		lump,
-  int		tag )
+void *W_CacheLumpNum(int lump, int tag)
 {
 	byte*	ptr;
 

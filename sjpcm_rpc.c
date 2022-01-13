@@ -25,7 +25,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <sjpcm.h>
-
+#include <stdio.h>
 static unsigned sbuff[64] __attribute__((aligned (64)));
 static struct t_SifRpcClientData cd0;
 
