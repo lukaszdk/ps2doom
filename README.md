@@ -25,3 +25,24 @@ L2                : y
 
 L1 and L2 are for entering savegame names.  
 ```
+Credits
+===========
+id Software for the source release 
+Lukasz D.K for the quick port
+Cosmito for upgrade the port 
+Adison(aka: dirsors) for the patches and fixes
+fjtrujy 
+Wally modder for ideas and the direction 
+André(Aka: Wolf3s) ideas and patches
+TnA plastic Motivation and ideas
+El irsa and squidware for helping me in question of porting the newlib
+
+Copyright
+==============
+Copyright (C) 1993 - 1996 id Software, Inc.
+Copyright (C) 2006 - 2011 Lukasz D.K.
+Copyright (C) 2016 - 2021 cosmito 
+Copyright (C) 2016 - 2022 Adilson Enio Pierog(Aka: dirsors)
+Copyright (C) 2021 - 2022 André Guilherme Mendes Da Luz bastos(aka: Wolf3s)
+Copyright (C) 2021 - 2022 Wally modder 
+
