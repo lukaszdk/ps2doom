@@ -25,7 +25,12 @@
 
 #ifndef __DSTRINGS__
 #define __DSTRINGS__
+extern char* endmsg[];
+extern char *doom1_msg[];
+extern char *doom2_msg[];
 
+extern char *doom1_endmsg[];
+extern char *doom2_endmsg[];
 
 // All important printed strings.
 // Language selection (message strings).

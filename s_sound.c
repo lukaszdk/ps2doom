@@ -45,8 +45,8 @@ rcsid[] = "$Id: s_sound.c,v 1.10 1999/10/12 13:01:14 cphipps Exp $";
 #include "include/w_wad.h"
 //#include "lprintf.h"   // cosmito
 
-#include "include/z_zone.h"   // cosmito
 
+#include <stdlib.h>
 // when to clip out sounds
 // Does not fit the large outdoor areas.
 #define S_CLIPPING_DIST (1200<<FRACBITS)
@@ -64,7 +64,7 @@ rcsid[] = "$Id: s_sound.c,v 1.10 1999/10/12 13:01:14 cphipps Exp $";
 #define NORM_PRIORITY 64
 #define NORM_SEP 128
 #define S_STEREO_SWING (96<<FRACBITS)
-
+#define PU_STATIC 1	// static entire execution time
 //jff 1/22/98 make sound enabling variables readable here
 extern int snd_card, mus_card;
 extern boolean nosfxparm, nomusicparm;
@@ -442,7 +442,7 @@ void S_SetMusicVolume(int volume)
 	if (!mus_card || nomusicparm)
 		return;
 	if (volume < 0 || volume > 15)
-		I_Error("Attempt to set music volume at %d", volume);
+	I_Error("Attempt to set music volume at %d", volume);
 	I_SetMusicVolume(volume);
 	snd_MusicVolume = volume;
 }
@@ -478,7 +478,7 @@ void S_ChangeMusic(int musicnum, int looping)
 {
 	musicinfo_t *music;
 
-		boolean mus_card = 0;		// cosmito
+	boolean mus_card = 0;		// cosmito
 	boolean nomusicparm = 1;	// cosmito
 
 	//jff 1/22/98 return if music is not enabled

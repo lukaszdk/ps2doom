@@ -474,13 +474,15 @@ P_TouchSpecialThing
 	break;
 	
       case SPR_MEDI:
-	if (!P_GiveBody (player, 25))
+	//Health check
+	if (player->health >= MAXHEALTH)
 	    return;
 
 	if (player->health < 25)
 	    player->message = GOTMEDINEED;
 	else
 	    player->message = GOTMEDIKIT;
+	P_GiveBody(player, 25);
 	break;
 
 	

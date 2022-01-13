@@ -1290,10 +1290,9 @@ void A_VileTarget (mobj_t*	actor)
 	return;
 
     A_FaceTarget (actor);
-
-    fog = P_SpawnMobj (actor->target->x,
-		       actor->target->x,
-		       actor->target->z, MT_FIRE);
+ 	/* Id-Software old mess up with archvile target offset. they used x two times on the offsets instead of x and y offset. */  
+    /* fog = P_SpawnMobj(actor->target->x,  actor->target->x, actor->target->z, MT_FIRE); */ 
+    fog = P_SpawnMobj(actor->target->x,  actor->target->y, actor->target->z, MT_FIRE);
     
     actor->tracer = fog;
     fog->target = actor;

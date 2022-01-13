@@ -351,16 +351,16 @@ void R_GenerateLookup (int texnum)
 	
     for (x=0 ; x<texture->width ; x++)
     {
-	if (!patchcount[x])
-	{
+	 if (!patchcount[x])
+	 {
 	    printf ("R_GenerateLookup: column without a patch (%s)\n",
 		    texture->name);
 	    return;
-	}
+	 }
 	// I_Error ("R_GenerateLookup: column without a patch");
 	
-	if (patchcount[x] > 1)
-	{
+	 if (patchcount[x] > 1)
+	 {
 	    // Use the cached block.
 	    collump[x] = -1;	
 	    colofs[x] = texturecompositesize[texnum];
@@ -372,8 +372,9 @@ void R_GenerateLookup (int texnum)
 	    }
 	    
 	    texturecompositesize[texnum] += texture->height;
-	}
-    }	
+	 }
+    }
+    Z_Free(patchcount);	
 }
 
 
@@ -382,10 +383,7 @@ void R_GenerateLookup (int texnum)
 //
 // R_GetColumn
 //
-byte*
-R_GetColumn
-( int		tex,
-  int		col )
+byte* R_GetColumn(int tex, int col)
 {
     int		lump;
     int		ofs;
@@ -451,7 +449,7 @@ void R_InitTextures (void)
     names = W_CacheLumpName ("PNAMES", PU_STATIC);
     nummappatches = LONG ( *((int *)names) );
     name_p = names+4;
-    patchlookup = alloca (nummappatches*sizeof(*patchlookup));
+    patchlookup = Z_Malloc(nummappatches*sizeof(*patchlookup), PU_STATIC, NULL);
     
     for (i=0 ; i<nummappatches ; i++)
     {

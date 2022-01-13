@@ -34,9 +34,9 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 #include "include/v_video.h"
 #include "include/m_argv.h"
 #include "include/d_main.h"
-
+#include "include/z_zone.h"
 #include "include/doomdef.h"
-
+#include "include/w_wad.h"
 
 SDL_Surface *screen;
 
@@ -50,6 +50,90 @@ extern SDL_Joystick *joystick;      // cosmito : shared between i_video.c and i_
 // According to Dave Taylor, it still is a bonehead thing
 // to use ....
 static int	multiply=1;
+
+// disk image data and background overwritten by the disk to be
+// restored by EndRead
+
+static byte *disk_image = NULL;
+static int disk_image_w, disk_image_h;
+static byte *saved_background;
+
+void I_BeginRead(void)
+{
+    int y;
+
+    if (disk_image == NULL)
+        return;
+
+    // save background and copy the disk image in
+
+    for (y=0; y<disk_image_h; ++y)
+    {
+        byte *screenloc = 
+               screens[0] 
+                 + (SCREENHEIGHT - 1 - disk_image_h + y) * SCREENWIDTH
+                 + (SCREENWIDTH - 1 - disk_image_w);
+
+        memcpy(saved_background + y * disk_image_w,
+               screenloc,
+               disk_image_w);
+        memcpy(screenloc, disk_image + y * disk_image_w, disk_image_w);
+    }
+
+    SDL_UpdateRect(screen, 
+                   screen->w - disk_image_w, screen->h - disk_image_h, 
+                   disk_image_w, disk_image_h);
+}
+
+void I_EndRead(void)
+{
+    int y;
+
+    if (disk_image == NULL)
+        return;
+
+    // save background and copy the disk image in
+
+    for (y=0; y<disk_image_h; ++y)
+    {
+        byte *screenloc = 
+               screens[0] 
+                 + (SCREENHEIGHT - 1 - disk_image_h + y) * SCREENWIDTH
+                 + (SCREENWIDTH - 1 - disk_image_w);
+
+        memcpy(screenloc, saved_background + y * disk_image_w, disk_image_w);
+    }
+
+    SDL_UpdateRect(screen, 
+                   screen->w - disk_image_w, screen->h - disk_image_h, 
+                   disk_image_w, disk_image_h);
+}
+
+static void LoadDiskImage(void)
+{
+    patch_t *disk;
+    int y;
+
+    disk = (patch_t *) W_CacheLumpName("STDISK", PU_STATIC);
+
+    V_DrawPatch(0, 0, 0, disk);
+    disk_image_w = SHORT(disk->width);
+    disk_image_h = SHORT(disk->height);
+    printf("%i, %i\n", disk_image_w, disk_image_h);
+
+    disk_image = Z_Malloc(disk_image_w * disk_image_h, PU_STATIC, NULL);
+    saved_background = Z_Malloc(disk_image_w * disk_image_h, PU_STATIC, NULL);
+
+    for (y=0; y<disk_image_h; ++y) 
+    {
+        memcpy(disk_image + disk_image_w * y,
+               screens[0] + SCREENWIDTH * y,
+               disk_image_w);
+    }
+
+    Z_Free(disk);
+LoadDiskImage();
+}
 
 static int joy_x=0, joy_y=0;
 static int last_key = 0;        // cosmito
@@ -940,7 +1024,7 @@ void I_InitGraphics(void)
     if (multiply == 1 && !SDL_MUSTLOCK(screen) ) {
 	screens[0] = (unsigned char *) screen->pixels;
     } else {
-	screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
+	screens[0] = (unsigned char *) Z_Malloc (SCREENWIDTH * SCREENHEIGHT, PU_STATIC, NULL);
         if ( screens[0] == NULL )
             I_Error("Couldn't allocate screen memory");
     }

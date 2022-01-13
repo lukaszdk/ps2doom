@@ -37,7 +37,9 @@ rcsid[] = "$Id: info.c,v 1.3 1997/01/26 07:45:00 b1 Exp $";
 
 #include "include/p_mobj.h"
 
-char *sprnames[NUMSPRITES] = {
+#include "include/z_zone.h"
+char *sprnames[] = 
+{
     "TROO","SHTG","PUNG","PISG","PISF","SHTF","SHT2","CHGG","CHGF","MISG",
     "MISF","SAWG","PLSG","PLSF","BFGG","BFGF","BLUD","PUFF","BAL1","BAL2",
     "PLSS","PLSE","MISL","BFS1","BFE1","BFE2","TFOG","IFOG","PLAY","POSS",
@@ -51,7 +53,7 @@ char *sprnames[NUMSPRITES] = {
     "POL3","POL1","POL6","GOR2","GOR3","GOR4","GOR5","SMIT","COL1","COL2",
     "COL3","COL4","CAND","CBRA","COL6","TRE1","TRE2","ELEC","CEYE","FSKU",
     "COL5","TBLU","TGRN","TRED","SMBT","SMGT","SMRT","HDB1","HDB2","HDB3",
-    "HDB4","HDB5","HDB6","POB1","POB2","BRS1","TLMP","TLP2"
+    "HDB4","HDB5","HDB6","POB1","POB2","BRS1","TLMP","TLP2", NULL
 };
 
 
@@ -853,12 +855,16 @@ state_t	states[NUMSTATES] = {
     {SPR_PAIN,32778,8,{NULL},S_PAIN_DIE5,0,0},	// S_PAIN_DIE4
     {SPR_PAIN,32779,8,{A_PainDie},S_PAIN_DIE6,0,0},	// S_PAIN_DIE5
     {SPR_PAIN,32780,8,{NULL},S_NULL,0,0},	// S_PAIN_DIE6
-    {SPR_PAIN,12,8,{NULL},S_PAIN_RAISE2,0,0},	// S_PAIN_RAISE1
+/*                                                             
+    id-Software old mess up pain elementals. 
+	They used to gave the pain elementals a raise state while they leave no corps.
+	
+	{SPR_PAIN,12,8,{NULL},S_PAIN_RAISE2,0,0},	// S_PAIN_RAISE1
     {SPR_PAIN,11,8,{NULL},S_PAIN_RAISE3,0,0},	// S_PAIN_RAISE2
     {SPR_PAIN,10,8,{NULL},S_PAIN_RAISE4,0,0},	// S_PAIN_RAISE3
     {SPR_PAIN,9,8,{NULL},S_PAIN_RAISE5,0,0},	// S_PAIN_RAISE4
     {SPR_PAIN,8,8,{NULL},S_PAIN_RAISE6,0,0},	// S_PAIN_RAISE5
-    {SPR_PAIN,7,8,{NULL},S_PAIN_RUN1,0,0},	// S_PAIN_RAISE6
+    {SPR_PAIN,7,8,{NULL},S_PAIN_RUN1,0,0},	// S_PAIN_RAISE6 */
     {SPR_SSWV,0,10,{A_Look},S_SSWV_STND2,0,0},	// S_SSWV_STND
     {SPR_SSWV,1,10,{A_Look},S_SSWV_STND,0,0},	// S_SSWV_STND2
     {SPR_SSWV,0,3,{A_Chase},S_SSWV_RUN2,0,0},	// S_SSWV_RUN1
@@ -1700,7 +1706,11 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL,		// flags
-	S_PAIN_RAISE1		// raisestate
+	/*                                                             
+    id-Software old mess up pain elementals . 
+	They used to gave the pain elementals a raise state while they leave no corps.
+       S_PAIN_RAISE1		// raisestate
+     */
     },
 
     {		// MT_WOLFSS

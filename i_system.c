@@ -145,7 +145,8 @@ void I_WaitVBL(int count)
 {
     SDL_Delay((count*1000)/70);
 }
-
+/*
+Dead void functions
 void I_BeginRead(void)
 {
 }
@@ -153,7 +154,7 @@ void I_BeginRead(void)
 void I_EndRead(void)
 {
 }
-
+*/
 byte*	I_AllocLow(int length)
 {
     byte*	mem;

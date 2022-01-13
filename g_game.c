@@ -1729,9 +1729,15 @@ boolean G_CheckDemoStatus (void)
 
     if (timingdemo)
     {
-	endtime = I_GetTime ();
-	I_Error ("timed %i gametics in %i realtics",gametic
-		 , endtime-starttime);
+		float fps;
+		int realtics;
+
+		endtime = I_GetTime ();
+
+		realtics = endtime - starttime;
+		fps = ((float) gametic * 35) / realtics;
+
+		I_Error (gametic, realtics, fps, "times %i gametics in %i realtics (%f fps)"); 
     }
 
     if (demoplayback)

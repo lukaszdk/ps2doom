@@ -45,14 +45,7 @@ rcsid[] = "$Id: p_floor.c,v 1.4 1997/02/03 16:47:54 b1 Exp $";
 //
 // Move a plane (floor or ceiling) and check for crushing
 //
-result_e
-T_MovePlane
-( sector_t*	sector,
-  fixed_t	speed,
-  fixed_t	dest,
-  boolean	crush,
-  int		floorOrCeiling,
-  int		direction )
+result_e T_MovePlane(sector_t* sector, fixed_t speed, fixed_t dest, boolean	crush, int floorOrCeiling, int direction )
 {
     boolean	flag;
     fixed_t	lastpos;
@@ -467,8 +460,9 @@ EV_BuildStairs
 
     floormove_t*	floor;
     
-    fixed_t		stairsize;
-    fixed_t		speed;
+    fixed_t		stairsize=0;
+    //this speed shouldn´t be 0 but it can deal for a while
+	fixed_t		speed=0;
 
     secnum = -1;
     rtn = 0;

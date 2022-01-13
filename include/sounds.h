@@ -85,7 +85,7 @@ typedef struct {
   int lumpnum;
 
   /* music data - cphipps 4/11 made const void* */ 
-  const void *data;
+  void *data;
 
   // music handle once registered
   int handle;

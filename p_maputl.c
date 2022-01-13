@@ -44,11 +44,7 @@ rcsid[] = "$Id: p_maputl.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
 // P_AproxDistance
 // Gives an estimation of distance (not exact)
 //
-
-fixed_t
-P_AproxDistance
-( fixed_t	dx,
-  fixed_t	dy )
+fixed_t P_AproxDistance( fixed_t dx, fixed_t dy)
 {
     dx = abs(dx);
     dy = abs(dy);
@@ -106,10 +102,7 @@ P_PointOnLineSide
 // Considers the line to be infinite
 // Returns side 0 or 1, -1 if box crosses the line.
 //
-int
-P_BoxOnLineSide
-( fixed_t*	tmbox,
-  line_t*	ld )
+int P_BoxOnLineSide(fixed_t* tmbox, line_t*	ld )
 {
     int		p1;
     int		p2;

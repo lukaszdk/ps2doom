@@ -23,7 +23,9 @@
 //---------------------------------------------------------------------
 
 
-
+/**********************
+ * This header file has some problems with z aclloc
+*/
 #ifndef __Z_ZONE__
 #define __Z_ZONE__
 
@@ -33,7 +35,7 @@
 // ZONE MEMORY
 // PU - purge tags.
 // Tags < 100 are not overwritten until freed.
-#define PU_STATIC		1	// static entire execution time
+#define PU_STATIC 1	// static entire execution time
 #define PU_SOUND		2	// static while playing
 #define PU_MUSIC		3	// static while playing
 #define PU_DAVE		4	// anything else Dave wants static
@@ -45,7 +47,7 @@
 
 // cosmito from lsdldoom
 void *(Z_Calloc)(size_t n, size_t n2, int tag, void **user, const char *, int);
-#define Z_Calloc(a,b,c,d)  (Z_Calloc)   (a,b,c,d,__FILE__,__LINE__)
+#define Z_Calloc(a,b,c,d)  (Z_Calloc)   (a,b,c,d, __FILE__, __LINE__)
 #define calloc(n1,n2)      Z_Calloc(n1,n2,PU_STATIC,0)
 
 

@@ -97,13 +97,9 @@ short*		maskedtexturecol;
 
 
 //
-// R_RenderMaskedSegRange
+// void R_RenderMaskedSegRange()
 //
-void
-R_RenderMaskedSegRange
-( drawseg_t*	ds,
-  int		x1,
-  int		x2 )
+void R_RenderMaskedSegRange(drawseg_t*	ds, int x1, int x2)
 {
     unsigned	index;
     column_t*	col;
@@ -210,7 +206,7 @@ void R_RenderSegLoop (void)
     int			yl;
     int			yh;
     int			mid;
-    fixed_t		texturecolumn;
+    fixed_t		texturecolumn=0;
     int			top;
     int			bottom;
 
@@ -371,10 +367,7 @@ void R_RenderSegLoop (void)
 // A wall segment will be drawn
 //  between start and stop pixels (inclusive).
 //
-void
-R_StoreWallRange
-( int	start,
-  int	stop )
+void R_StoreWallRange(int start, int stop )
 {
     fixed_t		hyp;
     fixed_t		sineval;
@@ -399,7 +392,8 @@ R_StoreWallRange
     
     // calculate rw_distance for scale calculation
     rw_normalangle = curline->angle + ANG90;
-    offsetangle = abs(rw_normalangle-rw_angle1);
+    //this abs is giving some warnings in my visual studio code
+	offsetangle = abs(rw_normalangle-rw_angle1);
     
     if (offsetangle > ANG90)
 	offsetangle = ANG90;

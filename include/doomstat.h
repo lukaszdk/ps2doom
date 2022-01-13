@@ -59,9 +59,10 @@ extern  boolean	devparm;	// DEBUG: launched with -devparm
 //
 extern GameMode_t	gamemode;
 extern GameMission_t	gamemission;
+extern char *gamedescription;
 
 // Set if homebrew PWAD stuff has been added.
-extern  boolean	modifiedgame;
+extern boolean modifiedgame;
 
 
 // -------------------------------------------

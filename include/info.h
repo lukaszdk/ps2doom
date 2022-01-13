@@ -893,12 +893,17 @@ typedef enum
     S_PAIN_DIE4,
     S_PAIN_DIE5,
     S_PAIN_DIE6,
+/*                                                             
+    id-Software old mess up pain elementals. 
+	They used to gave the pain elementals a raise state while they leave no corps.
+	
     S_PAIN_RAISE1,
     S_PAIN_RAISE2,
     S_PAIN_RAISE3,
     S_PAIN_RAISE4,
     S_PAIN_RAISE5,
-    S_PAIN_RAISE6,
+    S_PAIN_RAISE6, */
+
     S_SSWV_STND,
     S_SSWV_STND2,
     S_SSWV_RUN1,
@@ -1156,7 +1161,7 @@ typedef struct
 } state_t;
 
 extern state_t	states[NUMSTATES];
-extern char *sprnames[NUMSPRITES];
+extern char *sprnames[];
 
 
 

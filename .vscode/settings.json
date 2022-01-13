@@ -82,6 +82,8 @@
         "bdm.h": "c",
         "audsrv.h": "c",
         "math.h": "c",
-        "iopcontrol.h": "c"
+        "iopcontrol.h": "c",
+        "typeinfo": "c",
+        "stdio.h": "c"
     }
 }

@@ -30,6 +30,7 @@
 #include <SDL/SDL_timer.h>
 #include <kernel.h>
 #include <tamtypes.h>
+#include <string.h>
 static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 
 #define	BGCOLOR		7
@@ -55,6 +56,7 @@ extern const char *hdd_wads_folder;
 char currentWadName[20];
 
 #define R_OK	4
+// file access
 static int access(char *file, int mode)
 {
 	FILE *test_fp;
@@ -65,6 +67,7 @@ static int access(char *file, int mode)
 	}
 	return(-1);
 }
+
 #include "include/doomdef.h"
 #include "include/doomstat.h"
 #include "include/dstrings.h"
@@ -1653,22 +1656,22 @@ void D_DoomMain (void)
 		if (W_CheckNumForName(name[i])<0)
 		    I_Error("\nThis is not the registered version.");
     }
-    
-    // Iff additonal PWAD files are used, print modified banner
+    // If additonal PWAD files are used, print modified banner
     if (modifiedgame)
     {
-	/*m*/scr_printf (
+	/*m*/scr_printf 
+    (
 	    "===========================================================================\n"
-	    "ATTENTION:  This version of DOOM has been modified.  If you would like to\n"
-	    "get a copy of the original game, call 1-800-IDGAMES or see the readme file.\n"
-	    "        You will not receive technical support for modified games.\n"
-	    "                      press enter to continue\n"
-	    "===========================================================================\n"
-	    );
-	getchar ();
+	    "     PS2DOOM is free software, covered by the Id Open source\n"
+        "     License. However WITHOUT ANY WARRANTY even the implied warranty of "
+        "     FITNESS FOR A PARTICULAR PURPOSE. See the DOOM Source Code License for more details.\n"
+        "     You are welcome to change and distribute but you can´t sell comercially.\n"
+        "     See the source for more information.\n"                                                                 
+	    "===========================================================================\n");
+	
+    getchar ();
     }
 	
-
     // Check and print which version is executed.
     switch ( gamemode )
     {
@@ -1676,7 +1679,7 @@ void D_DoomMain (void)
       case indetermined:
 	scr_printf (
 	    "===========================================================================\n"
-	    "                                Shareware!\n"
+	    "                                Open source!\n"
 	    "===========================================================================\n"
 	);
 	break;
@@ -1685,10 +1688,10 @@ void D_DoomMain (void)
       case commercial:
 	scr_printf (
 	    "===========================================================================\n"
-	    "                 Commercial product - do not distribute!\n"
-	    "         Please report software piracy to the SPA: 1-800-388-PIR8\n"
-	    "===========================================================================\n"
-	);
+	    "         Open source product - you can do distributions or modify the code!\n"
+	    "         However you cannot comercialy sell the product                      "
+        "         as in the terms of the doom license\n                               "
+	    "===========================================================================\n");
 	break;
 	
       default:

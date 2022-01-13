@@ -1653,7 +1653,7 @@ void WI_loadData(void)
     sp_secret = W_CacheLumpName("WISCRT2", PU_STATIC);
 
     // Yuck. 
-    if (french)
+    if (W_CheckNumForName("WIOBJ") >= 0)
     {
 	// "items"
 	if (netgame && !deathmatch)
