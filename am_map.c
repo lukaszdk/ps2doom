@@ -616,7 +616,7 @@ AM_Responder
 {
 
     int rc;
-    static int cheatstate=0;
+//    static int cheatstate=0;
     static int bigstate=0;
     static char buffer[20];
 
