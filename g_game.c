@@ -1736,8 +1736,8 @@ boolean G_CheckDemoStatus (void)
 
 		realtics = endtime - starttime;
 		fps = ((float) gametic * 35) / realtics;
-
-		I_Error (gametic, realtics, fps, "times %i gametics in %i realtics (%f fps)"); 
+        //this should be scr_printf();
+        I_Error (gametic, realtics, fps, "times %i gametics in %i realtics (%f fps)"); 
     }
 
     if (demoplayback)

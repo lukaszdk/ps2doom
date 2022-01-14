@@ -1,5 +1,6 @@
-     // Bug, dear Shawn.
+     // Bug, dear Shawn 
     // Insufficient malloc, caused spurious realloc errors.
+    // todo: add pwad support here https://github.com/7dog123/ps2doom/commits/testing?after=578263b3ae8d10f012a6f3218d1e6a7594dc1721+69&branch=testing
     plutoniawad = malloc(strlen(doomwaddir)+1+/*9*/12+1+5);
     sprintf(plutoniawad, "%splutonia.wad", doomwaddir);
 
