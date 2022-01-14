@@ -542,7 +542,7 @@ int mmus2mid(const UBYTE *mus, MIDI *mididata, UWORD division, int nocomp)
 			mididata->track[i].data = NULL;
 		}
 
-		return 0;
+	return 0;
 }
 
 void free_mididata(MIDI *mid)
@@ -635,7 +635,7 @@ int MidiToMIDI(UBYTE *mid,MIDI *mididata)
 			mididata->track[i].data = NULL;
 			mididata->track[i].len = 0;
 		}
-		return 0;
+	return 0;
 }
 
 //#ifdef STANDALONE /* this code unused by BOOM provided for future portability */
