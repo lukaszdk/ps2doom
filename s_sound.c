@@ -215,7 +215,7 @@ void S_Start(void)
 			else
 				mnum = spmus[gamemap-1];
 		}
-		S_ChangeMusic(mnum, true);
+	S_ChangeMusic(mnum, true);
 }
 
 void S_StartSoundAtVolume(void *origin_p, int sfx_id, int volume)
