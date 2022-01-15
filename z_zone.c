@@ -21,8 +21,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id: z_zone.c,v 1.4 1997/02/03 16:47:58 b1 Exp $";
+// static const char rcsid[] = "$Id: z_zone.c,v 1.4 1997/02/03 16:47:58 b1 Exp $";
 
 #include "include/z_zone.h"
 #include "include/i_system.h"
@@ -434,9 +433,7 @@ void Z_CheckHeap (void)
 // Z_ChangeTag
 //
 void
-Z_ChangeTag2
-( void*		ptr,
-  int		tag )
+Z_ChangeTag2(void *ptr, int tag)
 {
     memblock_t*	block;
 	
@@ -445,14 +442,12 @@ Z_ChangeTag2
     if (block->id != ZONEID)
 	I_Error ("Z_ChangeTag: freed a pointer without ZONEID");
 
-    if (tag >= PU_PURGELEVEL && (unsigned)block->user < 0x100)
+    if (tag >= PU_PURGELEVEL && (long)block->user < 0x100)
 	I_Error ("Z_ChangeTag: an owner is required for purgable blocks");
 
     block->tag = tag;
 }
-
-
-
+  
 //
 // Z_FreeMemory
 //

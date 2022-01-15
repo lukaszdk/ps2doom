@@ -30,8 +30,7 @@
  *
  *-----------------------------------------------------------------------------*/
 
-static const char
-rcsid[] = "$Id: sounds.c,v 1.2 1999/10/12 13:01:14 cphipps Exp $";
+// static const char rcsid[] = "$Id: sounds.c,v 1.2 1999/10/12 13:01:14 cphipps Exp $";
 
 // killough 5/3/98: reformatted
 

@@ -22,8 +22,7 @@
 //-----------------------------------------------------------------------------
 
 
-static const char
-rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
+// static const char rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 
 
 #include <stdlib.h>
@@ -217,7 +216,7 @@ void W_AddFile (char *filename)
 
     lump_p = &lumpinfo[startlump];
 	
-    storehandle = reloadname ? -1 : (int)handle;
+    storehandle = reloadname ? -1 : (long)handle;
 	
     for (i=startlump ; i<numlumps ; i++,lump_p++, fileinfo++)
     {
@@ -498,7 +497,9 @@ W_ReadLump
 	    I_Error ("W_ReadLump: couldn't open %s",reloadname);
     }
     else
-	handle = (FILE *)l->handle;
+   //l->handle
+  //fopen(handle, "%d"); 
+       
 
 	//// Hack to make I/O quicker	
 	//ps2_fseek (handle, l->position, SEEK_SET);

@@ -21,8 +21,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id: p_plats.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
+// static const char rcsid[] = "$Id: p_plats.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 
 
 #include "include/i_system.h"
@@ -311,4 +310,5 @@ void P_RemoveActivePlat(plat_t* plat)
 	    return;
 	}
     I_Error ("P_RemoveActivePlat: can't find plat!");
+
 }

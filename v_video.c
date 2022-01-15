@@ -24,8 +24,7 @@
 //-----------------------------------------------------------------------------
 
 
-static const char
-rcsid[] = "$Id: v_video.c,v 1.5 1997/02/03 22:45:13 b1 Exp $";
+// static const char rcsid[] = "$Id: v_video.c,v 1.5 1997/02/03 22:45:13 b1 Exp $";
 
 
 #include "include/m_swap.h"

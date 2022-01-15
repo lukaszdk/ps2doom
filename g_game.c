@@ -21,8 +21,7 @@
 //-----------------------------------------------------------------------------
 
 
-static const char
-rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
+// static const char rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 
 #include <string.h>
 #include <stdlib.h>
@@ -208,7 +207,7 @@ int joyxside_byjoy;         /// cosmito
 int joyxside_bykey;         /// cosmito
 
 boolean         joyarray[5];
-boolean*	joybuttons = &joyarray[1];		// allow [-1]
+boolean *joybuttons = &joyarray[1];		// allow [-1] 
 
 int		savegameslot;
 char		savedescription[32];
@@ -362,10 +361,10 @@ void G_BuildTiccmd (ticcmd_t* cmd)
     /// cosmito : next/prev weapon section
     int newweapon = wp_nochange;
     if (gamekeydown[key_weaponnext])                                 
-    {
-        newweapon = P_NextWeapon(&players[consoleplayer]);
+    {	
+       newweapon = P_NextWeapon(&players[consoleplayer]);
     }
-    
+
     if (gamekeydown[key_weaponprevious])                                 
     {
         newweapon = P_PreviousWeapon(&players[consoleplayer]);
@@ -530,12 +529,12 @@ void G_DoLoadLevel (void)
     Z_CheckHeap ();
 
     // clear cmd building stuff
-    memset (gamekeydown, 0, sizeof(gamekeydown));
+    memset(gamekeydown, 0, sizeof(gamekeydown));
     joyxmove = joyymove = 0;
     mousex = mousey = 0;
     sendpause = sendsave = paused = false;
-    memset (mousebuttons, 0, sizeof(mousebuttons));
-    memset (joybuttons, 0, sizeof(joybuttons));
+    memset(mousebuttons, 0, sizeof(mousebuttons));
+    memset(joybuttons, 0, sizeof(joybuttons));
 }
 
 
@@ -752,7 +751,7 @@ void G_Ticker (void)
 		if (gametic > BACKUPTICS
 		    && consistancy[i][buf] != cmd->consistancy)
 		{
-		    I_Error ("consistency failure (%i should be %i)",
+   		    I_Error("consistency failure (%i should be %i)",
 			     cmd->consistancy, consistancy[i][buf]);
 		}
 		if (players[i].mo)
@@ -1737,7 +1736,7 @@ boolean G_CheckDemoStatus (void)
 		realtics = endtime - starttime;
 		fps = ((float) gametic * 35) / realtics;
         //this should be scr_printf();
-        I_Error (gametic, realtics, fps, "times %i gametics in %i realtics (%f fps)"); 
+       //I_Error (gametic, realtics, fps, "times %i gametics in %d realtics (%f fps)"); 
     }
 
     if (demoplayback)
@@ -1759,13 +1758,14 @@ boolean G_CheckDemoStatus (void)
 	return true;
     }
 
+
     if (demorecording)
     {
 	*demo_p++ = DEMOMARKER;
 	M_WriteFile (demoname, demobuffer, demo_p - demobuffer);
 	Z_Free (demobuffer);
 	demorecording = false;
-	I_Error ("Demo %s recorded",demoname);
+	I_Error(demoname, "Demo %s recorded");
     }
 
     return false;

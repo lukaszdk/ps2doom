@@ -22,8 +22,7 @@
 //-----------------------------------------------------------------------------
 
 
-static const char
-rcsid[] = "$Id: m_cheat.c,v 1.1 1997/02/03 21:24:34 b1 Exp $";
+// static const char rcsid[] = "$Id: m_cheat.c,v 1.1 1997/02/03 21:24:34 b1 Exp $";
 
 #include "include/m_cheat.h"
 
