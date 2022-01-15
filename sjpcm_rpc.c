@@ -24,63 +24,79 @@
 #include <sifrpc.h>
 #include <stdarg.h>
 #include <string.h>
-#include <sjpcm.h>
 #include <stdio.h>
-static unsigned sbuff[64] __attribute__((aligned (64)));
+#include <sjpcm.h>
+
+#define SJPCM_CALLBACK 0x12
+
+static unsigned sbuff[64] __attribute__((aligned(64)));
 static struct t_SifRpcClientData cd0;
 
 int sjpcm_inited = 0;
 int pcmbufl, pcmbufr;
 int bufpos;
 
+void (*_cb)(void);
+
+static void _sjpcm_callback(void *pkt, void *param)
+{
+	if (_cb)
+		_cb();
+}
+
 void SjPCM_Puts(char *format, ...)
 {
 	static char buff[4096];
-    va_list args;
-    int rv;
+	va_list args;
+	int rv;
 
-	if(!sjpcm_inited) return;
+	if (!sjpcm_inited)
+		return;
 
-    va_start(args, format);
-    rv = vsnprintf(buff, 4096, format, args);
+	va_start(args, format);
+	rv = vsnprintf(buff, 4096, format, args);
 
-	memcpy((char*)(&sbuff[0]),buff,252);
-	SifCallRpc(&cd0,SJPCM_PUTS,0,(void*)(&sbuff[0]),252,(void*)(&sbuff[0]),252,0,0);
+	memcpy((char *)(&sbuff[0]), buff, 252);
+	SifCallRpc(&cd0, SJPCM_PUTS, 0, (void *)(&sbuff[0]), 252, (void *)(&sbuff[0]), 252, 0, 0);
 }
 
 void SjPCM_Play()
 {
-	if(!sjpcm_inited) return;
+	if (!sjpcm_inited)
+		return;
 
-	SifCallRpc(&cd0,SJPCM_PLAY,0,(void*)(&sbuff[0]),0,(void*)(&sbuff[0]),0,0,0);
+	SifCallRpc(&cd0, SJPCM_PLAY, 0, (void *)(&sbuff[0]), 0, (void *)(&sbuff[0]), 0, 0, 0);
 }
 
 void SjPCM_Pause()
 {
-	if(!sjpcm_inited) return;
+	if (!sjpcm_inited)
+		return;
 
-	SifCallRpc(&cd0,SJPCM_PAUSE,0,(void*)(&sbuff[0]),0,(void*)(&sbuff[0]),0,0,0);
+	SifCallRpc(&cd0, SJPCM_PAUSE, 0, (void *)(&sbuff[0]), 0, (void *)(&sbuff[0]), 0, 0, 0);
 }
 
 void SjPCM_Setvol(unsigned int volume)
 {
-	if(!sjpcm_inited) return;
+	if (!sjpcm_inited)
+		return;
 
-	sbuff[5] = volume&0x3fff;
-	SifCallRpc(&cd0,SJPCM_SETVOL,0,(void*)(&sbuff[0]),64,(void*)(&sbuff[0]),64,0,0);
+	sbuff[5] = volume & 0x3fff;
+	SifCallRpc(&cd0, SJPCM_SETVOL, 0, (void *)(&sbuff[0]), 64, (void *)(&sbuff[0]), 64, 0, 0);
 }
 
 void SjPCM_Clearbuff()
 {
-	if(!sjpcm_inited) return;
+	if (!sjpcm_inited)
+		return;
 
-	SifCallRpc(&cd0,SJPCM_CLEARBUFF,0,(void*)(&sbuff[0]),0,(void*)(&sbuff[0]),0,0,0);
+	SifCallRpc(&cd0, SJPCM_CLEARBUFF, 0, (void *)(&sbuff[0]), 0, (void *)(&sbuff[0]), 0, 0, 0);
 }
 
 int SjPCM_Init(int sync)
 {
 	int i;
-/*
+	/*
 	do {
         if (sif_bind_rpc(&cd0, SJPCM_IRX, 0) < 0) {
             return -1;
@@ -88,22 +104,66 @@ int SjPCM_Init(int sync)
         nopdelay();
     } while(!cd0.server);
 */
-	while(1){
-		if (SifBindRpc( &cd0, SJPCM_IRX, 0) < 0) return -1; // bind error
- 		if (cd0.server != 0) break;
-    	i = 0x10000;
-    	while(i--);
+	while (1) {
+		if (SifBindRpc(&cd0, SJPCM_IRX, 0) < 0)
+			return -1;  // bind error
+		if (cd0.server != 0)
+			break;
+		i = 0x10000;
+		while (i--)
+			;
 	}
 
 	sbuff[0] = sync;
 
-	SifCallRpc(&cd0,SJPCM_INIT,0,(void*)(&sbuff[0]),64,(void*)(&sbuff[0]),64,0,0);
+	SifCallRpc(&cd0, SJPCM_INIT, 0, (void *)(&sbuff[0]), 64, (void *)(&sbuff[0]), 64, 0, 0);
 
 	FlushCache(0);
 
 	pcmbufl = sbuff[1];
 	pcmbufr = sbuff[2];
 	bufpos = sbuff[3];
+
+	DIntr();
+	SifAddCmdHandler(SJPCM_CALLBACK, _sjpcm_callback, NULL);
+	EIntr();
+
+	sjpcm_inited = 1;
+
+	return 0;
+}
+
+int SjPCM_InitEx(int sync, int num_blocks)
+{
+	int i;
+
+	while (1) {
+		if (SifBindRpc(&cd0, SJPCM_IRX, 0) < 0)
+			return -1;  // bind error
+		if (cd0.server != 0)
+			break;
+		i = 0x10000;
+		while (i--)
+			;
+	}
+
+	sbuff[0] = num_blocks;
+
+	SifCallRpc(&cd0, SJPCM_SETNUMBLOCKS, 0, (void *)(&sbuff[0]), 64, (void *)(&sbuff[0]), 64, 0, 0);
+
+	sbuff[0] = sync;
+
+	SifCallRpc(&cd0, SJPCM_INIT, 0, (void *)(&sbuff[0]), 64, (void *)(&sbuff[0]), 64, 0, 0);
+
+	FlushCache(0);
+
+	pcmbufl = sbuff[1];
+	pcmbufr = sbuff[2];
+	bufpos = sbuff[3];
+
+	DIntr();
+	SifAddCmdHandler(SJPCM_CALLBACK, _sjpcm_callback, NULL);
+	EIntr();
 
 	sjpcm_inited = 1;
 
@@ -113,55 +173,69 @@ int SjPCM_Init(int sync)
 // size should either be either 800 (NTSC) or 960 (PAL)
 void SjPCM_Enqueue(short *left, short *right, int size, int wait)
 {
-    int i;
-    struct t_SifDmaTransfer sdt;
+	int i;
+	struct t_SifDmaTransfer sdt;
 
-    if (!sjpcm_inited) return;
+	if (!sjpcm_inited)
+		return;
 
-    sdt.src = (void *)left;
-    sdt.dest = (void *)(pcmbufl + bufpos);
-    sdt.size = size*2;
-    sdt.attr = 0;
-
-	FlushCache(0);
-
-    i = SifSetDma(&sdt, 1); // start dma transfer
-    while ((wait != 0) && (SifDmaStat(i) >= 0)); // wait for completion of dma transfer
-
-    sdt.src = (void *)right;
-    sdt.dest = (void *)(pcmbufr + bufpos);
-    sdt.size = size*2;
-    sdt.attr = 0;
+	sdt.src = (void *)left;
+	sdt.dest = (void *)(pcmbufl + bufpos);
+	sdt.size = size * 2;
+	sdt.attr = 0;
 
 	FlushCache(0);
 
-    i = SifSetDma(&sdt, 1);
-    while ((wait != 0) && (SifDmaStat(i) >= 0));
+	i = SifSetDma(&sdt, 1);  // start dma transfer
+	while ((wait != 0) && (SifDmaStat(i) >= 0))
+		;  // wait for completion of dma transfer
+
+	sdt.src = (void *)right;
+	sdt.dest = (void *)(pcmbufr + bufpos);
+	sdt.size = size * 2;
+	sdt.attr = 0;
+
+	FlushCache(0);
+
+	i = SifSetDma(&sdt, 1);
+	while ((wait != 0) && (SifDmaStat(i) >= 0))
+		;
 
 	sbuff[0] = size;
-	SifCallRpc(&cd0,SJPCM_ENQUEUE,0,(void*)(&sbuff[0]),64,(void*)(&sbuff[0]),64,0,0);
+	SifCallRpc(&cd0, SJPCM_ENQUEUE, 0, (void *)(&sbuff[0]), 64, (void *)(&sbuff[0]), 64, 0, 0);
 	bufpos = sbuff[3];
-
 }
 
 int SjPCM_Available()
 {
-  if (!sjpcm_inited) return -1;
-  SifCallRpc(&cd0,SJPCM_GETAVAIL,0,(void*)(&sbuff[0]),64,(void*)(&sbuff[0]),64,0,0);
-  return sbuff[3];
+	if (!sjpcm_inited)
+		return -1;
+	SifCallRpc(&cd0, SJPCM_GETAVAIL, 0, (void *)(&sbuff[0]), 64, (void *)(&sbuff[0]), 64, 0, 0);
+	return sbuff[3];
 }
 
 int SjPCM_Buffered()
 {
-  if (!sjpcm_inited) return -1;
-  SifCallRpc(&cd0,SJPCM_GETBUFFD,0,(void*)(&sbuff[0]),64,(void*)(&sbuff[0]),64,0,0);
-  return sbuff[3];
+	if (!sjpcm_inited)
+		return -1;
+	SifCallRpc(&cd0, SJPCM_GETBUFFD, 0, (void *)(&sbuff[0]), 64, (void *)(&sbuff[0]), 64, 0, 0);
+	return sbuff[3];
+}
+
+void SjPCM_SetCallback(unsigned int threshold, void (*cb)(void))
+{
+	if (!sjpcm_inited)
+		return;
+	sbuff[0] = threshold;
+	SifCallRpc(&cd0, SJPCM_SETTHRESHOLD, 0, (void *)(&sbuff[0]), 64, (void *)(&sbuff[0]), 64, 0, 0);
+	_cb = cb;
 }
 
 void SjPCM_Quit()
 {
-	if(!sjpcm_inited) return;
+	if (!sjpcm_inited)
+		return;
 
-	SifCallRpc(&cd0,SJPCM_QUIT,0,(void*)(&sbuff[0]),0,(void*)(&sbuff[0]),0,0,0);
+	SifCallRpc(&cd0, SJPCM_QUIT, 0, (void *)(&sbuff[0]), 0, (void *)(&sbuff[0]), 0, 0, 0);
 	sjpcm_inited = 0;
 }
