@@ -3,7 +3,7 @@
 #include "include/mixer_thread.h"
 #include <kernel.h>
 #include <sjpcm.h>
-
+//todo: kill this sjpcm library no need this
 static sint16 mixbuffer_L[_MIXER_BUFSIZE] __attribute__((aligned (64)));
 static sint16 mixbuffer_R[_MIXER_BUFSIZE] __attribute__((aligned (64)));
 

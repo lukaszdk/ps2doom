@@ -23,8 +23,8 @@ void Mixer_StartThread()
 {
 	extern void *_gp;
 
-	// Create a temporary semaphore that we'll use to wait for the RPC
-	// thread to finish initializing.  */
+	/* Create a temporary semaphore that we'll use to wait for the RPC
+	 thread to finish initializing.  */
 	thread_playsema.init_count = 0;
 	thread_playsema.max_count = 1;
 	if ((thread_waitsema = CreateSema(&thread_playsema)) < 0)

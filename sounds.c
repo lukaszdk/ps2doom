@@ -37,10 +37,9 @@
 #include "include/doomtype.h"
 #include "include/sounds.h"
 
-//
-// Information about all the music
-//
-
+/*****************************
+Information about all the music
+******************************/
 musicinfo_t S_music[] = {
   { 0 },
   { "e1m1", 0 },
@@ -113,9 +112,9 @@ musicinfo_t S_music[] = {
 };
 
 
-//
-// Information about all the sfx
-//
+/********************************
+   Information about the all sfx
+**********************************/
 
 sfxinfo_t S_sfx[] = {
   // S_sfx[0] needs to be a dummy for odd reasons.
