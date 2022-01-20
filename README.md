@@ -60,7 +60,7 @@ Copyright (C) 2016 - 2021 cosmito
 
 Copyright (C) 2016 - 2022 Adilson Enio Pierog(Aka: dirsors)
 
-Copyright (C) 2020 - 2021 7dog123for fixes doom itself and patches
+Copyright (C) 2020 - 2021 
 
 Copyright (C) 2021 - 2022 André Guilherme Mendes Da Luz bastos(aka: Wolf3s)
 
