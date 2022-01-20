@@ -53,7 +53,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <ps2ip.h>
-#include "ps2doom.h"
+#include "include/i_ps2net.h"
 #include <math.h>
 #define IPPORT_USERRESERVED	1024 // ??
 #include "include/i_system.h"
