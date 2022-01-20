@@ -1,7 +1,5 @@
 #include "include/elf_structure.h"
 
-
-
 void GetElfFilename(const char *argv0_probe, char* deviceName, char* fullPath, char* elfFilename)
 {
     int i;
@@ -55,4 +53,35 @@ void GetElfFilename(const char *argv0_probe, char* deviceName, char* fullPath, c
      {
         memcpy(elfFilename, argv0_probe + slashIndex + 1, lenght - slashIndex);
      }
-}    
+}   
+
+int getDisplayModeFromELFName(char **argv)
+{ 
+   char tmp[10]; 
+   int ln = 0,i,j; 
+   ln = strlen(argv[0]); 
+   if (ln>=8) 
+   { 
+     // check for PAL 
+     j=0; 
+     for(i=ln-7; i<=ln-5; i++) 
+     tmp[j++] = argv[0][i]; 
+     tmp[j] = 0;
+
+     if (strcmp(tmp, "PAL") == 0 || strcmp(tmp, "pal") == 0) 
+    return 0; 
+    
+    // check for NTSC 
+    j=0; 
+    for(i=ln-8; i<=ln-5; i++) 
+	tmp[j++] = argv[0][i]; 
+    tmp[j] = 0;
+	
+     if (strcmp(tmp, "NTSC") == 0 || strcmp(tmp, "ntsc") == 0)
+            return 1;
+    }
+   
+    return -1;
+
+}
+													    
