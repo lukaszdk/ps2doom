@@ -107,7 +107,7 @@ void D_DoomLoop (void);
 
 
 char*		wadfiles[MAXWADFILES];
-
+char*           iwadfile;
 
 boolean		devparm;	// started game with -devparm
 boolean         nomonsters;	// checkparm of -nomonsters
@@ -773,6 +773,212 @@ void D_AddFile (char *file)
 //    //I_Error ("Game mode indeterminate\n");
 //}
 
+//check if file exists
+static int FileExists(char *filename)
+{
+   //c++ std::fstream
+   FILE *fstream;
+   
+   fstream = fopen(filename, "r");
+
+   if (fstream != NULL) 
+   { fclose(fstream); return 1; 
+
+   } 
+     else 
+    { 
+	return 0; 
+    }
+}
+
+struct
+{
+    char *name;
+    GameMission_t mission;
+} iwads[] = {
+    {"doom.wad",     doom},
+    {"doom2.wad",    doom2},
+    {"tnt.wad",      pack_tnt},
+    {"plutonia.wad", pack_plut},
+    {"doom1.wad",    doom},
+};
+
+/*
+ Search a directory to try to find an IWAD
+ Returns non-zero if successful
+*/
+static int Find_IWADS_Dir(char *dir)
+{
+   int i; 
+   int result;
+
+   result = 0; 
+   
+   for(i=0; i<sizeof(iwads) / sizeof(*iwads); i++)
+   {
+      char *filename = malloc(strlen(dir) + strlen(iwads[i].name) + 3);
+
+
+      sprintf(filename, "%s/%s", dir, iwads[i].name);
+
+      if (FileExists(filename)) 
+      { 
+	iwadfile = filename; 
+	gamemission = iwads[i].mission; 
+	D_AddFile(filename); 
+	result = 1; 
+	break; 
+      }
+      
+      else 
+      { 
+	free(filename); 
+      }
+   
+   }
+    return result;
+}
+
+/*
+  When given an IWAD with the '-iwad' parameter, this void declaration will try to indentify
+by his name
+*/
+static void IdentifyIWADByName(char *name)
+{
+   int i;
+   
+   for (i=0; i<sizeof(iwads) / sizeof(*iwads);++i) 
+   { 
+      if(strlen(name) < strlen(iwads[i].name))    continue;
+
+      // Check if it ends in this IWAD name.
+      if (!strcasecmp(name + strlen(name) - strlen(iwads[i].name), iwads[i].name)) 
+      { 
+	gamemission = iwads[i].mission; 
+	break; 
+      }
+   }
+  gamemission = none;
+}
+
+/*
+  static void FindIWAD
+
+Description:
+  Checks availability of IWAD files by name, 
+  to determine whether registered/commercial features 
+  should be executed (notably loading PWAD's).
+
+*/
+
+static void FindIWAD (void)
+{ 
+  char *doomwaddir; 
+  int result; 
+  int iwadparm;
+
+  result = 0; 
+  doomwaddir = getenv("DOOMWADDIR"); 
+  iwadparm = M_CheckParm("-iwad");
+
+  if (iwadparm)
+  {
+    iwadfile = myargv[iwadparm + 1]; 
+    D_AddFile(iwadfile); 
+    IdentifyIWADByName(iwadfile); 
+    result = 1;
+  }
+  
+  else if (doomwaddir != NULL) 
+  {
+    result = Find_IWADS_Dir(doomwaddir);
+  }
+  
+  if (result == 0)
+  {
+    result = Find_IWADS_Dir(".") 
+    || Find_IWADS_Dir("/usr/share/games/doom") 
+    || Find_IWADS_Dir("/usr/local/share/games/doom");
+  }
+
+  if (result == 0)
+  {
+     I_Error("Game mode indeterminate. No IWAD file was found. Try\n" "specifying one with the '-iwad' command line parameter.\n");
+  }
+
+}
+
+/*
+Find out what version of Doom IWAD is playing.
+*/
+static void IdentifyVersion(void)
+{
+/*
+gamemission is set up by the FindIWAD function. But if we specify '-iwad', we have to identify using Identify_IWAD_By_Name() However, if the iwad doesn't match any known IWAD name,we may have a dilemma. Try to identify by its contents. 
+*/
+  if (gamemission == none)
+  {
+    int i;
+
+    for (i=0; i<numlumps; ++i) 
+    { 
+      if (!strncasecmp(lumpinfo[i].name, "MAP01", 8)) 
+      { 
+	gamemission = doom2; 
+	break; 
+      } 
+      
+      else if (!strncasecmp(lumpinfo[i].name, "E1M1", 8)) 
+      { 
+	gamemission = doom; break; 
+      } 
+    }  
+  }
+
+  if (gamemission == none) 
+  { 
+   // Still no idea. I don't think this is going to work.  
+    I_Error("Unknown or invalid IWAD file."); 
+  }
+
+   if (gamemission == doom) 
+   {
+    // Doom 1. But which version?
+    if (W_CheckNumForName("E4M1") > 0) 
+    { 
+     // Ultimate Doom
+      gamedescription = "The Ultimate DOOM"; 
+      gamemode = retail; 
+    } 
+
+    else if(W_CheckNumForName("E3M1") > 0) 
+    { 
+	gamedescription = "DOOM Registered"; 
+	gamemode = registered; 
+    }
+
+    else 
+    { 
+     gamedescription = "DOOM Shareware"; 
+     gamemode = shareware; 
+    }
+  }
+  
+  else 
+  {
+    //Doom 2 of some kind.  But which mission?
+    gamemode = commercial;
+    if (gamemission == doom2) 
+	gamedescription = "DOOM 2: Hell on Earth"; 
+    else if (gamemission == pack_plut) 
+    gamedescription = "DOOM 2: Plutonia Experiment"; 
+    else if (gamemission == pack_tnt) 
+    gamedescription = "DOOM 2: TNT - Evilution"; }
+  
+  printf(gamedescription, "%s\n");
+
+
+}
 
 int waitPadReady(int port, int slot) {
     int state;
@@ -795,8 +1001,8 @@ int waitPadReady(int port, int slot) {
         printf("Pad OK!\n");
     }
     return 0;
-}
 
+}
 
 int initializePad(int port, int slot) {
     int ret;
@@ -1412,7 +1618,9 @@ void D_DoomMain (void)
     FindResponseFile ();
 	
     IdentifyVersionAndSelect();
-	
+    
+    FindIWAD();
+
     setbuf (stdout, NULL);
     modifiedgame = false;
 	
