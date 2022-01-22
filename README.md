@@ -1,7 +1,7 @@
 PS2Doom WIP
 ===========
 
-A working in progress PlayStation 2 port
+A working in progress DOOM PlayStation 2 port
 
 Requires PS2SDK, gsKit, SDL isjpcm for PS2 to compile.
 
@@ -60,7 +60,7 @@ Copyright (C) 2016 - 2021 cosmito
 
 Copyright (C) 2016 - 2022 Adilson Enio Pierog(Aka: dirsors)
 
-Copyright (C) 2020 - 2021 
+Copyright (C) 2020 - 2021 7dog123
 
 Copyright (C) 2021 - 2022 André Guilherme Mendes Da Luz bastos(aka: Wolf3s)
 
