@@ -1,6 +1,7 @@
-#include <string.h>
 
+#include "include/s_sound.h"
 #include "include/d_main.h"
+
 
 /****************************************************************************
 ** ps2doom cheat support - code typing and command line
@@ -49,10 +50,17 @@ void ps2_do_cheat(int cheat)
 	   str = "idbeholdl";
 	   break;
 	   case 13: 
-	   str = "no_sound";
-	   SjPCM_Pause();
-	   default:
+	   str = "no_sound"; //Deactivates thesound
+          // wip SjPCM_Pause()
 	   return;
+           break;
+	   
+	   case 14: 
+	   str = "no_music";
+           S_StopMusic();
+	   return;
+	   break;
+	   
 
        }
 
