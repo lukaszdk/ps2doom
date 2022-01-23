@@ -113,13 +113,10 @@ typedef enum
 // Defines suck. C sucks.
 // C++ might sucks for OOP, but it sure is a better C.
 // So there.
-#define SCREENWIDTH  320
+#define SCREENWIDTH  640
 //SCREEN_MUL*BASE_WIDTH //320
-#define SCREENHEIGHT 200
+#define SCREENHEIGHT 480
 //(int)(SCREEN_MUL*BASE_WIDTH*INV_ASPECT_RATIO) //200
-
-
-
 
 // The maximum number of players, multiplayer/networking.
 #define MAXPLAYERS		4
@@ -130,6 +127,7 @@ typedef enum
 // The current state of the game: whether we are
 // playing, gazing at the intermission screen,
 // the game final animation, or a demo.
+
 typedef enum
 {
     GS_LEVEL,
