@@ -1,11 +1,10 @@
 
 - create Web repository for sources, patches,
   news, and pointer to doom-editing mailing
-  list.
+  list.(I dunno why this but maybe this can be a good idea)
 
-- get DOOM Public License from id
-Done
------------------------------------------------
+- get DOOM Public License from id(Done)
+----------------------------------------------
 
 - remove m_fixed, switch to floating point
   More stable, and prolly even faster.
@@ -15,16 +14,16 @@ Done
   scales implied by the graphics. Rather do
   GLDOOM and use texture mapping.
 
-- adjust aspect ratio?
+- adjust aspect ratio to 640x480?
   320x200 is nothing viable nowadays.
   A 320x240 base (4:3) would be a lot better.
-  See above on width/height.
-  Done
+  See above on width/height.(Done)
  
 - limited look up/down by y-shearing?
-  Prolly not worth it, rather switch to GLDOOM.
+  Prolly not worth it, rather switch to GLDOOM
+(GLdoom? lol i would use ps2gl or gsKit but this is nosense)
 
-- switch to C++?
+- switch to C++?(Why a rewrite?)
   The action function pointers have varying
   argument lists (no parameter, one, etc.).
   C++ doesn't like that much. A major rewrite.
@@ -68,7 +67,7 @@ Done
    sky texture (done by game version).
    Explicit?
 
-- remove all game version checks
+- remove all game version checks(Done)
 
 - different handling of Demo - don't
    exit on "different game version"
@@ -109,9 +108,9 @@ Done
 
 - clip explosion range damage (and sprites) using
    REJECT? That is, if one Sector/SSector not
-   visible from the other, do not apply damage,
-   not render sprite if player in other sector.
-   Hmmm - explosion behind small pillar might not be
+   visible from the other, do not apply damage,not render sprite if player in other sector.
+ 
+ Hmmm - explosion behind small pillar might not be
    visible at all, but do we care?
 
 
