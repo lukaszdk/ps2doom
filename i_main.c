@@ -244,130 +244,11 @@ int getFileSize(int fd)
 
 void InitDoomed_screen()
 {
-    int fd;
-    int MC0F;
-    int MC1F;
-    int MC0T;
-    int MC1T;
-    char MC0EXEC;
-    char MC1EXEC;
-    char folder; 
-    char device;
-    char target;
-    char path;
-    char MC0DIR = "mc0:/";
-    char MC1DIR = "mc1:/";
-    float BOOT; 
-    float BOOT2;
-    int FMCB;
-    int revision;
-
+  
     init_scr();
     scr_printf("--==== PS2DOOM v1.0.5.0 ====--\n\n\n");
     scr_printf("A Doom PS2 port started by Lukasz Bruun, improved by cosmito and modified by wolf3s\n\n\n");
     scr_printf ("thanks to Wally modder, Dirsors, fjtrujy, Howling Wolf & Chelsea, Squidware, el irsa and the good old friend TnA plastic");
-    fioClose(fd);
-
-    fd = fioOpen("mc0:/FORTUNA/icon.icn", O_RDONLY);
-	if (getFileSize(fd) == 51040){
-		MC0T = 1;
-		strcpy(revision, "rev1");
-	} else if (getFileSize(fd) == 16876){
-		MC0T = 1;
-		strcpy(revision, "rev2");
-	}
-	fioClose(fd);
-	fd = fioOpen("mc1:/FORTUNA/icon.icn", O_RDONLY);
-	if (getFileSize(fd) == 51040){
-		MC1T = 1;
-		strcpy(revision, "rev1");
-	} else if (getFileSize(fd) == 16876){
-		MC1T = 1;
-		strcpy(revision, "rev2");
-	}
-	if(MC0T == 1){ scr_printf("FORTUNA %s detected on Memory Card 1! \n"); }
-	if(MC1T == 1){ scr_printf("FORTUNA %s detected on Memory Card 2! \n"); }
-	fioClose(fd);
-	strncat(MC0DIR,S_IEXEC,25);
-	fd = fioOpen(MC0DIR, O_RDONLY);
-	if (fd <= 0){
-	} else 
-    {
-		scr_printf("FMCB detected on Memory Card 1! \n");
-		MC0F = 1;
-	}
-	fioClose(fd);
-	strncat(MC1DIR,S_IEXEC,25);
-	fd = fioOpen(MC1DIR, O_RDONLY);
-	if (fd <= 0){
-	} else {
-		scr_printf("FMCB detected on Memory Card 2! \n");
-		MC1F = 1;
-	}
-	fioClose(fd);
-	fd = fioOpen("mc0:/FORTUNA/BOOT2.ELF", O_RDONLY);
-	if (fd <= 0){
-	} else {
-		scr_printf("BOOT2.ELF available on Memory Card 1! \n");
-		MC0T = 1;
-		BOOT2 = 1;
-	}
-	fioClose(fd);
-	fd = fioOpen("mc1:/FORTUNA/BOOT2.ELF", O_RDONLY);
-	if (fd <= 0){
-	} else {
-		scr_printf("BOOT2.ELF available on Memory Card 2! \n");
-		MC1T = 1;
-		BOOT2 = 1;
-	}
-	if (FMCB == 1){
-		if (MC0F == 1){	
-			char *args[3];
-			strncpy(MC0EXEC,"-x ",3);
-			strncat(MC0EXEC,MC0DIR,33);
-			args[0] = "-m rom0:SIO2MAN";
-			args[1] = "-m rom0:MCMAN";
-			args[2] = MC0EXEC;
-			scr_printf("Launching FMCB ... \n");
-			LoadExecPS2("moduleload", 3, args);
-			}
-		if (MC1F == 1){
-			char *args[3];
-			strncpy(MC1EXEC,"-x ",3);
-			strncat(MC1EXEC,MC1DIR,33);
-			args[0] = "-m rom0:SIO2MAN";
-			args[1] = "-m rom0:MCMAN";
-			args[2] = MC1EXEC;
-			scr_printf("Launching FMCB ... \n");
-			LoadExecPS2("moduleload", 3, args);
-			}
-
-	}
-	if (BOOT2 == 1 && FMCB == 0)
-    {
-		if (MC0T == 1)
-        {
-			strncpy(device,"mc0:",5);
-			strncpy(folder,"/FORTUNA/",10);
-			target = device;
-			strncat(target,folder,14);
-			path = target;
-			strcat(target,"BOOT2.ELF");
-		}
-		if (MC1T == 1)
-        {
-			strncpy(device,"mc1:",5);
-			strncpy(folder,"/FORTUNA/",10);
-			target = device;
-			strncat(target,folder,14);
-			path = target;
-			strcat(target,"BOOT2.ELF");
-			}
-		scr_printf("Launching BOOT2.ELF ... \n");
-		SifLoadElf(target,path);	
-	}
-    strncat(S_IEXEC,"/osdmain.elf",12);
-	fioClose(fd);
 
 }
 
@@ -414,10 +295,8 @@ int LoadModuleFio()
     // USB mass support
     SifExecModuleBuffer(usbd, size_usbd, 0, NULL, &ret);
     SifExecModuleBuffer(usbhdfsd, size_usbhdfsd, 0, NULL, &ret);   
-}
 
-void loadHdd_modules_and_load()
-{
+// hdd modules thing
     FILE *fp;
     int i, j, nj;
     const char *s;
@@ -427,7 +306,6 @@ void loadHdd_modules_and_load()
     char deviceName[10];
     char fullPath[256];
     int use_hdd;
-    int ret;
     const char *hdd_path_to_partition;
     use_hdd = CONFIG_FALSE;
     if(use_hdd == CONFIG_TRUE)
@@ -536,10 +414,8 @@ void loadHdd_modules_and_load()
             printf("found: %s = %d\n", config_probestring, use_hdd);
         }
     }    
+
 }
-
-// Check if ELF name ends with PAL, pal, NTSC, ntsc.
-
 
 //main
 int main( int argc, char**	argv ) 
@@ -598,9 +474,7 @@ int main( int argc, char**	argv )
     
     printf("sample: kicking IRXs\n");
 
-//load hdd device 
-//#endif
-    loadHdd_modules_and_load();
+
 
 	// Since this is the first call, -1 should be returned.
 	mcGetInfo(0, 0, &mc_Type, &mc_Free, &mc_Format); 
