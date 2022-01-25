@@ -311,8 +311,8 @@ void W_InitMultipleFiles (char** filenames)
 	//I_Error ("W_InitFiles: no files found");
     {
         scr_clear();
-        scr_printf ("\n\nERROR at W_InitFiles: no files found\n\n");
-        scr_printf (" Put a .WAD file along with PS2Doom.elf before running it or check if HDD paths are correct at ps2doom.config.\n\n");
+        //scr_printf ("\n\nERROR at W_InitFiles: no files found\n\n");
+        printf (" Put a .WAD file along with PS2Doom.elf before running it or check if HDD paths are correct at ps2doom.config.\n\n");
         SleepThread();
     }
     

@@ -20,62 +20,62 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef __D_ENGLSH__
-#define __D_ENGLSH__
+#ifndef __D_PORTUGUESE__
+#define __D_PORTUGUESE__
 
 //
 //	Strings printadas para tradução
 //
 
 //
-// D_Main.C
+// d_main.c
 //
 #define D_DEVSTR	"Modo de desenvolvimento LIGADO.\n"
 #define D_CDROM	"Versão de CD-ROM: default.cfg de c:\\doomdata\n"
 
 //
-//	M_Menu.C
+//	m_menu.c
 //
-#define PRESSKEY 	"press a key."
-#define PRESSYN 	"press y or n."
-#define QUITMSG	"are you sure you want to\nquit this great game?"
-#define LOADNET 	"you can't do load while in a net game!\n\n"PRESSKEY
-#define QLOADNET	"you can't quickload during a netgame!\n\n"PRESSKEY
-#define QSAVESPOT	"you haven't picked a quicksave slot yet!\n\n"PRESSKEY
-#define SAVEDEAD 	"you can't save if you aren't playing!\n\n"PRESSKEY
-#define QSPROMPT 	"quicksave over your game named\n\n'%s'?\n\n"PRESSYN
-#define QLPROMPT	"do you want to quickload the game named\n\n'%s'?\n\n"PRESSYN
+#define PRESSKEY 	"aperte um botão."
+#define PRESSYN 	"aperte y ou n."
+#define QUITMSG	"tem certeza que você quer\nsair desse ótimo jogo?"
+#define LOADNET 	"você não pode carregat emquanto estiver em um jogo na rede local!\n\n"PRESSKEY
+#define QLOADNET	"você não pode carregar rápido durante um jogo na rede local!\n\n"PRESSKEY
+#define QSAVESPOT	"você ainda não pegou um slot de save rápido!\n\n"PRESSKEY
+#define SAVEDEAD 	"você nãk pode salvar enquanto não estiver jogando!\n\n"PRESSKEY
+#define QSPROMPT 	"desseja usar um save rápido em cima do seu jogo nomeado\n\n'%s'?\n\n"PRESSYN
+#define QLPROMPT	"você quer fazer um carregamento rápido do jogo nomeado\n\n'%s'?\n\n"PRESSYN
 
 #define NEWGAME	\
-"you can't start a new game\n"\
-"while in a network game.\n\n"PRESSKEY
+"Você não pode iniciar um novo jogo\n"\
+"enquanto em jogo na rede local.\n\n"PRESSKEY
 
 #define NIGHTMARE	\
-"are you sure? this skill level\n"\
-"isn't even remotely fair.\n\n"PRESSYN
+"Você tem certeza? em usar esse nivel de dificuldade \n"\
+"isso nem é remotamente justo.\n\n"PRESSYN
 
 #define SWSTRING	\
-"this is the shareware version of doom.\n\n"\
-"you need to order the entire trilogy.\n\n"PRESSKEY
+"essa é uma versão código aberto do doom.\n\n"\
+"você não precisa pagar toda trilogia já que é de graça.\n\n"PRESSKEY
 
-#define MSGOFF	"Messages OFF"
-#define MSGON		"Messages ON"
-#define NETEND	"you can't end a netgame!\n\n"PRESSKEY
-#define ENDGAME	"are you sure you want to end the game?\n\n"PRESSYN
+#define MSGOFF	 "Mensagens DESLIGADAS"
+#define MSGON		"Mensagens LIGADAS"
+#define NETEND	"você não pode encerrar um jogo de rede local!\n\n"PRESSKEY
+#define ENDGAME	"você tem certeza de que você quer acabar o jogo?\n\n"PRESSYN
 
-#define DOSY		"(press y to quit)"
+#define DOSY		"(aperte y para sair)"
 
-#define DETAILHI	"High detail"
-#define DETAILLO	"Low detail"
-#define GAMMALVL0	"Gamma correction OFF"
-#define GAMMALVL1	"Gamma correction level 1"
-#define GAMMALVL2	"Gamma correction level 2"
-#define GAMMALVL3	"Gamma correction level 3"
-#define GAMMALVL4	"Gamma correction level 4"
-#define EMPTYSTRING	"empty slot"
+#define DETAILHI	"Alto detalhe High detail"
+#define DETAILLO	"Baixo detalhe"
+#define GAMMALVL0	"Correção de Gama DESLIGADA"
+#define GAMMALVL1	"Correcão de Gama nível 1"
+#define GAMMALVL2	"Correção de Gama nível 2"
+#define GAMMALVL3	"Correção de Gama nível 3"
+#define GAMMALVL4	"Correção de Game nível 4"
+#define EMPTYSTRING	"slot vazio"
 
 //
-//	P_inter.C
+//	p_inter.c
 //
 #define GOTARMOR	"Picked up the armor."
 #define GOTMEGA	"Picked up the MegaArmor!"
@@ -699,4 +699,5 @@
 // $Log:$
 //
 //-----------------------------------------------------------------------------
+
 

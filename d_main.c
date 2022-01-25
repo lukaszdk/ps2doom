@@ -1867,7 +1867,7 @@ void D_DoomMain (void)
     // If additonal PWAD files are used, print modified banner
     if (modifiedgame)
     {
-	/*m*/scr_printf 
+	/*m*/printf 
     (
 	"===========================================================================\n"
 	"     PS2DOOM is free software, covered by the DOOM Source Code\n               "
@@ -1885,7 +1885,7 @@ void D_DoomMain (void)
     {
       case shareware:
       case indetermined:
-	scr_printf (
+	printf (
 	    "===========================================================================\n"
 	    "                                Open source!\n"
 	    "===========================================================================\n"
@@ -1894,7 +1894,7 @@ void D_DoomMain (void)
       case registered:
       case retail:
       case commercial:
-	scr_printf (
+	printf (
 	    "===========================================================================\n"
 	    "         Open source product - you can do distributions or modify the code!\n"
 	    "         However you cannot comercialy sell the product                      "
