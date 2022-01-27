@@ -1,9 +1,13 @@
-// TBD : ver se é preciso mais alguma coisa
+/* TBD: 
+ PT:BR Verrificar se é preciso mais alguma coisa
+ EN-US: See if needs more something.
+*/
 
 #include "include/z_zone.h"
 #include "include/i_system.h"
 #include "include/w_wad.h"
 #include <string.h>
+
 static struct
 {
   void *cache;
@@ -46,8 +50,6 @@ const void* W_LockLumpNum(int lump)
 
   if (!cachelump[lump].cache) 
   { 
-
-
     // read the lump in
     Z_Malloc(len, PU_CACHE, &cachelump[lump].cache);
     memcpy(cachelump[lump].cache, data, len);
@@ -74,7 +76,6 @@ const void* W_LockLumpNum(int lump)
 
   return cachelump[lump].cache;
 }
-
 
 void W_UnlockLumpNum(int lump)
 {

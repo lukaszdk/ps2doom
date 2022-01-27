@@ -1,6 +1,7 @@
-
-EE_OBJS = am_map.o cosmito_wav.c elf_structure.c d_command.c  d_items.o d_main.o d_net.o doomdef.o doomstat.o \
-dstrings.o f_finale.o f_wipe.o g_game.o hu_lib.o hu_stuff.o  \
+EE_OBJS = am_map.o cosmito_wav.c d_command.c d_items.o d_main.o d_net.o doomdef.o doomstat.o dstrings.o \
+elf_structure.o f_finale.o f_wipe.o \
+g_game.o \
+hu_lib.o hu_stuff.o \
 i_main.o i_net.o i_sound.o i_system.o i_video.o info.o m_argv.o m_bbox.o \
 m_cheat.o m_fixed.o m_menu.o m_misc.o m_random.o m_swap.o mixer_thread.o mixer.o mmus2mid.o p_ceilng.o \
 p_doors.o p_enemy.o p_floor.o p_inter.o p_lights.o p_map.o p_maputl.o \

@@ -3,7 +3,7 @@ PS2Doom WIP
 
 A working in progress DOOM PlayStation 2 port
 
-Requires PS2SDK, gsKit, SDL isjpcm for PS2 to compile.
+Requires PS2SDK, gsKit, SDL, isjpcm for PS2 to compile.
 
 Buildable with: make all
 
@@ -35,9 +35,9 @@ Lukasz D.K for the quick port
 
 Cosmito for upgrade the port
 
-Adison(aka: dirsors) for the patches and fixes
+Adison Enio Pierog (aka: dirsors) for the patches and fixes
 
-fjtrujy
+fjtrujy for help
 
 Wally modder for ideas and direction
 
