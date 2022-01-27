@@ -1386,7 +1386,7 @@ void IdentifyVersionAndSelect (void)        // cosmito
     if (nWadsFound > 0)
     {
         scr_setXY(0,y);
-        scr_printf("->");
+        scr_setCursor("->");
 
         int butres = 0;
         u32 old_pad = 0;
@@ -1408,22 +1408,22 @@ void IdentifyVersionAndSelect (void)        // cosmito
             if(butres == PAD_UP)
             {
                 scr_setXY(0,y);
-                scr_printf("  ");
+                scr_setCursor("  ");
                 y--;
                 if(y < ymin)
                     y = ymin;
                 scr_setXY(0,y);
-                scr_printf("->");
+                scr_setCursor("->");
             }
             else if(butres == PAD_DOWN)
             {
                 scr_setXY(0,y);
-                scr_printf("  ");
+                scr_setCursor("  ");
                 y++;
                 if(y > ymax)
                     y = ymax;
                 scr_setXY(0,y);
-                scr_printf("->");
+                scr_setCursor("->");
             }
             else if(butres == PAD_CROSS || butres == PAD_CIRCLE)
             {
