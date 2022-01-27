@@ -1,8 +1,8 @@
 #include <tamtypes.h>
 #include <stdio.h>
 #include <kernel.h>
+#include <tcpip.h>
 #include <math.h>
-#include "ps2doom.h"
 
 extern double pow (double a, double b)
 {
