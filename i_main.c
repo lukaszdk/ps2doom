@@ -66,7 +66,8 @@ static char s_pUDNL   [] __attribute__(   (  section( ".data" ), aligned( 1 )  )
 #include <kernel.h>     //for GetThreadId 
 #include <libmc.h>
 
-#include "include/cosmitoFileIO.h"
+#include "include/cosmito_wav.h"
+#include "include/elf_structure.h"
 
 
 //Declare usbd module //
@@ -114,8 +115,6 @@ unsigned int size_cdvd;
 //#endif
 
 extern int SAMPLECOUNT = 512;
-
-int getDisplayModeFromELFName(char **argv);
 
 /// ------------------------- por em .h
 //typedef enum
@@ -229,9 +228,9 @@ void ResetIOP()
 	while(!SifIopReset("", 0)){};
 	while(!SifIopSync()){};
 	SifLoadFileExit();
-    SifExitRpc();
-    SifInitRpc(0);
-    ResetIOP();
+        SifExitRpc();
+        SifInitRpc(0);
+        ResetIOP();
 	SifInitIopHeap();
 }
 
@@ -320,13 +319,12 @@ int LoadModuleFio()
         if (ret < 0)
         {
             printf("Failed to load module: PS2HDD.IRX");
-            scr_printf("Failed to load module: PS2HDD.IRX");
+            //scr_printf("Failed to load module: PS2HDD.IRX");
         }
         static char pfsarg[] = "-m" "\0" "4" "\0" "-o" "\0" "10" "\0" "-n" "\0" "40";
         SifExecModuleBuffer(ps2fs, size_ps2fs, sizeof(pfsarg), pfsarg, &ret);
         if (ret < 0)
         {
-            scr_printf("Failed to load module: PS2FS.IRX");
             printf("Failed to load module: PS2FS.IRX");
         }
         //#endif
