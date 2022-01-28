@@ -32,8 +32,6 @@
 ** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **-------------------------------------------*/
 
-#include "w_wad.h"
-#include "doomtype.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -45,128 +43,79 @@
 #endif
 #endif
 
-#define IWAD_ID		MAKE_ID('I','W','A','D')
-#define PWAD_ID		MAKE_ID('P','W','A','D')
+#define PWAD_ID	MAKE_ID('P','W','A','D')
+
+typedef struct
+{ 
+  char identification[4];  
+  int numlumps; 
+  int infotableofs;
+} pwadinfo_t;
+
+typedef struct
+{ 
+   int filepos; 
+   int size; 
+   char name[8];
+} filelump_t;
+
+typedef enum 
+{ 
+  // CPhipps - define elements in order of 'how new/unusual' 
+  source_pre, // predefined lump 
+  source_auto_load, // lump auto-loaded by config file 
+  source_pwad, // pwad file load 
+  source_lmp, // lmp file load 
+  source_net // CPhipps 
+  //e6y//  
+  ,source_deh 
+  ,source_err
+} pwad_source_t;
+
+// CPhipps - changed wad init// We _must_ have the wadfiles[] the same as those actually loaded, so there // is no point having these separate entities. This belongs here.
+
+typedef struct 
+{ 
+  char* name; 
+  pwad_source_t src; 
+  int handle;
+} pwadfile_info_t;
+
+extern pwadfile_info_t *pwadfiles;
+
+extern size_t numwadfiles; // CPhipps - size of the wadfiles array
 
 
-inline bool P_IsBuildMap(MapData *map)
+typedef enum
+{ 
+  ns_global=0, 
+  ns_sprites, 
+  ns_flats, 
+  ns_colormaps, 
+  ns_ps2doom, 
+  ns_demos, 
+  ns_hires //e6y
+} li_namespace_e; // haleyjd 05/21/02: renamed from "namespace"
+
+typedef struct
 {
-	return false;
-}
+  // WARNING: order of some fields important (see info.c).
 
-//===========================================================================
-//
-// GetMapIndex
-//
-// Gets the type of map lump or -1 if invalid or -2 if required and not found.
-//
-//===========================================================================
+  char  name[9];
+  int   size;
 
-struct checkstruct
-{
-	const char lumpname[9];
-	bool  required;
-};
+  // killough 1/31/98: hash table fields, used for ultra-fast hash table lookup
+  int index, next;
 
-static const struct checkstruct check[] = 
-	{
-		{"",		 true},
-		{"THINGS",	 true},
-		{"LINEDEFS", true},
-		{"SIDEDEFS", true},
-		{"VERTEXES", true},
-		{"SEGS",	 false},
-		{"SSECTORS", false},
-		{"NODES",	 false},
-		{"SECTORS",	 true},
-		{"REJECT",	 false},
-		{"BLOCKMAP", false},
-		{"BEHAVIOR", false},
-		//{"SCRIPTS",	 false},
-	};
+  // killough 4/17/98: namespace tags, to prevent conflicts between resources
+  li_namespace_e li_namespace; // haleyjd 05/21/02: renamed from "namespace"
+ pwadfile_info_t *pwadfile; 
+ int position; 
+ pwad_source_t source; 
+ int flags; //e6y
+} lumpinfo_t;
 
-struct MapData
-{
-   struct ResourceHolder	
-   {		
-	int *data = NULL;
-   
-     const char ResourceDel()
-     {
-	 delete data;
-     }
-     //TBD: Resource file
-     //ResourceHolder &operator=(FResourceFile *other) { data = other; return *this; }
-		//FResourceFile *operator->() { return data; }
-		//operator FResourceFile *() const { return data; }
+#define LUMP_STATIC 0x00000001 /* assigned gltexture should be static */
 
-   } 
-   
-   // The order of members here is important
-	// Resource should be destructed after MapLumps as readers may share FResourceLump objects
-	// For example, this is the case when map .wad is loaded from .pk3 file
-     	ResourceHolder resource;
-
-      struct MapLump
-	{
-	  char Name[8] = { 0 };
-	  FileReader Reader;
-	} MapLumps[ML_MAX];
-	FileReader nofile;
-
-	bool HasBehavior = false;
-	bool isText = false;
-	bool InWad = false;
-	int lumpnum = -1;
-
-        /*Todo:	
-void Seek(unsigned int lumpindex)	{		if (lumpindex<countof(MapLumps))		{			file = &MapLumps[lumpindex].Reader;			file->Seek(0, FileReader::SeekSet);		}	}
-	 
-FileReader &Reader(unsigned int lumpindex)
-	{
-		if (lumpindex < countof(MapLumps))
-		{
-			auto &file = MapLumps[lumpindex].Reader;
-			file.Seek(0, FileReader::SeekSet);
-			return file;
-		}
-		return nofile;
-	}
-
-        FileReader &Reader(unsigned int lumpindex)	{		if (lumpindex < countof(MapLumps))		{			auto &file = MapLumps[lumpindex].Reader;			file.Seek(0, FileReader::SeekSet);			return file;		}		return nofile;	}
-
-        TArray<uint8_t> Read(unsigned lumpindex)	{		TArray<uint8_t> buffer(Size(lumpindex), true); 		Read(lumpindex, buffer.Data(), (int)buffer.Size());		return buffer;	} 	uint32_t Size(unsigned int lumpindex)	{		if (lumpindex<countof(MapLumps) && MapLumps[lumpindex].Reader.isOpen())		{			return (uint32_t)MapLumps[lumpindex].Reader.GetLength();		}		return 0;	} 	bool CheckName(unsigned int lumpindex, const char *name)	{		if (lumpindex < countof(MapLumps))		{			return !strnicmp(MapLumps[lumpindex].Name, name, 8);		}		return false;	}
-
-void GetChecksum(uint8_t cksum[16];
-friend class MapLoader;	
-friend MapData *P_OpenMapData(const char * mapname, bool justcheck);
-*/
-
-}
-  
-
-
-
-static int GetMapIndex(const char *mapname, int lastindex, const char *lumpname, bool needrequired);
-
-//===========================================================================
-//
-// Opens a map for reading
-//
-//===========================================================================
-
-MapData *P_OpenMapData(const char * mapname, bool justcheck);
-
-bool P_CheckMapData(const char *mapname);
-
-//===========================================================================
-//
-// GetChecksum
-//
-// Hashes a map based on its header, THINGS, LINEDEFS, SIDEDEFS, SECTORS,
-// and BEHAVIOR lumps. Node-builder generated lumps are not included.
-//
-//===========================================================================
-
-void GetChecksum(uint8_t cksum[16]);
-
+extern lumpinfo_t *lumpinfo;
+extern int numlumps;
