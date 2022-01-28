@@ -35,7 +35,7 @@ Lukasz D.K for the quick port
 
 Cosmito for upgrade the port
 
-Adison Enio Pierog (aka: dirsors) for the patches and fixes
+Adilson Enio Pierog (aka: dirsors) for the patches and fixes
 
 fjtrujy for help
 
