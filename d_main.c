@@ -816,7 +816,8 @@ static int Find_IWADS_Dir(char *dir)
    
    for(i=0; i<sizeof(iwads) / sizeof(*iwads); i++)
    {
-      char *filename = malloc(strlen(dir) + strlen(iwads[i].name) + 3);
+    //todo:Zalloc here
+    char *filename = malloc(strlen(dir) + strlen(iwads[i].name) + 3);
 
 
       sprintf(filename, "%s/%s", dir, iwads[i].name);

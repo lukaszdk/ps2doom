@@ -1,12 +1,13 @@
 #ifndef _MIXER_H
 #define _MIXER_H
 
-#define _MIXER_MAXCHANNELS 8    // TBD
+#define _MIXER_MAXCHANNELS 8    // TBD: add SDL2 Mixer
 #define _MIXER_BUFSIZE  960
 
 typedef signed short sint16;
 typedef signed int sint32;
 
+///
 /// Section Init
 ///
 void Mixer_SetMode();
@@ -20,8 +21,19 @@ int  PlaySampleAtChannel(int selected_channel, sint16 * sampleAddress, int sampl
 int  StopSampleAtChannel(int selected_channel);
 int  IsPlayingAtChannel(int chan);
 
-// se fizer um resume, testar se o channel.counter > 0 ... assim distingue-se entre um stop (.counter == 0) e um pause.
+/*
+PT:BR se fizer um resume, ele vai testar se o channel.counter > 0 ... assim ele mesmo se distinguirá entre um stop (.counter == 0) e um pause.
 
+EN-US: if he makes an resmume, he will be testing if the channel.counter > 0 ... then he will choose between an stop (.counter > 0) and a pause  
+
+void Mixer(char *file)
+{
+   channel->counter;
+}
+
+*/
+
+///
 /// Section B
 ///
 void Mixer_Tick();
@@ -37,5 +49,5 @@ typedef struct
 
 } channel;
 
-// uso : array channels : channel channels[]
+// use : array channels : channel channels[]
 #endif
