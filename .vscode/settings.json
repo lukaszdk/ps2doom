@@ -84,6 +84,10 @@
         "math.h": "c",
         "iopcontrol.h": "c",
         "typeinfo": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "pad_support.h": "c",
+        "elf.h": "c",
+        "elf_structure.h": "c",
+        "debug.h": "c"
     }
 }

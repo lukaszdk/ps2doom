@@ -1,9 +1,43 @@
 #include "include/elf_structure.h"
+#include <elf.h>
+#include <stdlib.h>
+#include <libcdvd-common.h>
+
+typedef struct
+ {
+     u8 ident[16];  // struct definition for ELF object header
+     u16 type;
+     u16 machine;
+     u32 version;
+     u32 entry;
+     u32 phoff;
+     u32 shoff;
+     u32 flags;
+     u16 ehsize;
+     u16 phentsize;
+     u16 phnum;
+     u16 shentsize;
+     u16 shnum;
+     u16 shstrndx;
+ } elf_header_t;
+  
+ typedef struct
+ {
+     u32 type;  // struct definition for ELF program section header
+     u32 offset;
+     void *vaddr;
+     u32 paddr;
+     u32 filesz;
+     u32 memsz;
+     u32 flags;
+     u32 align;
+ } elf_pheader_t;
+  
 
 void GetElfFilename(const char *argv0_probe, char* deviceName, char* fullPath, char* elfFilename)
 {
     int i;
-
+    
     int lenght = strlen(argv0_probe); 
     int twopointsindex  = 0; 
     int slashIndex = 0; 
@@ -85,18 +119,26 @@ int getDisplayModeFromELFName(char **argv)
 
 }
 					
-/*
-// Hwc code thanks for it(WIP)
 
-void elf_loader(){
-// Load & execute embedded loader from here
+
+void elf_loader()
+{
+    char args;
+    int i;
+    char boot_elf;
+    char CNF_RAM_p;
+    char CDVD_INIT_EXIT;
+       elf_header_t *boot_header;
+    elf_pheader_t *boot_pheader; 
+    // Load & execute embedded loader from here
     boot_elf = (u8 *)&elf_loader;
 
     // Get Elf header
-    boot_header = (elf_header_t )boot_elf;
+    boot_header;
+    
 
     // Check elf magic
-    if (((u32*)boot_header->ident) != ELF_MAGIC)
+    if (((u32*)boot_header->ident) != ELFMAG)
         return;
 
     // Get program headers
@@ -106,7 +148,7 @@ void elf_loader(){
     // section, then padd with zeros if needed.
     for (i = 0; i < boot_header->phnum; i++) {
 
-        if (boot_pheader[i].type != ELF_PT_LOAD)
+        if (boot_pheader[i].type != PT_LOAD)
             continue;
 
         memcpy(boot_pheader[i].vaddr, boot_elf + boot_pheader[i].offset, boot_pheader[i].filesz);
@@ -117,11 +159,11 @@ void elf_loader(){
 
     if (CNF_RAM_p != NULL)
         free(CNF_RAM_p);
-    cdInit(CDVD_INIT_EXIT);
+    sceCdInit(CDVD_INIT_EXIT);
        SifExitRpc();
 
     // Execute Elf Loader
     ExecPS2((void *)boot_header->entry, 0, 1, args);
 
 }
-*/
+

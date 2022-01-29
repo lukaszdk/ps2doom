@@ -29,10 +29,15 @@
 #include "include/m_argv.h"
 #include "include/d_main.h"
 #include "include/w_wad.h"
+#include "include/modules.h"
+#include <stdio.h>
 
+#include <libmc.h>
+
+#include <libconfig.h>
 
 #include <sifrpc.h>
-#include <libconfig.h>
+
 #include <debug.h>
 #include <libhdd.h>
 #include <libpwroff.h>
@@ -42,7 +47,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h>
 #include <io_common.h>
@@ -50,6 +54,7 @@
 #include <fileXio.h>
 #include <iopcontrol.h>
 #include <iopheap.h>
+
 
 //#endif
 
@@ -62,57 +67,13 @@ static char s_pUDNL   [] __attribute__(   (  section( ".data" ), aligned( 1 )  )
 // cosmitoMixer
 #include <sifrpc.h>
 #include "include/mixer.h"
-#include "include/mixer_thread.h"
+
 #include <kernel.h>     //for GetThreadId 
-#include <libmc.h>
+
 
 #include "include/cosmito_wav.h"
 #include "include/elf_structure.h"
-
-
-//Declare usbd module //
-unsigned char usbd[];
-unsigned int size_usbd;
-
-//Declare usbhdfsd module //
-unsigned char usbhdfsd[];
-unsigned int size_usbhdfsd;
-
-unsigned char usbmass_bd_irx;
-unsigned int size_usbmass_bd_irx;
-
-unsigned char SJPCM[];
-unsigned int size_SJPCM;
-
-unsigned char freesd[];
-unsigned int size_freesd;
-
-//#ifdef PS2HDD
-/*Declare iomanX module*/
-unsigned char iomanX[];
-unsigned int size_iomanX;
-/*Declare fileXio module*/
-unsigned char fileXio[];
-unsigned int size_fileXio;
-/*Declare ps2dev9 module*/
-unsigned char ps2dev9[];
-unsigned int size_ps2dev9;
-/*Declare ps2atad module*/
-unsigned char ps2atad[];
-unsigned int size_ps2atad;
-/*Declare ps2hdd module*/
-unsigned char ps2hdd[];
-unsigned int size_ps2hdd;
-/*Declare ps2fsmodule*/
-unsigned char ps2fs[];
-unsigned int size_ps2fs;
-/*Declare poweroff module*/
-unsigned char poweroff[];
-unsigned int size_poweroff;
-/*Declare cdvd module*/
-unsigned char cdvd[];
-unsigned int size_cdvd;
-//#endif
+#include "include/pad_support.h"
 
 extern int SAMPLECOUNT = 512;
 
@@ -221,6 +182,65 @@ char config_probestring[200];
 
 const char *hdd_wads_folder;
 
+
+int getFileSize(int fd) 
+{
+	int size = fioLseek(fd, 0, SEEK_END);
+	fioLseek(fd, 0, SEEK_SET);
+	return size;
+}
+
+//Declare usbd module //
+unsigned char usbd[];
+unsigned int size_usbd;
+
+//Declare usbhdfsd module //
+unsigned char usbhdfsd[];
+unsigned int size_usbhdfsd;
+
+unsigned char usbmass_bd_irx;
+unsigned int size_usbmass_bd_irx;
+
+unsigned char SJPCM[];
+unsigned int size_SJPCM;
+
+unsigned char freesd[];
+unsigned int size_freesd;
+
+//#ifdef PS2HDD
+/*Declare iomanX module*/
+unsigned char iomanX[];
+unsigned int size_iomanX;
+/*Declare fileXio module*/
+unsigned char fileXio[];
+unsigned int size_fileXio;
+/*Declare ps2dev9 module*/
+unsigned char ps2dev9[];
+unsigned int size_ps2dev9;
+/*Declare ps2atad module*/
+unsigned char ps2atad[];
+unsigned int size_ps2atad;
+/*Declare ps2hdd module*/
+unsigned char ps2hdd[];
+unsigned int size_ps2hdd;
+/*Declare ps2fsmodule*/
+unsigned char ps2fs[];
+unsigned int size_ps2fs;
+/*Declare poweroff module*/
+unsigned char poweroff[];
+unsigned int size_poweroff;
+/*Declare cdvd module*/
+unsigned char cdvd[];
+unsigned int size_cdvd;
+//#endif
+char config_probestring[200];
+
+/// -------------------------
+
+
+#define DEBUG_LIBCONFIG
+
+const char *hdd_wads_folder;
 //code by vts
 void ResetIOP()
 {
@@ -232,23 +252,6 @@ void ResetIOP()
         SifInitRpc(0);
         ResetIOP();
 	SifInitIopHeap();
-}
-
-int getFileSize(int fd) 
-{
-	int size = fioLseek(fd, 0, SEEK_END);
-	fioLseek(fd, 0, SEEK_SET);
-	return size;
-}
-
-void InitDoomed_screen()
-{
-  
-    init_scr();
-    scr_printf("--==== PS2DOOM v1.0.5.0 ====--\n\n\n");
-    scr_printf("A Doom PS2 port started by Lukasz Bruun, improved by cosmito and modified by wolf3s\n\n\n");
-    scr_printf ("thanks to Wally modder, Dirsors, fjtrujy, Howling Wolf & Chelsea, Squidware, el irsa and the good old friend TnA plastic");
-
 }
 
 int LoadModuleFio()

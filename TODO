@@ -121,3 +121,5 @@
 
 - threaded sndserver? SHM mixing buffer?
    Or internal, timer-based?
+
+- Fix the fucking black screen after several updates

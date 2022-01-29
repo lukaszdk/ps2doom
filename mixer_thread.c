@@ -5,7 +5,6 @@
 #include <kernel.h>
 #include <sifrpc.h>
 
-#include "include/mixer_thread.h"
 #include "include/mixer.h"
 
 #define THREAD_STACK_SIZE	(8 * 1024)

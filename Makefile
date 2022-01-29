@@ -1,4 +1,4 @@
-EE_OBJS = am_map.o cosmito_wav.c d_command.c d_items.o d_main.o d_net.o doomdef.o doomstat.o dstrings.o \
+EE_OBJS = am_map.o cosmito_wav.o d_command.o d_items.o d_main.o d_net.o doomdef.o doomstat.o dstrings.o \
 elf_structure.o f_finale.o f_wipe.o \
 g_game.o \
 hu_lib.o hu_stuff.o \

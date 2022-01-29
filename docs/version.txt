@@ -1,0 +1,206 @@
+//
+// IdentifyVersion
+// Checks availability of IWAD files by name,
+// to determine whether registered/commercial features
+// should be executed (notably loading PWAD's).
+//
+
+//void IdentifyVersion (void)
+//{
+//
+//    char*	doom1wad;
+//    char*	doomwad;
+//    char*	doomuwad;
+//    char*	doom2wad;
+//
+//    char*	doom2fwad;
+//    char*	plutoniawad;
+//    char*	tntwad;
+//
+//    char *home;
+//    char *doomwaddir;
+//	
+//#ifdef _EE
+//    //char elfFilename[100];
+//    //char deviceName[10];
+//    //char fullPath[256];
+//    extern char elfFilename[100];
+//    extern char deviceName[10];
+//    extern char fullPath[256];
+//#endif
+//
+//    doomwaddir = getenv("DOOMWADDIR");
+//
+//	#ifdef _EE
+//		//doomwaddir = "";
+//        //doomwaddir = "mass:";
+//        //GetElfFilename(myargv[0], deviceName, fullPath, elfFilename);     // now done at i_main.c
+//        doomwaddir = fullPath;
+//	#else
+//    if (!doomwaddir)
+//		doomwaddir = "./";
+//	#endif
+//
+////#ifdef PS2HDD
+//    if(use_hdd == 1)
+//        doomwaddir = "pfs0:";
+////#endif
+//
+//    // Commercial.
+//    doom2wad = malloc(strlen(doomwaddir)+1+9+1+5);
+//    sprintf(doom2wad, "%sdoom2.wad", doomwaddir);
+//
+//    // Retail.
+//    doomuwad = malloc(strlen(doomwaddir)+1+8+1+5);
+//    sprintf(doomuwad, "%sdoomu.wad", doomwaddir);
+//    
+//    // Registered.
+//    doomwad = malloc(strlen(doomwaddir)+1+8+1+5);
+//    sprintf(doomwad, "%sdoom.wad", doomwaddir);
+//    
+//    // Shareware.
+//    doom1wad = malloc(strlen(doomwaddir)+1+9+1+5);
+//    sprintf(doom1wad, "%sdoom1.wad", doomwaddir);
+//
+//     // Bug, dear Shawn.
+//    // Insufficient malloc, caused spurious realloc errors.
+//    plutoniawad = malloc(strlen(doomwaddir)+1+/*9*/12+1+5);
+//    sprintf(plutoniawad, "%splutonia.wad", doomwaddir);
+//
+//    tntwad = malloc(strlen(doomwaddir)+1+9+1+5);
+//    sprintf(tntwad, "%stnt.wad", doomwaddir);
+//
+//
+//    // French stuff.
+//    doom2fwad = malloc(strlen(doomwaddir)+1+10+1+5);
+//    sprintf(doom2fwad, "%sdoom2f.wad", doomwaddir);
+//
+//    home = getenv("HOME");
+//    if (!home)
+//      home = ".";
+//    sprintf(basedefault, "%s.doomrc", home);
+//
+//    if (M_CheckParm ("-shdev"))
+//    {
+//        gamemode = shareware;
+//        devparm = true;
+//        D_AddFile (DEVDATA"doom1.wad");
+//        D_AddFile (DEVMAPS"data_se/texture1.lmp");
+//        D_AddFile (DEVMAPS"data_se/pnames.lmp");
+//        strcpy (basedefault,DEVDATA"default.cfg");
+//        return;
+//    }
+//
+//    if (M_CheckParm ("-regdev"))
+//    {
+//        gamemode = registered;
+//        devparm = true;
+//        D_AddFile (DEVDATA"doom.wad");
+//        D_AddFile (DEVMAPS"data_se/texture1.lmp");
+//        D_AddFile (DEVMAPS"data_se/texture2.lmp");
+//        D_AddFile (DEVMAPS"data_se/pnames.lmp");
+//        strcpy (basedefault,DEVDATA"default.cfg");
+//        return;
+//    }
+//
+//    if (M_CheckParm ("-comdev"))
+//    {
+//        gamemode = commercial;
+//        devparm = true;
+//        /* I don't bother
+//        if(plutonia)
+//        D_AddFile (DEVDATA"plutonia.wad");
+//        else if(tnt)
+//        D_AddFile (DEVDATA"tnt.wad");
+//        else*/
+//        D_AddFile (DEVDATA"doom2.wad");
+//
+//        D_AddFile (DEVMAPS"cdata/texture1.lmp");
+//        D_AddFile (DEVMAPS"cdata/pnames.lmp");
+//        strcpy (basedefault,DEVDATA"default.cfg");
+//        return;
+//    }
+//
+//    if ( !access (doom2fwad,R_OK) )
+//    {
+//        gamemode = commercial;
+//        // C'est ridicule!
+//        // Let's handle languages in config files, okay?
+//        language = french;
+//        printf("French version\n");
+//
+//        //// halves sample playing frequency to avoid lack of memory for the upsampled sounds
+//        //mixer_period = 2;
+//        //SAMPLERATE = SAMPLERATE	/ 2;
+//        //printf("doom2f detected : halving sample playing frequency to %dHz **************** \n", SAMPLERATE);
+//
+//        D_AddFile (doom2fwad);
+//        sprintf(currentWadName, "doom2fsav");
+//        return;
+//    }
+//
+//    if ( !access (doom2wad,R_OK) )
+//    {
+//        gamemode = commercial;
+//
+//        // halves sample playing frequency to avoid lack of memory for the upsampled sounds
+//        //mixer_period = 2;
+//        //SAMPLERATE = SAMPLERATE	/ 2;
+//        //printf("doom2 detected : halving sample playing frequency to %dHz **************** \n", SAMPLERATE);
+//
+//        sprintf(currentWadName, "doom2sav");
+//        //printf("\n\n           ->> %s\n\n", currentWadName);
+//
+//        D_AddFile (doom2wad);
+//        return;
+//    }
+//
+//    if ( !access (plutoniawad, R_OK ) )
+//    {
+//      gamemode = commercial;
+//      sprintf(currentWadName, "plutoniasav");
+//      D_AddFile (plutoniawad);
+//      return;
+//    }
+//
+//    if ( !access ( tntwad, R_OK ) )
+//    {
+//      gamemode = commercial;
+//      sprintf(currentWadName, "tntsav");
+//      
+//      D_AddFile (tntwad);
+//      return;
+//    }
+//
+//    if ( !access (doomuwad,R_OK) )
+//    {
+//      gamemode = retail;
+//      sprintf(currentWadName, "doomusav");
+//      D_AddFile (doomuwad);
+//      return;
+//    }
+//
+//    if ( !access (doomwad,R_OK) )
+//    {
+//      gamemode = registered;
+//      sprintf(currentWadName, "doomsav");
+//      D_AddFile (doomwad);
+//      return;
+//    }
+//
+//    if ( !access (doom1wad,R_OK) )
+//    {
+//      gamemode = shareware;
+//      sprintf(currentWadName, "doom1sav");
+//      D_AddFile (doom1wad);
+//      return;
+//    }
+//
+//    printf("Game mode indeterminate.\n");
+//    gamemode = indetermined;
+//    sprintf(currentWadName, "indetersav");
+//
+//    // We don't abort. Let's see what the PWAD contains.
+//    //exit(1);
+//    //I_Error ("Game mode indeterminate\n");
+//}
