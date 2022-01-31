@@ -56,7 +56,7 @@ Copyright (C) 1993 - 1996 id Software, Inc.
 
 Copyright (C) 2006 - 2011 Lukasz D.K.
 
-Copyright (C) 2016 - 2021 cosmito
+Copyright (C) 2009 - 2021 cosmito
 
 Copyright (C) 2016 - 2022 Adilson Enio Pierog(Aka: dirsors)
 
