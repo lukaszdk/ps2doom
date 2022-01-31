@@ -88,6 +88,7 @@
         "pad_support.h": "c",
         "elf.h": "c",
         "elf_structure.h": "c",
-        "debug.h": "c"
+        "debug.h": "c",
+        "type_traits": "c"
     }
 }

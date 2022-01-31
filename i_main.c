@@ -23,7 +23,7 @@
 
 // static const char rcsid[] = "$Id: i_main.c,v 1.4 1997/02/03 22:45:10 b1 Exp $";
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 #include "include/doomdef.h"
 #include "include/m_argv.h"
@@ -185,8 +185,8 @@ const char *hdd_wads_folder;
 
 int getFileSize(int fd) 
 {
-	int size = fioLseek(fd, 0, SEEK_END);
-	fioLseek(fd, 0, SEEK_SET);
+	int size = fseek(fd, 0, SEEK_END);
+	fseek(fd, 0, SEEK_SET);
 	return size;
 }
 
@@ -237,7 +237,6 @@ char config_probestring[200];
 
 /// -------------------------
 
-
 #define DEBUG_LIBCONFIG
 
 const char *hdd_wads_folder;
@@ -254,23 +253,60 @@ void ResetIOP()
 	SifInitIopHeap();
 }
 
-int LoadModuleFio()
+//main
+int main( int argc, char**	argv ) 
 {
-	SifLoadFileInit();
-	fioInit();
-	sbv_patch_disable_prefix_check();
-    
-    SifLoadModule("rom0:SIO2MAN", 0, NULL);
-	SifLoadModule("rom0:MCMAN", 0, NULL);
-	SifLoadModule("rom0:MCSERV", 0, NULL);
+    FILE *fp;
+    int i, j, nj;
+    const char *s;
+    char configfile[256];
+    config_t cfg;       // libconfig
+    char elfFilename[100];
+    char deviceName[10];
+    char fullPath[256];
+    int use_hdd;
     int ret;   
+    int mc_Type, mc_Free, mc_Format;
+    static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
+    static char pfsarg[] = "-m" "\0" "4" "\0" "-o" "\0" "10" "\0" "-n" "\0" "40";
+    int mountErr = 0;
+    const char *hdd_path_to_partition;
+    use_hdd = CONFIG_FALSE;
+    int handle;
+    int forceDisplayMode = -1;
+    myargc = argc; 
+    myargv = argv; 
+    s32 main_thread_id;
+    int x;
+    int swap_analogsticks;
+    int configLoadSuccess = 0;
+    GetElfFilename(argv[0], deviceName, fullPath, elfFilename);
+    main_thread_id = GetThreadId();
+	
+    SifInitRpc(0); 
+        
+    init_scr();
+    scr_printf("--==== PS2DOOM v1.0.5.0 ====--\n\n\n");
+    scr_printf("A Doom PS2 port started by Lukasz Bruun, improved by cosmito and modified by wolf3s\n\n\n");
+    scr_printf ("thanks to Wally modder, Dirsors, fjtrujy, Howling Wolf & Chelsea, Squidware, el irsa and the good old friend TnA plastic");
+    scr_clear();
+
+    printf("sample: kicking IRXs\n");
+	
+    //ret = SifLoadModule("rom0:LIBSD", 0, NULL);
     ret = SifExecModuleBuffer(freesd, size_freesd, 0, NULL, &ret);
 	printf("freesd loadmodule %d\n", ret);
+
+    
+    //Load embedded modules
+
     // SJPCM
     SifExecModuleBuffer(SJPCM, size_SJPCM, 0, NULL, &ret);
+    
+    // USB mass support
+    SifExecModuleBuffer(usbd, size_usbd, 0, NULL, &ret);
+    SifExecModuleBuffer(usbhdfsd, size_usbhdfsd, 0, NULL, &ret);
 
-        // MC support   (from ps2sdk mc_example.c)
-    int mc_Type, mc_Free, mc_Format;
 	ret = SifLoadModule("rom0:XSIO2MAN", 0, NULL);
 	if (ret < 0) {
 		printf("Failed to load module: SIO2MAN");
@@ -278,8 +314,7 @@ int LoadModuleFio()
 		SleepThread();
 	}
 	ret = SifLoadModule("rom0:XMCMAN", 0, NULL);
-	if (ret < 0) 
-    {
+	if (ret < 0) {
 		printf("Failed to load module: MCMAN");
 		scr_printf("Failed to load module: MCMAN");
 		SleepThread();
@@ -293,23 +328,177 @@ int LoadModuleFio()
 		printf("Failed to initialise memcard server!\n");
 		SleepThread();
 	}
+	// Since this is the first call, -1 should be returned.
+	mcGetInfo(0, 0, &mc_Type, &mc_Free, &mc_Format); 
+	mcSync(0, NULL, &ret);
+	printf("mcGetInfo returned %d\n",ret);
+	printf("Type: %d Free: %d Format: %d\n\n", mc_Type, mc_Free, mc_Format);
 
-    // USB mass support
-    SifExecModuleBuffer(usbd, size_usbd, 0, NULL, &ret);
-    SifExecModuleBuffer(usbhdfsd, size_usbhdfsd, 0, NULL, &ret);   
+	// Assuming that the same memory card is connected, this should return 0
+	mcGetInfo(0,0,&mc_Type,&mc_Free,&mc_Format);
+	mcSync(0, NULL, &ret);
+	printf("mcGetInfo returned %d\n",ret);
+	printf("Type: %d Free: %d Format: %d\n\n", mc_Type, mc_Free, mc_Format);
+    if (ret != 0)
+        printf("mc0 trouble... should save to other device... To implement\n");  /// TBD
+    
+    // create save/load dir (mc0:PS2DOOM)
+    fopen("mc0:PS2DOOM/doomsav0.dsg", O_RDONLY);
+    if (handle < 0)
+    {
+        fioMkdir("mc0:PS2DOOM"); // Make sure it exists
+        printf(" ... created mc0:PS2DOOM ...\n");
+    }
+    else
+        fclose(handle);
 
-// hdd modules thing
-    FILE *fp;
-    int i, j, nj;
-    const char *s;
-    char configfile[256];
-    config_t cfg;       // libconfig
-    char elfFilename[100];
-    char deviceName[10];
-    char fullPath[256];
-    int use_hdd;
-    const char *hdd_path_to_partition;
-    use_hdd = CONFIG_FALSE;
+
+    /// config
+    sprintf(configfile, "%s%s", fullPath, "ps2doom.config");
+
+    // First, try to load from localpath. If fails, try from 'mc0:'
+    
+    fp = fopen(configfile, "rb");
+    if(!fp)
+    {
+        printf("file '%s' not found. Going to try 'mc0:PS2DOOM/ps2doom.config'\n", configfile);
+        sprintf(configfile, "%s", "mc0:PS2DOOM/ps2doom.config");
+
+        fp = fopen(configfile, "rb");
+        if(!fp)
+        {
+            // Using default actions for buttons
+#ifdef DEBUG_LIBCONFIG
+            printf("Unable to open '%s'. Using defaults\n", configfile);
+#endif
+            int nConfig_buttonsEntries = sizeof(config_buttons)/sizeof(config_buttons[0]);
+            for (i=0; i<nConfig_buttonsEntries; i++)
+            {
+                nj = sizeof(config_actions)/sizeof(config_actions[0]);
+                for(j=0; j<nj; j++)
+                {
+                    if(strcmp(config_actions[j].name, config_buttons[i].defaultaction) == 0)
+                    {
+                        int value = config_actions[j].value;
+                        //config_buttons[i] = value;
+                    }
+                }      
+            }
+        }
+        else
+            configLoadSuccess = 1;
+    }
+    else
+        configLoadSuccess = 1;
+
+    if(configLoadSuccess == 1)
+    {
+        // Get the actions for buttons from config
+        
+        config_init(&cfg);
+        x = config_read(&cfg, fp);
+        fclose(fp);
+        if(x)
+        {
+            // Process each ps2doom.controls config entries
+            int nConfigEntries = sizeof(config_buttons)/sizeof(config_buttons[0]);
+            for (i=0; i<nConfigEntries; i++)
+            {
+                sprintf(config_probestring, "%s%s", "ps2doom.controls.", config_buttons[i].name);
+                if(! config_lookup_string(&cfg, config_probestring, &s))
+                {
+#ifdef DEBUG_LIBCONFIG
+                    printf("NOT FOUND %s\n", config_probestring);
+#endif
+                }
+                else
+                {
+#ifdef DEBUG_LIBCONFIG
+                    printf("found: %s = %s\n", config_probestring, s);
+#endif
+                    nj = sizeof(config_actions)/sizeof(config_actions[0]);
+                    for(j=0; j<nj; j++)
+                    {
+                        if(strcmp(config_actions[j].name, s) == 0)
+                        {
+                            int value = config_actions[j].value;
+                            //config_buttons[i] = value;
+                        }
+                    }      
+                }
+            }
+        }
+        else
+            printf("error on line %d: %s\n", cfg.error_line, cfg.error_text);
+
+        use_hdd = CONFIG_FALSE;
+        sprintf(config_probestring, "%s", "ps2doom.hdd.use_hdd");
+        if(!config_lookup_bool(&cfg, config_probestring, &use_hdd))
+        {
+            use_hdd = CONFIG_FALSE;
+            printf("NOT FOUND %s\n", config_probestring);
+        }
+        else
+        {
+            printf("found: %s = %d\n", config_probestring, use_hdd);
+        }
+
+
+        if(use_hdd == CONFIG_TRUE)
+        {
+            sprintf(config_probestring, "%s", "ps2doom.hdd.path_to_partition");
+            if(!config_lookup_string(&cfg, config_probestring, &hdd_path_to_partition))
+            {
+                printf("NOT FOUND %s\n", config_probestring);
+                scr_printf("Error: Value '%s' at ps2doom.config not found\n", config_probestring);
+                SleepThread();
+            }
+            else
+            {
+                printf("found: %s = %s\n", config_probestring, hdd_path_to_partition);
+            }
+
+            sprintf(config_probestring, "%s", "ps2doom.hdd.wads_folder");
+            if(!config_lookup_string(&cfg, config_probestring, &hdd_wads_folder))
+            {
+                printf("NOT FOUND %s\n", config_probestring);
+                scr_printf("Error: Value '%s' at ps2doom.config not found\n", config_probestring);
+                SleepThread();
+            }
+            else
+            {
+                printf("found: %s = %s\n", config_probestring, hdd_wads_folder);
+            }
+        }
+
+        //
+        swap_analogsticks = CONFIG_FALSE;
+        sprintf(config_probestring, "%s", "ps2doom.controls.switches.swap_analogsticks");
+        if(!config_lookup_bool(&cfg, config_probestring, &swap_analogsticks))
+        {
+            swap_analogsticks = CONFIG_FALSE;
+#ifdef DEBUG_LIBCONFIG
+            printf("NOT FOUND %s\n", config_probestring);
+#endif
+        }
+        else
+        {
+#ifdef DEBUG_LIBCONFIG
+            printf("found: %s = %d\n", config_probestring, swap_analogsticks);
+#endif
+        }
+
+        
+    }
+
+#ifdef DEBUG_LIBCONFIG
+    for(i=0; i<sizeof(config_buttons)/sizeof(config_buttons[0]); i++)
+    {
+        printf("%d (%s)\n", config_buttons[i], config_buttons[i].name);
+    }
+#endif
+
+
     if(use_hdd == CONFIG_TRUE)
     {
         SifExecModuleBuffer(poweroff, size_poweroff, 0, NULL, &ret);
@@ -317,17 +506,17 @@ int LoadModuleFio()
         SifExecModuleBuffer(fileXio, size_fileXio, 0, NULL, &ret);
         SifExecModuleBuffer(ps2dev9, size_ps2dev9, 0, NULL, &ret);
         SifExecModuleBuffer(ps2atad, size_ps2atad, 0, NULL, &ret);
-        static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
         SifExecModuleBuffer(ps2hdd, size_ps2hdd, sizeof(hddarg), hddarg, &ret);
         if (ret < 0)
         {
             printf("Failed to load module: PS2HDD.IRX");
-            //scr_printf("Failed to load module: PS2HDD.IRX");
+            scr_printf("Failed to load module: PS2HDD.IRX");
         }
-        static char pfsarg[] = "-m" "\0" "4" "\0" "-o" "\0" "10" "\0" "-n" "\0" "40";
+
         SifExecModuleBuffer(ps2fs, size_ps2fs, sizeof(pfsarg), pfsarg, &ret);
         if (ret < 0)
         {
+            scr_printf("Failed to load module: PS2FS.IRX");
             printf("Failed to load module: PS2FS.IRX");
         }
         //#endif
@@ -364,7 +553,7 @@ int LoadModuleFio()
             printf( "HDD Is Formatted!\n" );
         }
 
-        int mountErr = 0;
+        
         mountErr = fileXioMount( "pfs0:", hdd_path_to_partition, FILEXIO_MOUNT );
         
         if( mountErr < 0 )
@@ -374,238 +563,8 @@ int LoadModuleFio()
             SleepThread();
         }
         //#endif
-    
-        if(use_hdd == CONFIG_TRUE)
-        {
-            sprintf(config_probestring, "%s", "ps2doom.hdd.path_to_partition");
-            if(!config_lookup_string(&cfg, config_probestring, &hdd_path_to_partition))
-            {
-                printf("NOT FOUND %s\n", config_probestring);
-                scr_printf("Error: Value '%s' at ps2doom.config not found\n", config_probestring);
-                SleepThread();
-            }
-            else
-            {
-                printf("found: %s = %s\n", config_probestring, hdd_path_to_partition);
-            }
-
-            sprintf(config_probestring, "%s", "ps2doom.hdd.wads_folder");
-            if(!config_lookup_string(&cfg, config_probestring, &hdd_wads_folder))
-            {
-                printf("NOT FOUND %s\n", config_probestring);
-                scr_printf("Error: Value '%s' at ps2doom.config not found\n", config_probestring);
-                SleepThread();
-            }
-            else
-            {
-                printf("found: %s = %s\n", config_probestring, hdd_wads_folder);
-            }
-        }
-         
-         
-        use_hdd = CONFIG_FALSE;
-        sprintf(config_probestring, "%s", "ps2doom.hdd.use_hdd");
-        if(!config_lookup_bool(&cfg, config_probestring, &use_hdd))
-        {
-            use_hdd = CONFIG_FALSE;
-            printf("NOT FOUND %s\n", config_probestring);
-        }
-        else
-        {
-            printf("found: %s = %d\n", config_probestring, use_hdd);
-        }
-    }    
-
-}
-
-//main
-int main( int argc, char**	argv ) 
-{
-    int use_hdd;
-    int swap_analogsticks;
-    int config_buttons_int[] = 
-    {
-    //-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,     0xac, 0xae, 0xad, 0xaf,    -1, -1, -1, -1
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-    };
-    int ret;
-    int forceDisplayMode = -1;
-    int mc_Type, mc_Free, mc_Format;
-    int i, j, nj;
-    int fd;
-    int CdStatus;
-    
-    const char *s;
-    char configfile[256];
-    char *target, *path, *SYSEXEC;
-    char elfFilename[100];
-    char device[50];
-    char deviceName[10];
-    char fullPath[256];
-    char folder[50];
-    char *MC0DIR = "mc0:/";
-	char *MC1DIR = "mc1:/";
-    char *MASS0DIR = "mass0:/";
-    char *MASS1DIR = "mass1:/";
-    char *MC0EXEC[100];
-	char *MC1EXEC[100];
-    char* doom1wad;
-    char* doomwad;
-    char* doomuwad;
-    char* doom2wad;
-    char* doom2fwad;
-    char* plutoniawad;
-    char* tntwad;
-    char *home;
-    char *doomwaddir;
-
-    myargc = argc; 
-    myargv = argv; 
-    s32 main_thread_id;
-	config_t cfg;       // libconfig
-    FILE *fp;
-
-    GetElfFilename(argv[0], deviceName, fullPath, elfFilename);
-    main_thread_id = GetThreadId();
-
-	SifInitRpc(0); 
-    LoadModuleFio();
-    InitDoomed_screen();
-
-    
-    printf("sample: kicking IRXs\n");
-
-
-
-	// Since this is the first call, -1 should be returned.
-	mcGetInfo(0, 0, &mc_Type, &mc_Free, &mc_Format); 
-	mcSync(0, NULL, &ret);
-	printf("mcGetInfo returned %d\n",ret);
-	printf("Type: %d Free: %d Format: %d\n\n", mc_Type, mc_Free, mc_Format);
-
-	// Assuming that the same memory card is connected, this should return 0
-	mcGetInfo(0,0,&mc_Type,&mc_Free,&mc_Format);
-	mcSync(0, NULL, &ret);
-	printf("mcGetInfo returned %d\n",ret);
-	printf("Type: %d Free: %d Format: %d\n\n", mc_Type, mc_Free, mc_Format);
-    if (ret != 0)
-        printf("mc0 trouble... should save to other device... To implement\n");  /// TBD
-    
-    // create save/load dir (mc0:PS2DOOM)
-    int handle = fioOpen ("mc0:PS2DOOM/doomsav0.dsg", O_RDONLY);
-    if (handle < 0)
-    {
-        fioMkdir("mc0:PS2DOOM"); // Make sure it exists
-        printf(" ... created mc0:PS2DOOM ...\n");
-    }
-    else
-        fioClose(handle);
-
-
-    /// config
-    sprintf(configfile, "%s%s", fullPath, "ps2doom.config");
-
-    // First, try to load from localpath. If fails, try from 'mc0:'
-    int configLoadSuccess = 0;
-    fp = fopen(configfile, "rb");
-    if(!fp)
-    {
-        printf("file '%s' not found. Going to try 'mc0:PS2DOOM/ps2doom.config'\n", configfile);
-        sprintf(configfile, "%s", "mc0:PS2DOOM/ps2doom.config");
-
-        fp = fioOpen(configfile, "rb");
-        if(!fp)
-        {
-            // Using default actions for buttons
-#ifdef DEBUG_LIBCONFIG
-            printf("Unable to open '%s'. Using defaults\n", configfile);
-#endif
-            int nConfig_buttonsEntries = sizeof(config_buttons)/sizeof(config_buttons[0]);
-            for (i=0; i<nConfig_buttonsEntries; i++)
-            {
-                nj = sizeof(config_actions)/sizeof(config_actions[0]);
-                for(j=0; j<nj; j++)
-                {
-                    if(strcmp(config_actions[j].name, config_buttons[i].defaultaction) == 0)
-                    {
-                        int value = config_actions[j].value;
-                        config_buttons_int[i] = value;
-                    }
-                }      
-            }
-        }
-        else
-            configLoadSuccess = 1;
-    }
-    else
-        configLoadSuccess = 1;
-
-    if(configLoadSuccess == 1)
-    {
-        // Get the actions for buttons from config
-        int x;
-        config_init(&cfg);
-        x = config_read(&cfg, fp);
-        fioClose(fp);
-        if(x)
-        {
-            // Process each ps2doom.controls config entries
-            int nConfigEntries = sizeof(config_buttons)/sizeof(config_buttons[0]);
-            for (i=0; i<nConfigEntries; i++)
-            {
-                sprintf(config_probestring, "%s%s", "ps2doom.controls.", config_buttons[i].name);
-                if(! config_lookup_string(&cfg, config_probestring, &s))
-                {
-#ifdef DEBUG_LIBCONFIG
-                    printf("NOT FOUND %s\n", config_probestring);
-#endif
-                }
-                else
-                {
-#ifdef DEBUG_LIBCONFIG
-                    printf("found: %s = %s\n", config_probestring, s);
-#endif
-                    nj = sizeof(config_actions)/sizeof(config_actions[0]);
-                    for(j=0; j<nj; j++)
-                    {
-                        if(strcmp(config_actions[j].name, s) == 0)
-                        {
-                            int value = config_actions[j].value;
-                            config_buttons_int[i] = value;
-                        }
-                    }      
-                }
-            }
-        }
-        else
-            printf("error on line %d: %s\n", cfg.error_line, cfg.error_text);
-
-        //
-        swap_analogsticks = CONFIG_FALSE;
-        sprintf(config_probestring, "%s", "ps2doom.controls.switches.swap_analogsticks");
-        if(!config_lookup_bool(&cfg, config_probestring, &swap_analogsticks))
-        {
-            swap_analogsticks = CONFIG_FALSE;
-#ifdef DEBUG_LIBCONFIG
-            printf("NOT FOUND %s\n", config_probestring);
-#endif
-        }
-        else
-        {
-#ifdef DEBUG_LIBCONFIG
-            printf("found: %s = %d\n", config_probestring, swap_analogsticks);
-#endif
-        }
-
-        
     }
 
-#ifdef DEBUG_LIBCONFIG
-    for(i=0; i<sizeof(config_buttons)/sizeof(config_buttons[0]); i++)
-    {
-        printf("%d (%s)\n", config_buttons_int[i], config_buttons[i].name);
-    }
-#endif
 
     SjPCM_Init(1);		// sync mode
 
@@ -615,6 +574,8 @@ int main( int argc, char**	argv )
     ChangeThreadPriority ( GetThreadId (), 42 );
     Mixer_Init();       // TBD : arg number channels
 
+    return 0;
+    
     // Until sdl isn't fixed
     int PAL = detect_signal();
     if (PAL == 1)
@@ -632,6 +593,9 @@ int main( int argc, char**	argv )
         SAMPLECOUNT = 960;
     else
         SAMPLECOUNT = 800;
+
+
+    D_DoomMain (); 
 
     return 0;
 } 

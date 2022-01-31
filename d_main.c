@@ -1009,16 +1009,6 @@ void checkForWadFile(char* wadname, char** foundwadfiles, char* foundfile, int* 
     }
 }
 
-void InitDoomed_screen()
-{
-  
-    init_scr();
-    scr_printf("--==== PS2DOOM v1.0.5.0 ====--\n\n\n");
-    scr_printf("A Doom PS2 port started by Lukasz Bruun, improved by cosmito and modified by wolf3s\n\n\n");
-    scr_printf ("thanks to Wally modder, Dirsors, fjtrujy, Howling Wolf & Chelsea, Squidware, el irsa and the good old friend TnA plastic");
-    scr_clear();
-}
-
 void IdentifyVersionAndSelect (void)        // cosmito
 {
 
@@ -1160,8 +1150,6 @@ void IdentifyVersionAndSelect (void)        // cosmito
     }
 
 
-    /// start wad prompt
-    InitDoomed_screen();
     scr_printf("Point to a WAD with 'dpad Up' and 'dpad Up' and select with 'X' or 'O'\n");
     
     int ymin = 6, nWadsFound = 0;
