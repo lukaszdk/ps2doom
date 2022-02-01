@@ -5,8 +5,8 @@
 #include <kernel.h>
 #include <sifrpc.h>
 
-#include "include/mixer.h"
-
+#include <mixer/mixer_thread.h>
+#include <mixer/mixer.h>
 #define THREAD_STACK_SIZE	(8 * 1024)
 
 static int         thread_waitsema = -1;

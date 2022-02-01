@@ -66,12 +66,12 @@ static char s_pUDNL   [] __attribute__(   (  section( ".data" ), aligned( 1 )  )
 
 // cosmitoMixer
 #include <sifrpc.h>
-#include "include/mixer.h"
+#include <mixer/mixer.h>
 
 #include <kernel.h>     //for GetThreadId 
 
 
-#include "include/cosmito_wav.h"
+#include <mixer/wav.h>
 #include "include/elf_structure.h"
 #include "include/pad_support.h"
 

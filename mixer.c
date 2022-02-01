@@ -1,5 +1,5 @@
-#include "include/mixer.h"
-
+#include <mixer/mixer.h>
+#include <mixer/mixer_thread.h>
 #include <kernel.h>
 #include <sjpcm.h>
 

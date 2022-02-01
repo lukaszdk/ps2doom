@@ -1,4 +1,4 @@
-#include "include/cosmito_wav.h"
+#include <mixer/wav.h>
 
 // Note: This calls fseek, so watch out...
 int GetFilesize(FILE * fd)

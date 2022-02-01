@@ -24,13 +24,11 @@ int  IsPlayingAtChannel(int chan);
 
 /*
 PT:BR se fizer um resume, ele vai testar se o channel.counter > 0 ... assim ele mesmo se distinguirá entre um stop (.counter == 0) e um pause.
-
 EN-US: if he makes an resmume, he will be testing if the channel.counter > 0 ... then he will choose between an stop (.counter > 0) and a pause  
 void Mixer(char *file)
 {
    channel->counter;
 }
-
 */
 
 ///
