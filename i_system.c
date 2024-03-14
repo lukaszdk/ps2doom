@@ -108,16 +108,15 @@ int  I_GetTime (void)
 //
 void I_Init (void)
 {
-//  if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 )
-    if ( SDL_Init(SDL_INIT_VIDEO) < 0 )
+    if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 )
         I_Error("Could not initialize SDL: %s", SDL_GetError());
 
-//  I_InitSound();
+    I_InitSound();
 //  I_InitGraphics();
 
-//     SDL_Joystick *joystick;
+       SDL_Joystick *joystick;
 
-//     joystick = SDL_JoystickOpen(0);
+       joystick = SDL_JoystickOpen(0);
 
 }
 
