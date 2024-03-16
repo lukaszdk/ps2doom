@@ -438,7 +438,7 @@ int ps2_fread(void *dest, int num, int size, FILE *fd)
 
 		int size = ftell(fd);
 
-		// printf("file: %i size: %i\n", fd, size);
+		printf("file: %i size: %i\n", fd, size);
 
 		ps2_buffer = (char*)malloc(size);
 
