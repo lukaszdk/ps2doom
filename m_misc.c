@@ -29,8 +29,7 @@ rcsid[] = "$Id: m_misc.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include <stdlib.h>
 #include <ctype.h>
-
-extern int access(char *file, int mode);
+#include <unistd.h>
 
 #include "doomdef.h"
 

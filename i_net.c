@@ -273,9 +273,7 @@ int GetLocalAddress (void)
     if (v == -1)
 	I_Error ("GetLocalAddress : gethostname: errno %d",errno);
 
-	#ifdef _EE
-		// TODO!!
-	#else
+	#ifndef _EE //TODO:
 	    hostentry = gethostbyname (hostname);
 	#endif
 
@@ -359,9 +357,7 @@ void I_InitNetwork (void)
 	}
 	else
 	{
-		#ifdef _EE
-			// TODO!!
-		#else
+		#ifndef _EE //TODO:
 		    hostentry = gethostbyname (myargv[i]);
 		#endif
 

@@ -34,20 +34,10 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #include <stdio.h>
 #include <stdlib.h>
 
-//extern int access(char *file, int mode);
+#include <unistd.h>
 
 #define R_OK	4
-static int access(char *file, int mode)
-{
-	FILE *test_fp;
 
-	test_fp = fopen(file, "r");
-	if ( test_fp != NULL ) {
-		fclose(test_fp);
-		return(0);
-	}
-	return(-1);
-}
 
 #include "doomdef.h"
 #include "doomstat.h"
@@ -1004,11 +994,6 @@ void D_DoomMain (void)
     // init subsystems
     printf ("V_Init: allocate screens.\n");
     V_Init ();
-
-	#ifdef _EE
-		SDL_SYS_TimerInit();
-	#endif
-
 
     printf ("M_LoadDefaults: Load system defaults.\n");
     M_LoadDefaults ();              // load before initing other systems
